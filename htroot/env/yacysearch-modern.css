@@ -71,7 +71,7 @@ body#yacysearch::after {
 }
 
 /* ============================================
-   Header/Navbar - Minimal Modern Style
+   Header/Navbar - Google-like Minimal Style
    ============================================ */
 body#yacysearch .navbar {
   position: fixed;
@@ -81,104 +81,105 @@ body#yacysearch .navbar {
   z-index: 1000;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  background: rgba(255, 255, 255, 0.85) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
   border-bottom: 1px solid rgba(229, 231, 235, 0.5);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  min-height: 60px;
-  padding: 8px 20px;
+  min-height: 56px;
+  padding: 0 16px;
 }
 
-/* Hide the default navbar collapse and mobile toggle */
+/* Hide the mobile toggle */
 body#yacysearch .navbar-toggle {
   display: none !important;
 }
 
+/* Navbar collapse - show but simplified */
 body#yacysearch .navbar-collapse {
   display: flex !important;
   align-items: center;
-  justify-content: flex-end;
   padding: 0;
   margin: 0;
   border: none;
   box-shadow: none;
   height: auto !important;
-  overflow: visible;
+  flex: 1;
 }
 
 body#yacysearch .navbar-collapse.collapse {
   display: flex !important;
 }
 
-/* Hide unnecessary nav items, keep only icons */
+/* Hide left nav items (login etc) */
 body#yacysearch .navbar-collapse .nav.navbar-nav:first-child {
-  display: none;
-}
-
-body#yacysearch .navbar-collapse .navbar-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  float: none;
-}
-
-body#yacysearch .navbar-right > li {
-  float: none;
-}
-
-/* Simplify header dropdowns to just icons */
-body#yacysearch .navbar-right #header_search > a span.hidden-sm,
-body#yacysearch .navbar-right #header_administration span.hidden-sm,
-body#yacysearch .navbar-right #header_administration span.hidden-md {
   display: none !important;
 }
 
-body#yacysearch .navbar-right #header_search > a .visible-sm {
-  display: inline !important;
+/* Show right navbar with icons */
+body#yacysearch .navbar-collapse .navbar-right {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto !important;
+  margin-right: 0 !important;
 }
 
-/* Icon buttons in navbar */
+body#yacysearch .navbar-right > li {
+  display: block !important;
+  float: none;
+}
+
+/* Hide text labels, show only icons */
+body#yacysearch .navbar-right #header_search > a span.hidden-sm,
+body#yacysearch .navbar-right #header_administration span.hidden-sm,
+body#yacysearch .navbar-right #header_administration span.hidden-md,
+body#yacysearch .navbar-right span:not(.glyphicon) {
+  display: none !important;
+}
+
+body#yacysearch .navbar-right .caret {
+  display: none !important;
+}
+
+/* Icon buttons in navbar - circular Google style */
 body#yacysearch .navbar-right .dropdown > a,
 body#yacysearch .navbar-right .btn {
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
-  padding: 0;
+  padding: 0 !important;
   border-radius: 50%;
   background: var(--bg-gray-100);
-  border: none;
+  border: none !important;
   color: var(--text-secondary);
   transition: all 0.2s ease;
 }
 
 body#yacysearch .navbar-right .dropdown > a:hover,
 body#yacysearch .navbar-right .btn:hover {
-  background: var(--bg-gray-100);
+  background: #ecfdf5;
   color: var(--primary-green);
-}
-
-body#yacysearch .navbar-right .dropdown > a .caret {
-  display: none;
 }
 
 body#yacysearch .navbar-right form {
   margin: 0;
 }
 
-/* Logo styling in header - inline with search */
+/* Logo styling in header - inline with search on same row */
 body#yacysearch .navbar-brand {
-  display: flex;
+  display: flex !important;
   align-items: center;
   gap: 8px;
-  padding: 0;
+  padding: 0 !important;
   margin: 0 !important;
   height: auto;
   float: none;
+  flex-shrink: 0;
 }
 
-body#yacysearch .navbar-brand .yacylogo {
+body#yacysearch .navbar-brand .yacylogo,
+body#yacysearch .navbar-brand img {
   max-height: 28px !important;
   width: auto !important;
 }
@@ -187,55 +188,77 @@ body#yacysearch .navbar-header {
   float: none;
   display: flex;
   align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+/* Hide greeting text in navbar, keep only logo */
+body#yacysearch .navbar-brand #greeting {
+  display: none !important;
 }
 
 /* ============================================
    Search Bar Row - Logo + Search + Icons
    ============================================ */
-body#yacysearch .container-fluid {
+body#yacysearch .navbar > .container-fluid {
   display: flex;
   align-items: center;
   gap: 16px;
   max-width: 100%;
-  padding: 0 20px;
+  padding: 0 16px;
+  height: 56px;
 }
 
-/* Search form in header */
+/* Search form - fixed in header navbar area */
 body#yacysearch form.search.small {
-  flex: 1;
-  max-width: 650px;
-  margin: 0 auto;
-  position: relative;
-  top: auto;
-  z-index: auto;
+  position: fixed !important;
+  top: 8px !important;
+  left: 160px !important;
+  max-width: 500px;
+  width: calc(100% - 350px);
+  margin: 0 !important;
+  z-index: 1050 !important;
+  padding: 0 !important;
 }
 
-/* Search input group */
+/* Hide the sort button that conflicts with search */
+body#yacysearch .input-group-btn #resortCached {
+  display: none !important;
+}
+
+/* Search input group - perfect alignment */
 body#yacysearch .input-group {
   display: flex;
-  align-items: stretch;
+  align-items: center;
   max-width: 100% !important;
-  border-radius: var(--radius-xl);
+  border-radius: 24px;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  border: 2px solid #e5e7eb;
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.12);
+  border: 1px solid #dfe1e5;
   background: var(--bg-white);
   transition: all 0.3s ease;
+  height: 44px;
+}
+
+body#yacysearch .input-group:hover {
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.2);
 }
 
 body#yacysearch .input-group:focus-within {
-  border-color: var(--primary-green);
-  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+  border-color: transparent;
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.2);
 }
 
 body#yacysearch .searchinput {
   flex: 1;
-  font-size: 16px;
+  font-size: 15px;
   border: none !important;
   border-radius: 0 !important;
-  padding: 12px 20px;
+  padding: 0 16px;
   background: transparent;
   box-shadow: none !important;
+  height: 42px;
+  line-height: 42px;
 }
 
 body#yacysearch .searchinput:focus {
@@ -243,24 +266,27 @@ body#yacysearch .searchinput:focus {
   box-shadow: none !important;
 }
 
-/* Search button - aligned properly */
+/* Search button - perfectly aligned with input */
 body#yacysearch .input-group-btn {
   display: flex;
-  align-items: stretch;
+  align-items: center;
+  height: 100%;
 }
 
 body#yacysearch .input-group-btn .btn {
   border: none !important;
-  border-radius: 0 !important;
+  border-radius: 0 22px 22px 0 !important;
   background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
   color: white;
-  padding: 12px 24px;
+  padding: 0 20px;
   font-size: 14px;
   font-weight: 600;
-  height: 100%;
+  height: 42px;
   display: flex;
   align-items: center;
+  justify-content: center;
   transition: all 0.3s ease;
+  line-height: 1;
 }
 
 body#yacysearch .input-group-btn .btn:hover {
@@ -268,29 +294,71 @@ body#yacysearch .input-group-btn .btn:hover {
 }
 
 /* ============================================
-   Main Content Area
+   Main Content Area - Simple Layout
    ============================================ */
 body#yacysearch .starter-template {
-  padding-top: 80px;
+  padding-top: 60px;
+}
+
+body#yacysearch .container-fluid {
+  width: 100%;
+  max-width: 100%;
 }
 
 body#yacysearch .main {
-  padding: 24px;
+  padding: 20px;
   position: relative;
   z-index: 1;
+  background: transparent;
 }
 
-/* Fix Bootstrap grid to work properly */
-body#yacysearch > .container-fluid > .row,
-body#yacysearch .starter-template > .row {
+/* Search results row */
+body#yacysearch .row {
   display: flex;
   flex-wrap: wrap;
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 60px;
+  padding: 0 20px;
 }
 
-/* Remove Bootstrap offsets that break the layout */
+/* Main content column */
+body#yacysearch .main,
+body#yacysearch .col-sm-8,
+body#yacysearch .col-md-9 {
+  flex: 1;
+  max-width: none;
+  width: auto;
+  float: none;
+  padding: 20px;
+}
+
+/* Sidebar column */
+body#yacysearch .sidebar,
+body#yacysearch .col-sm-4,
+body#yacysearch .col-md-3 {
+  flex: 0 0 280px;
+  width: 280px;
+  max-width: 280px;
+  float: none;
+}
+
+/* Remove Bootstrap offsets */
 body#yacysearch .col-sm-offset-4,
 body#yacysearch .col-md-offset-3 {
   margin-left: 0;
+}
+
+/* Ensure all content is visible */
+body#yacysearch #results,
+body#yacysearch #resultscontainer,
+body#yacysearch .searchresults,
+body#yacysearch .search-stats-container,
+body#yacysearch .progress,
+body#yacysearch p,
+body#yacysearch article,
+body#yacysearch div {
+  visibility: visible;
 }
 
 /* ============================================
@@ -608,6 +676,7 @@ p.snippet {
   display: flex;
   gap: 8px;
   margin-top: 16px;
+  flex-wrap: wrap;
 }
 
 .action-btn {
@@ -615,8 +684,8 @@ p.snippet {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 8px 16px;
-  border-radius: var(--radius-lg);
+  padding: 8px 14px;
+  border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -624,16 +693,20 @@ p.snippet {
   text-decoration: none;
   border: none;
   white-space: nowrap;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .action-btn.primary {
-  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-  color: white;
+  background: var(--bg-white);
+  border: 2px solid var(--primary-green) !important;
+  color: var(--primary-green);
+  min-width: 90px;
 }
 
 .action-btn.primary:hover {
-  opacity: 0.9;
-  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+  background: var(--primary-green);
   color: white;
   text-decoration: none;
 }
@@ -648,9 +721,34 @@ p.snippet {
   text-decoration: none;
 }
 
+/* Result URL line - proper alignment */
+.result-url-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.result-url-line .favicon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.result-cite {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* URL Actions - Visible on hover */
 .urlactions {
   display: flex;
+  align-items: center;
+  flex-shrink: 0;
   gap: 4px;
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -675,25 +773,28 @@ div.searchresults:hover .urlactions {
 }
 
 /* ============================================
-   Sidebar - Glassmorphism Filters
+   Sidebar - Glassmorphism Filters (Collapsible)
    ============================================ */
 .sidebar {
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: var(--radius-xl);
-  padding: 24px;
+  padding: 16px;
   border: 1px solid rgba(229, 231, 235, 0.5);
   box-shadow: var(--shadow-lg);
   position: sticky;
-  top: 100px;
-  max-height: calc(100vh - 120px);
+  top: 72px;
+  max-height: calc(100vh - 90px);
   overflow-y: auto;
+  width: 260px;
+  flex: 0 0 260px;
+  margin-right: 20px;
 }
 
 .filter-section {
-  margin-bottom: 24px;
-  padding-bottom: 24px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
   border-bottom: 1px solid #e5e7eb;
 }
 
@@ -703,47 +804,73 @@ div.searchresults:hover .urlactions {
   padding-bottom: 0;
 }
 
-.filter-title {
-  font-size: 14px;
+.filter-title,
+.filter-section h3 {
+  font-size: 13px;
   font-weight: 700;
   color: var(--text-primary);
-  margin: 0 0 16px 0;
+  margin: 0 0 12px 0;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
+  cursor: pointer;
+  padding: 8px 0;
+  border-radius: 6px;
+  transition: color 0.2s ease;
 }
 
-.filter-title .glyphicon {
+.filter-title:hover,
+.filter-section h3:hover {
   color: var(--primary-green);
 }
 
-/* Mode Switch Buttons */
+.filter-title .glyphicon,
+.filter-section h3 .glyphicon {
+  color: var(--primary-green);
+  font-size: 12px;
+}
+
+/* Collapsible filter content */
+.filter-section .filter-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.filter-section.collapsed .filter-content,
+.filter-section.collapsed .mode-switch-buttons,
+.filter-section.collapsed .content-type-filters {
+  display: none;
+}
+
+/* Mode Switch Buttons - Compact */
 .mode-switch-buttons {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 .mode-btn {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 18px;
-  border: 2px solid #e5e7eb;
-  border-radius: var(--radius-lg);
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   background: var(--bg-white);
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   width: 100%;
   text-align: left;
 }
 
 .mode-btn:hover {
-  border-color: #d1d5db;
-  background: var(--bg-gray-50);
+  border-color: var(--primary-green);
+  background: #ecfdf5;
+  color: #047857;
 }
 
 .mode-btn.active {
@@ -753,41 +880,46 @@ div.searchresults:hover .urlactions {
 }
 
 .mode-btn .glyphicon {
-  font-size: 16px;
+  font-size: 14px;
+  color: var(--primary-green);
 }
 
-/* Content Type Filters */
+/* Content Type Filters - Compact Grid */
 .content-type-filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 6px;
 }
 
 .filter-chip {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border: 2px solid #e5e7eb;
-  border-radius: var(--radius-full);
+  gap: 4px;
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
   background: var(--bg-white);
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .filter-chip:hover {
-  border-color: #d1d5db;
-  background: var(--bg-gray-50);
+  border-color: var(--primary-green);
+  background: #ecfdf5;
+  color: #047857;
 }
 
 .filter-chip.active {
   background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
   border-color: transparent;
   color: white;
-  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+}
+
+.filter-chip .glyphicon {
+  font-size: 11px;
 }
 
 /* Pro Tip Card */
@@ -1258,18 +1390,15 @@ body#yacysearch .nav-list .active > a {
 }
 
 /* ============================================
-   Hide Help/Info Sections - Minimal Design
+   Hide Help/Info Sections - Ultra Minimal Design
    ============================================ */
 body#yacysearch #info,
 body#yacysearch .help-block,
 body#yacysearch .alert-info:not(.search-alert),
 body#yacysearch #feedbackform,
-body#yacysearch [id*="help"],
 body#yacysearch .panel-footer,
 body#yacysearch footer .help,
-body#yacysearch .yacyinfo,
-body#yacysearch #yacylivesearch + .row,
-body#yacysearch .container-fluid > .row > .alert-info {
+body#yacysearch .yacyinfo {
   display: none !important;
 }
 
@@ -1290,18 +1419,35 @@ body#yacysearch .pro-tip-card {
   display: none !important;
 }
 
+/* Hide footer completely for cleaner look */
+body#yacysearch footer,
+body#yacysearch .footer,
+body#yacysearch #footer {
+  display: none !important;
+}
+
+/* Hide any remaining help text and info sections */
+body#yacysearch .help-text,
+body#yacysearch .info-box,
+body#yacysearch .support-info,
+body#yacysearch .notice {
+  display: none !important;
+}
+
 /* ============================================
-   Collapsible Sidebar
+   Collapsible Sidebar - Compact
    ============================================ */
 .sidebar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .sidebar-title {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
@@ -1311,9 +1457,9 @@ body#yacysearch .pro-tip-card {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
   background: var(--bg-gray-100);
   border: none;
   color: var(--text-secondary);
@@ -1322,7 +1468,7 @@ body#yacysearch .pro-tip-card {
 }
 
 .sidebar-toggle:hover {
-  background: var(--bg-gray-100);
+  background: #ecfdf5;
   color: var(--primary-green);
 }
 
@@ -1335,7 +1481,7 @@ body#yacysearch .pro-tip-card {
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  padding: 8px 0;
+  padding: 6px 0;
 }
 
 .filter-section .filter-header:hover {
@@ -1350,64 +1496,57 @@ body#yacysearch .pro-tip-card {
   transform: rotate(-90deg);
 }
 
-/* Make sidebar and main content work properly */
-body#yacysearch .sidebar {
-  width: 280px;
-  flex: 0 0 280px;
-  order: -1;
-}
-
-body#yacysearch .main {
-  flex: 1;
-  min-width: 0;
-  max-width: 900px;
-}
+/* Sidebar defined earlier - this section intentionally left empty */
 
 /* ============================================
-   Logo + Search Bar Same Row Fix
+   Logo + Search Bar Same Row Fix - Google Style
    ============================================ */
 body#yacysearch .navbar > .container-fluid {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 20px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 16px;
+  height: 56px;
+  padding: 0 20px !important;
 }
 
 body#yacysearch .navbar-header {
   flex-shrink: 0;
-  margin: 0;
-  padding: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
 }
 
 body#yacysearch .navbar-brand {
-  float: none;
+  float: none !important;
   padding: 0 !important;
   margin: 0 !important;
-  height: auto;
-  display: flex;
+  height: auto !important;
+  display: flex !important;
   align-items: center;
 }
 
 body#yacysearch .navbar-brand img {
-  max-height: 32px;
-  width: auto;
+  max-height: 30px !important;
+  width: auto !important;
 }
 
-/* Search form takes remaining space */
+/* Search form takes remaining space in center */
 body#yacysearch .navbar-form,
 body#yacysearch form.search.small {
   flex: 1;
-  max-width: 600px;
-  margin: 0 auto 0 0 !important;
+  max-width: 560px;
+  margin: 0 !important;
   padding: 0 !important;
   float: none !important;
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
 }
 
-/* Nav icons on the right */
+/* No nav icons on the right - cleaner look */
 body#yacysearch .navbar-right {
-  margin-left: auto !important;
-  margin-right: 0 !important;
-  float: none !important;
+  display: none !important;
 }
 
 /* ============================================
@@ -1546,4 +1685,200 @@ body#yacysearch .dropdown-menu > li > a:hover {
 body#yacysearch .dropdown-menu .divider {
   background: #e5e7eb;
   margin: 8px 0;
+}
+
+/* ============================================
+   Sidebar Navigation Filters - Green Theme
+   ============================================ */
+body#yacysearch .nav-sidebar,
+body#yacysearch .menugroup {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px 0;
+}
+
+body#yacysearch .nav-sidebar li,
+body#yacysearch .menugroup li {
+  margin-bottom: 4px;
+}
+
+body#yacysearch .nav-sidebar h3,
+body#yacysearch .menugroup h3 {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+body#yacysearch .nav-sidebar h3:hover,
+body#yacysearch .menugroup h3:hover {
+  color: var(--primary-green);
+}
+
+body#yacysearch .nav-sidebar h3 .glyphicon,
+body#yacysearch .menugroup h3 .glyphicon {
+  color: var(--primary-green);
+  font-size: 11px;
+}
+
+body#yacysearch .nav-sidebar a,
+body#yacysearch .menugroup a,
+body#yacysearch .MenuItemLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-white);
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  color: var(--text-secondary) !important;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+body#yacysearch .nav-sidebar a:hover,
+body#yacysearch .menugroup a:hover,
+body#yacysearch .MenuItemLink:hover {
+  background: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+  color: #047857 !important;
+}
+
+body#yacysearch .nav-sidebar input[type="checkbox"],
+body#yacysearch .menugroup input[type="checkbox"] {
+  accent-color: var(--primary-green);
+  margin: 0;
+  width: 14px;
+  height: 14px;
+}
+
+/* Button groups in sidebar - Green theme */
+body#yacysearch .btn-group .btn,
+body#yacysearch .btn-group-justified .btn {
+  background: var(--bg-white) !important;
+  border: 1px solid #e5e7eb !important;
+  color: var(--text-secondary) !important;
+  font-size: 12px;
+  padding: 6px 10px;
+  transition: all 0.2s ease;
+}
+
+body#yacysearch .btn-group .btn:hover,
+body#yacysearch .btn-group-justified .btn:hover {
+  background: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+  color: #047857 !important;
+}
+
+body#yacysearch .btn-group .btn.active,
+body#yacysearch .btn-group-justified .btn.active {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
+  border-color: transparent !important;
+  color: white !important;
+}
+
+/* Nav protocols buttons */
+body#yacysearch #nav-protocols .btn {
+  border-radius: 6px !important;
+  margin: 2px;
+}
+
+/* Ranking buttons */
+body#yacysearch #rankingButtons .btn {
+  border-radius: 6px !important;
+}
+
+/* ============================================
+   Override ALL Blue Bootstrap Colors
+   ============================================ */
+body#yacysearch .btn-info,
+body#yacysearch .btn-primary,
+body#yacysearch .label-info,
+body#yacysearch .label-primary,
+body#yacysearch .bg-info,
+body#yacysearch .bg-primary,
+body#yacysearch .text-info {
+  background: var(--bg-white) !important;
+  border-color: var(--primary-green) !important;
+  color: var(--primary-green) !important;
+}
+
+body#yacysearch .btn-info:hover,
+body#yacysearch .btn-primary:hover {
+  background: #ecfdf5 !important;
+  color: #047857 !important;
+}
+
+body#yacysearch .btn-info.active,
+body#yacysearch .btn-primary.active,
+body#yacysearch .btn.active {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
+  border-color: transparent !important;
+  color: white !important;
+}
+
+/* Toggle visibility buttons in sidebar */
+body#yacysearch [onclick*="toggleVisibility"] {
+  cursor: pointer;
+}
+
+body#yacysearch .nav-sidebar .btn,
+body#yacysearch .menugroup .btn,
+body#yacysearch #nav-hosts .btn,
+body#yacysearch #nav-protocols .btn,
+body#yacysearch [id^="nav-"] .btn {
+  background: var(--bg-white) !important;
+  border: 1px solid #e5e7eb !important;
+  color: var(--text-secondary) !important;
+  border-radius: 6px !important;
+}
+
+body#yacysearch .nav-sidebar .btn:hover,
+body#yacysearch .menugroup .btn:hover,
+body#yacysearch #nav-hosts .btn:hover,
+body#yacysearch #nav-protocols .btn:hover,
+body#yacysearch [id^="nav-"] .btn:hover {
+  background: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+  color: #047857 !important;
+}
+
+body#yacysearch .nav-sidebar .btn.active,
+body#yacysearch .menugroup .btn.active,
+body#yacysearch #nav-hosts .btn.active,
+body#yacysearch #nav-protocols .btn.active,
+body#yacysearch [id^="nav-"] .btn.active {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
+  border-color: transparent !important;
+  color: white !important;
+}
+
+/* Fix btn-group-justified blue buttons */
+body#yacysearch .btn-group-justified .btn-default,
+body#yacysearch .btn-group .btn-default {
+  background: var(--bg-white) !important;
+  border: 1px solid #e5e7eb !important;
+  color: var(--text-secondary) !important;
+}
+
+body#yacysearch .btn-group-justified .btn-default:hover,
+body#yacysearch .btn-group .btn-default:hover {
+  background: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+  color: #047857 !important;
+}
+
+body#yacysearch .btn-group-justified .btn-default.active,
+body#yacysearch .btn-group .btn-default.active {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
+  border-color: transparent !important;
+  color: white !important;
 }

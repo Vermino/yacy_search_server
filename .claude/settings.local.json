@@ -1,0 +1,6 @@
+{
+  "enabledMcpjsonServers": [
+    "viktor"
+  ],
+  "enableAllProjectMcpServers": true
+}

@@ -8,8 +8,11 @@
 </script>  
 
 #(resource-switches)#::
-<div class="filter-section">
-  <h3 class="filter-title">Search Mode</h3>
+<div class="filter-section" id="search-mode-section">
+  <h3 class="filter-title" onclick="toggleFilterSection('search-mode-section')">
+    <span>Search Mode</span>
+    <span class="glyphicon glyphicon-chevron-down collapse-icon"></span>
+  </h3>
   <form action="yacysearch.html" method="get" accept-charset="UTF-8" id="resource-switch-form"
     data-trigger="hover" data-placement="right" data-container="body"
     title="#(global)#Your search is done using only your own peer, locally.::Your search is done using peers in the YaCy P2P network.#(/global)#"
@@ -84,8 +87,11 @@ $('#resource-switch-form').popover()
 #(/ranking-switches)#
 
 #(searchdomswitches)#::
-<div class="filter-section">
-  <h3 class="filter-title">Content Type</h3>
+<div class="filter-section" id="content-type-section">
+  <h3 class="filter-title" onclick="toggleFilterSection('content-type-section')">
+    <span>Content Type</span>
+    <span class="glyphicon glyphicon-chevron-down collapse-icon"></span>
+  </h3>
   <form action="yacysearch.html" method="get" accept-charset="UTF-8" name="contentdomSwitchForm"
     onsubmit="document.getElementById('contentdomSwitchFormQuery').value = document.getElementById('search').value;">
       <input type="hidden" id="contentdomSwitchFormQuery" name="query" value="#[former]#"/>
@@ -318,8 +324,20 @@ function toggleVisibility(name, count) {
 </ul>
 #(/nav-about)#
 
-<!-- Pro Tip Card -->
-<div class="pro-tip-card">
-  <h4><span class="glyphicon glyphicon-star"></span> YaCy Pro Tip</h4>
-  <p>YaCy is a decentralized search engine. The more peers connected, the better your search results. Help build the open web!</p>
-</div>
+<!-- Filter Section Toggle Script -->
+<script>
+function toggleFilterSection(sectionId) {
+  var section = document.getElementById(sectionId);
+  if (section) {
+    section.classList.toggle('collapsed');
+    var icon = section.querySelector('.collapse-icon');
+    if (icon) {
+      if (section.classList.contains('collapsed')) {
+        icon.className = 'glyphicon glyphicon-chevron-right collapse-icon';
+      } else {
+        icon.className = 'glyphicon glyphicon-chevron-down collapse-icon';
+      }
+    }
+  }
+}
+</script>

@@ -70,136 +70,177 @@ body#index::after {
 }
 
 /* ============================================
-   Header/Navbar - Ultra Minimal Style
+   Header/Navbar - Top Banner Style (Google-like)
    ============================================ */
 body#index .navbar {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: auto;
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  left: 0 !important;
   z-index: 1000;
   background: transparent !important;
-  border: none;
-  box-shadow: none;
-  min-height: auto;
-  padding: 16px 20px;
+  border: none !important;
+  box-shadow: none !important;
+  min-height: 56px !important;
+  height: 56px !important;
+  padding: 0 16px !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
 }
 
-/* Hide the default navbar collapse and mobile toggle */
+/* Hide mobile toggle */
 body#index .navbar-toggle {
   display: none !important;
 }
 
+/* Navbar container */
+body#index .navbar > .container-fluid {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Show navbar collapse as flex row */
 body#index .navbar-collapse {
   display: flex !important;
   align-items: center;
   justify-content: flex-end;
-  padding: 0;
-  margin: 0;
-  border: none;
-  box-shadow: none;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
   height: auto !important;
-  overflow: visible;
+  width: auto !important;
+  float: none !important;
 }
 
 body#index .navbar-collapse.collapse {
   display: flex !important;
 }
 
-/* Hide unnecessary nav items, keep only icons */
+/* Hide left nav items */
 body#index .navbar-collapse .nav.navbar-nav:first-child {
-  display: none;
-}
-
-body#index .navbar-collapse .navbar-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  float: none;
-}
-
-body#index .navbar-right > li {
-  float: none;
-}
-
-/* Simplify header dropdowns to just icons */
-body#index .navbar-right #header_search > a span.hidden-sm,
-body#index .navbar-right #header_administration span.hidden-sm,
-body#index .navbar-right #header_administration span.hidden-md {
   display: none !important;
 }
 
-body#index .navbar-right #header_search > a .visible-sm {
-  display: inline !important;
+/* Show right navbar with icon buttons - horizontal row */
+body#index .navbar-collapse .navbar-right {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+  margin: 0 !important;
+  float: none !important;
 }
 
-/* Icon buttons in navbar */
+body#index .navbar-right > li {
+  display: block !important;
+  float: none !important;
+}
+
+/* Hide text labels - icons only */
+body#index .navbar-right #header_search > a span.hidden-sm,
+body#index .navbar-right #header_administration span.hidden-sm,
+body#index .navbar-right #header_administration span.hidden-md,
+body#index .navbar-right span:not(.glyphicon) {
+  display: none !important;
+}
+
+body#index .navbar-right .caret {
+  display: none !important;
+}
+
+/* Icon buttons - circular style */
 body#index .navbar-right .dropdown > a,
 body#index .navbar-right .btn {
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
-  padding: 0;
+  padding: 0 !important;
   border-radius: 50%;
-  background: var(--bg-gray-100);
-  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  border: none !important;
   color: var(--text-secondary);
   transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 body#index .navbar-right .dropdown > a:hover,
 body#index .navbar-right .btn:hover {
-  background: var(--bg-gray-100);
+  background: #ecfdf5;
   color: var(--primary-green);
 }
 
-body#index .navbar-right .dropdown > a .caret {
-  display: none;
-}
-
 body#index .navbar-right form {
-  margin: 0;
+  margin: 0 !important;
 }
 
-/* Logo styling - hidden on index as there's a main logo */
+/* Logo styling - hidden on index as there's a main centered logo */
 body#index .navbar-brand {
-  display: none;
+  display: none !important;
+}
+
+/* Hide navbar header on frontpage */
+body#index .navbar-header {
+  display: none !important;
 }
 
 /* ============================================
-   Main Content Container
+   Main Content Container - Centered Google Style
    ============================================ */
 body#index .container-fluid {
-  max-width: 650px;
+  max-width: 600px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 24px;
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  min-height: auto !important;
+  height: auto !important;
+  background: transparent !important;
+  padding-top: 120px;
+  padding-bottom: 40px;
 }
 
 body#index .starter-template {
   text-align: center;
   width: 100%;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  min-height: auto !important;
 }
 
 /* ============================================
-   Logo & Title - Centered Above Search
+   Logo & Title - Perfectly Centered Above Search
    ============================================ */
 body#index h2.yacy {
-  margin: 0 0 24px 0;
+  margin: 0 0 32px 0;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+body#index h2.yacy .yacylogo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 body#index h2.yacy .yacylogo img {
-  max-width: 200px;
+  max-width: 180px;
   height: auto;
   filter: drop-shadow(0 4px 20px rgba(22, 163, 74, 0.15));
   transition: transform 0.3s ease;
@@ -215,72 +256,84 @@ body#index h2.yacy:not(:has(.yacylogo)) {
 }
 
 /* ============================================
-   Search Form - Simple Clean Style
+   Search Form - Clean Google-like Style
    ============================================ */
 body#index form.search {
-  background: transparent;
-  padding: 0;
-  margin: 0 auto;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
   max-width: 100%;
-  border: none;
-  box-shadow: none;
+  border: none !important;
+  box-shadow: none !important;
+  width: 100%;
 }
 
 body#index fieldset.maininput {
-  border: none;
-  padding: 0;
-  margin: 0;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
 }
 
-/* Search input group */
+/* Search input group - Google style */
 body#index .input-group {
   display: flex;
-  align-items: stretch;
-  border-radius: var(--radius-xl);
+  align-items: center;
+  border-radius: 24px;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  border: 2px solid #e5e7eb;
-  background: var(--bg-white);
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.12);
+  border: 1px solid #dfe1e5;
+  background: var(--bg-white) !important;
   transition: all 0.3s ease;
+  height: 48px;
+}
+
+body#index .input-group:hover {
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.2);
 }
 
 body#index .input-group:focus-within {
-  border-color: var(--primary-green);
-  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+  border-color: transparent;
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.2);
 }
 
 body#index .searchinput {
   flex: 1;
-  font-size: 18px;
+  font-size: 16px;
   border: none !important;
   border-radius: 0 !important;
-  padding: 16px 24px;
-  background: transparent;
+  padding: 0 20px !important;
+  background: transparent !important;
   box-shadow: none !important;
+  height: 46px;
+  line-height: 46px;
 }
 
 body#index .searchinput:focus {
-  outline: none;
+  outline: none !important;
   box-shadow: none !important;
+  background: transparent !important;
 }
 
-/* Search button */
+/* Search button - aligned properly */
 body#index .input-group-btn {
   display: flex;
-  align-items: stretch;
+  align-items: center;
+  height: 100%;
 }
 
 body#index .input-group-btn .btn-primary {
   border: none !important;
-  border-radius: 0 !important;
-  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-  color: white;
-  padding: 16px 32px;
-  font-size: 16px;
+  border-radius: 0 24px 24px 0 !important;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
+  color: white !important;
+  padding: 0 28px !important;
+  font-size: 15px;
   font-weight: 600;
-  height: 100%;
+  height: 46px;
   display: flex;
   align-items: center;
+  justify-content: center;
   transition: all 0.3s ease;
 }
 
@@ -552,4 +605,90 @@ body#index .tt-suggestion.tt-cursor {
 
 body#index .tt-suggestion strong {
   color: var(--primary-green);
+}
+
+/* ============================================
+   Override All Blue Bootstrap Colors
+   ============================================ */
+body#index .btn-info,
+body#index .btn-primary,
+body#index .label-info,
+body#index .label-primary,
+body#index .bg-info,
+body#index .bg-primary {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
+  border-color: transparent !important;
+  color: white !important;
+}
+
+body#index .text-info,
+body#index .text-primary {
+  color: var(--primary-green) !important;
+}
+
+body#index .panel-info,
+body#index .panel-primary {
+  border-color: var(--primary-green) !important;
+}
+
+body#index .panel-info > .panel-heading,
+body#index .panel-primary > .panel-heading {
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5) !important;
+  border-color: var(--primary-green) !important;
+  color: #047857 !important;
+}
+
+body#index .progress-bar-info,
+body#index .progress-bar {
+  background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)) !important;
+}
+
+/* ============================================
+   Hide Footer and Unnecessary Content
+   ============================================ */
+body#index footer,
+body#index .footer,
+body#index #footer {
+  display: none !important;
+}
+
+/* Hide any help/info/donation content */
+body#index .help-block,
+body#index .help-text,
+body#index .info-box,
+body#index [id*="help"],
+body#index p:has(a[href*="donate"]),
+body#index div:has(a[href*="donate"]),
+body#index a[href*="donate"] {
+  display: none !important;
+}
+
+/* ============================================
+   Additional Background Cleanup
+   ============================================ */
+body#index .form-control:focus {
+  border-color: var(--primary-green) !important;
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1) !important;
+}
+
+body#index .input-group-addon {
+  background: var(--bg-gray-100) !important;
+  border-color: #e5e7eb !important;
+}
+
+/* Ensure no blue anywhere */
+body#index [class*="btn-info"],
+body#index [class*="bg-info"],
+body#index [class*="text-info"],
+body#index [class*="border-info"] {
+  --bs-info: var(--primary-green) !important;
+}
+
+/* Clean container background */
+body#index .row,
+body#index .col-xs-12,
+body#index .col-sm-12,
+body#index .col-md-12,
+body#index .col-lg-12 {
+  background: transparent !important;
 }

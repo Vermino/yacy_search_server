@@ -108,15 +108,15 @@ Use the RSS search result format to add static searches to your RSS reader, if y
 <!-- body -->
 </div> <!-- close the starter-template, to open a row -->
 
-  <div class="row">
-    <div class="col-sm-8 col-sm-offset-4 col-md-9 col-md-offset-3 main">
+  <div class="row search-results-row">
+    <div class="col-sm-8 col-md-9 main">
 #(topmenu)#
-<form class="search small" name="searchform" method="get" accept-charset="UTF-8" style="position:fixed;top:8px;z-index:1052;">
+<form class="search small" name="searchform" method="get" accept-charset="UTF-8">
 ::
-<form class="search small col-xs-9 col-sm-5 col-lg-5" name="searchform" method="get" accept-charset="UTF-8" style="position:fixed;top:8px;z-index:1052;">
+<form class="search small" name="searchform" method="get" accept-charset="UTF-8">
 #(/topmenu)#
 
-  <div class="input-group" style="max-width:445px;">
+  <div class="input-group">
     <input name="query" id="search" type="text" class="form-control searchinput typeahead" size="40" maxlength="200" 
     	placeholder="#[promoteSearchPageGreeting]#" value="#[former]#" #(focus)#::autofocus="autofocus"#(/focus)# onFocus="this.select()" onclick="document.getElementById('Enter').innerHTML = 'search'"/>
     <div class="input-group-btn">
