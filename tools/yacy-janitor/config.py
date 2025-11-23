@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     yacy_url: str = Field(default="http://localhost:8090", description="YaCy base URL")
     yacy_admin_user: str = Field(default="admin", description="YaCy admin username")
     yacy_admin_password: str = Field(default="yacy", description="YaCy admin password")
+    yacy_blacklist_name: str = Field(default="blacklist.black", description="YaCy blacklist file name")
 
     # LLM configuration
     llm_provider: str = Field(default="openai", description="LLM provider: openai, anthropic, local")
@@ -28,6 +29,13 @@ class Settings(BaseSettings):
     ban_hosts_file: Path = Field(default=Path("/data/ban_hosts.txt"))
     manual_review_file: Path = Field(default=Path("/data/manual_review.jsonl"))
     cache_file: Path = Field(default=Path("/data/classification_cache.json"))
+    curated_seeds_file: Path = Field(default=Path("/data/curated_seeds.txt"))
+    url_mustmatch_file: Path = Field(default=Path("/data/url_mustmatch.regex"))
+    url_mustnotmatch_file: Path = Field(default=Path("/data/url_mustnotmatch.regex"))
+
+    # Git auto-commit
+    git_auto_commit: bool = Field(default=False, description="Auto-commit host list changes")
+    git_repo_path: Optional[Path] = Field(default=None, description="Git repository path for seeds")
 
     # Classification thresholds
     keep_confidence_threshold: float = Field(default=0.7, ge=0.0, le=1.0)

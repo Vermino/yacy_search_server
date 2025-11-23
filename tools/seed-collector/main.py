@@ -10,9 +10,9 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from models import (
@@ -63,11 +63,17 @@ app.add_middleware(
 async def root():
     """Landing page with bookmarklet."""
     stats = await seed_queue.get_stats()
+    public_url = os.environ.get("PUBLIC_URL", "http://localhost:8091")
     return f"""
     <!DOCTYPE html>
     <html>
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>YaCy Seed Collector</title>
+        <link rel="manifest" href="/static/manifest.json">
+        <meta name="theme-color" content="#2563eb">
+        <link rel="apple-touch-icon" href="/static/icon-192.png">
         <style>
             body {{ font-family: system-ui, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }}
             .bookmarklet {{ display: inline-block; padding: 10px 20px; background: #2563eb; color: white;
@@ -76,6 +82,9 @@ async def root():
             code {{ background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }}
             pre {{ background: #f1f5f9; padding: 15px; border-radius: 6px; overflow-x: auto; }}
             .stats {{ background: #f8fafc; padding: 15px; border-radius: 6px; margin: 20px 0; }}
+            .install-btn {{ display: none; padding: 10px 20px; background: #22c55e; color: white;
+                           border: none; border-radius: 6px; cursor: pointer; margin: 10px 0; }}
+            .install-btn.show {{ display: inline-block; }}
         </style>
     </head>
     <body>
@@ -196,6 +205,70 @@ async def get_pending_hosts():
     """Get unique hosts from pending seeds."""
     hosts = await seed_queue.get_pending_hosts()
     return {"hosts": sorted(hosts), "count": len(hosts)}
+
+
+@app.post("/share")
+async def share_target(
+    title: Optional[str] = Form(None),
+    text: Optional[str] = Form(None),
+    url: Optional[str] = Form(None),
+):
+    """
+    PWA Web Share Target endpoint.
+
+    Receives shared content from mobile devices and adds URLs to the queue.
+    """
+    # Try to extract URL from the shared content
+    shared_url = url
+
+    # If no URL, try to find one in the text
+    if not shared_url and text:
+        import re
+        url_pattern = r'https?://[^\s<>"{}|\\^`\[\]]+'
+        urls = re.findall(url_pattern, text)
+        if urls:
+            shared_url = urls[0]
+
+    if not shared_url:
+        # Redirect back with error
+        return HTMLResponse("""
+        <!DOCTYPE html>
+        <html>
+        <head><title>Share Failed</title></head>
+        <body>
+            <h1>No URL found</h1>
+            <p>Could not find a URL in the shared content.</p>
+            <a href="/">Go back</a>
+        </body>
+        </html>
+        """, status_code=400)
+
+    # Create and add the seed
+    seed_input = SeedInput(url=shared_url, title=title or "")
+    seed = Seed.from_input(seed_input)
+    await seed_queue.add(seed)
+
+    # Show success page
+    return HTMLResponse(f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Added to Seeds</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {{ font-family: system-ui; padding: 20px; text-align: center; }}
+            .success {{ color: #22c55e; font-size: 48px; }}
+            .url {{ word-break: break-all; color: #64748b; }}
+        </style>
+    </head>
+    <body>
+        <div class="success">✓</div>
+        <h1>Added to Seeds</h1>
+        <p class="url">{seed.host}</p>
+        <p>The URL has been added to your seed queue.</p>
+    </body>
+    </html>
+    """)
 
 
 @app.get("/bookmarklet", response_class=HTMLResponse)

@@ -66,7 +66,7 @@ services:
         max-size: "50m"
         max-file: "2"
 
-  # LLM Janitor Service
+  # LLM Janitor Service (background worker)
   janitor:
     build:
       context: ./tools/yacy-janitor
@@ -79,6 +79,7 @@ services:
       - YACY_URL=http://yacy:8090
       - YACY_ADMIN_USER=admin
       - YACY_ADMIN_PASSWORD=${YACY_ADMIN_PASSWORD:-yacy}
+      - YACY_BLACKLIST_NAME=${YACY_BLACKLIST_NAME:-blacklist.black}
       # LLM configuration
       - LLM_PROVIDER=${LLM_PROVIDER:-openai}
       - LLM_API_KEY=${LLM_API_KEY:-}
@@ -91,6 +92,9 @@ services:
       - BAN_HOSTS_FILE=/data/ban_hosts.txt
       - MANUAL_REVIEW_FILE=/data/manual_review.jsonl
       - CACHE_FILE=/data/classification_cache.json
+      - CURATED_SEEDS_FILE=/data/curated_seeds.txt
+      - URL_MUSTMATCH_FILE=/data/url_mustmatch.regex
+      - URL_MUSTNOTMATCH_FILE=/data/url_mustnotmatch.regex
       # Scheduling (in minutes)
       - HOST_SCAN_INTERVAL_MINUTES=${HOST_SCAN_INTERVAL:-60}
       - CLASSIFICATION_INTERVAL_MINUTES=${CLASSIFICATION_INTERVAL:-15}
@@ -102,6 +106,45 @@ services:
       yacy:
         condition: service_healthy
     restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "2"
+
+  # Janitor API (manual review and management)
+  janitor-api:
+    build:
+      context: ./tools/yacy-janitor
+      dockerfile: Dockerfile
+    container_name: yacy-janitor-api
+    command: ["python", "api.py"]
+    ports:
+      - "8092:8092"
+    volumes:
+      - janitor_data:/data
+    environment:
+      - YACY_URL=http://yacy:8090
+      - YACY_ADMIN_USER=admin
+      - YACY_ADMIN_PASSWORD=${YACY_ADMIN_PASSWORD:-yacy}
+      - YACY_BLACKLIST_NAME=${YACY_BLACKLIST_NAME:-blacklist.black}
+      - DATA_DIR=/data
+      - KEEP_HOSTS_FILE=/data/keep_hosts.txt
+      - BAN_HOSTS_FILE=/data/ban_hosts.txt
+      - MANUAL_REVIEW_FILE=/data/manual_review.jsonl
+      - CACHE_FILE=/data/classification_cache.json
+      - CURATED_SEEDS_FILE=/data/curated_seeds.txt
+      - URL_MUSTMATCH_FILE=/data/url_mustmatch.regex
+      - URL_MUSTNOTMATCH_FILE=/data/url_mustnotmatch.regex
+    depends_on:
+      yacy:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8092/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     logging:
       driver: json-file
       options:

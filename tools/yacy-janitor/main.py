@@ -168,15 +168,25 @@ class YaCyJanitor:
             logger.info("action_keep", host=host, confidence=confidence)
 
         elif category.is_ban() and confidence >= self.settings.ban_confidence_threshold:
-            # Add to ban list and delete from index
+            # Add to ban list, YaCy blacklist, and delete from index
             await self.host_lists.add_to_ban(host)
+
+            # Add to YaCy's blacklist file
+            blacklist_added = await client.add_to_blacklist(
+                host,
+                self.settings.yacy_blacklist_name
+            )
+
+            # Delete from index
             deleted = await client.delete_host(host)
+
             self.stats.hosts_banned += 1
             logger.info(
                 "action_ban",
                 host=host,
                 category=category.value,
                 confidence=confidence,
+                blacklist_added=blacklist_added,
                 deleted=deleted,
             )
 

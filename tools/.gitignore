@@ -38,6 +38,7 @@ data/
 *.jsonl
 *.json
 !env.example
+!manifest.json
 
 # OS
 .DS_Store
