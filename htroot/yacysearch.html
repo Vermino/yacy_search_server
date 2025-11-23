@@ -6,6 +6,7 @@
   <link rel="alternate" type="application/rss+xml" title="Search for #[former]#" href="yacysearch.rss?query=#[formerEncoded]#" />
   <link rel="search" type="application/opensearchdescription+xml" title="YaCy '#[clientname]#'" href="#[thisaddress]#/opensearchdescription.xml" />
   <link rel="stylesheet" type="text/css" media="screen" href="env/highslide.css" />
+  <link rel="stylesheet" type="text/css" media="screen" href="env/yacysearch-modern.css" />
   <script type="text/javascript" src="js/ajax.js"></script>
   <script type="text/javascript" src="js/xml.js"></script>
   <script type="text/javascript" src="js/yacysearch.js"></script>
@@ -154,12 +155,17 @@ Use the RSS search result format to add static searches to your RSS reader, if y
 	<p>No Results. (length of search words must be at least 1 character)</p>
 	::
 	<div id="results"></div>
-    <div class="progress" style="margin-top:10px;margin-bottom:0px;">
-      <div class="progress-bar progress-bar-info" id="progressbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width:0%;">
-        <span style="position:absolute;display:block;text-align:left;width:85%;color:black;">&nbsp;&nbsp;&nbsp;<strong id="offset">#[offset]#</strong>-<strong id="itemscount">#[itemscount]#</strong> of <strong id="totalcount">#[totalcount]#</strong> 
-        #(globalresults)#::; (<strong id="localIndexCount">#[localIndexCount]#</strong> local, <strong id="remoteIndexCount">#[remoteIndexCount]#</strong> remote from <strong id="remotePeerCount">#[remotePeerCount]#</strong> YaCy peers).#(/globalresults)# 
-        	<span id="feedingStatus" style="visibility: hidden;" class="glyphicon glyphicon-transfer" title="YaCy server is fetching results from available data sources."></span>
-        </span>
+    <!-- Results stats and progress -->
+    <div class="search-stats-container" style="margin: 16px 0;">
+      <p class="search-stats" style="font-size:14px;color:#70757a;margin:0 0 8px 0;">
+        <span id="offset">#[offset]#</span>-<span id="itemscount">#[itemscount]#</span> of about <strong id="totalcount">#[totalcount]#</strong> results
+        #(globalresults)#::
+        <span class="stats-detail">(<span id="localIndexCount">#[localIndexCount]#</span> local, <span id="remoteIndexCount">#[remoteIndexCount]#</span> remote from <span id="remotePeerCount">#[remotePeerCount]#</span> peers)</span>
+        #(/globalresults)#
+        <span id="feedingStatus" style="visibility: hidden;" class="glyphicon glyphicon-refresh glyphicon-spin" title="Fetching results..."></span>
+      </p>
+      <div class="progress" style="height:3px;margin:0;border-radius:2px;">
+        <div class="progress-bar progress-bar-info" id="progressbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width:0%;transition:width 0.3s ease;"></div>
       </div>
     </div>
 	::

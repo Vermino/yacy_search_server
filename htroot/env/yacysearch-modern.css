@@ -1,0 +1,1000 @@
+/* yacysearch-modern.css - Modern Google-like search results styling */
+
+/* ============================================
+   CSS Variables for easy theming
+   ============================================ */
+:root {
+  --search-primary-color: #1a0dab;
+  --search-visited-color: #681da8;
+  --search-url-color: #006621;
+  --search-snippet-color: #545454;
+  --search-meta-color: #70757a;
+  --search-border-color: #dadce0;
+  --search-hover-bg: #f8f9fa;
+  --search-bg-color: #ffffff;
+  --search-accent-color: #4285f4;
+  --search-max-width: 652px;
+  --search-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ============================================
+   Main Layout - Centered content like Google
+   ============================================ */
+body#yacysearch {
+  background-color: #fff;
+  font-family: var(--search-font-family);
+}
+
+body#yacysearch .main {
+  max-width: 800px;
+  padding: 0 16px;
+}
+
+/* Search results container */
+#resultscontainer,
+body#yacysearch .main > div:not(.searchresults) {
+  max-width: var(--search-max-width);
+}
+
+/* ============================================
+   Search Input - Modern styling
+   ============================================ */
+body#yacysearch form.search.small {
+  margin-left: 0;
+}
+
+body#yacysearch .searchinput {
+  font-size: 16px;
+  border: 1px solid var(--search-border-color);
+  border-radius: 24px;
+  padding: 12px 20px;
+  box-shadow: none;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+body#yacysearch .searchinput:focus {
+  outline: none;
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+  border-color: rgba(223, 225, 229, 0);
+}
+
+body#yacysearch .input-group {
+  max-width: 600px !important;
+}
+
+body#yacysearch .input-group-btn .btn {
+  border-radius: 0 24px 24px 0;
+  border: 1px solid var(--search-border-color);
+  border-left: none;
+  background: #f8f9fa;
+  color: #3c4043;
+  padding: 10px 20px;
+  font-size: 14px;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+body#yacysearch .input-group-btn .btn:hover {
+  background: #f1f3f4;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   Progress Bar - Minimal modern styling
+   ============================================ */
+body#yacysearch .progress {
+  height: 4px;
+  border-radius: 2px;
+  margin: 16px 0;
+  max-width: var(--search-max-width);
+  background-color: #e8eaed;
+  overflow: visible;
+}
+
+body#yacysearch .progress-bar {
+  background-color: var(--search-accent-color);
+  border-radius: 2px;
+}
+
+body#yacysearch .progress-bar span {
+  position: relative;
+  top: 8px;
+  font-size: 13px;
+  color: var(--search-meta-color);
+  white-space: nowrap;
+}
+
+/* ============================================
+   Search Results - Google-like cards
+   ============================================ */
+div.searchresults {
+  padding: 0;
+  margin-bottom: 28px;
+  max-width: var(--search-max-width);
+  border: none;
+  background: transparent;
+}
+
+div.searchresults:hover {
+  background: transparent;
+}
+
+/* Result title */
+h4.linktitle {
+  margin: 0 0 4px 0;
+  padding: 0;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+h4.linktitle a {
+  color: var(--search-primary-color);
+  text-decoration: none;
+  display: inline;
+}
+
+h4.linktitle a:visited {
+  color: var(--search-visited-color);
+}
+
+h4.linktitle a:hover {
+  text-decoration: underline;
+}
+
+/* Favicon styling */
+img.favicon, object.favicon {
+  margin: 0 8px 0 0;
+  float: none;
+  vertical-align: middle;
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+}
+
+/* URL line container - displays favicon, URL, and actions */
+.result-url-line {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+  gap: 8px;
+}
+
+.result-url-line .favicon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  margin: 0;
+  float: none;
+}
+
+/* URL display - Green like Google */
+cite.result-cite {
+  font-style: normal;
+  font-size: 14px;
+  line-height: 1.3;
+  flex-grow: 1;
+  min-width: 0;
+}
+
+cite.result-cite a {
+  color: var(--search-url-color);
+  text-decoration: none;
+  word-break: break-all;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+cite.result-cite a:hover {
+  text-decoration: underline;
+}
+
+/* Legacy p.url support */
+div.searchresults p.url {
+  margin: 0 0 4px 0;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+div.searchresults p.url a {
+  color: var(--search-url-color);
+  text-decoration: none;
+  word-break: break-all;
+}
+
+div.searchresults p.url a:hover {
+  text-decoration: underline;
+}
+
+/* Snippet/Description */
+div.searchresults p.snippet {
+  margin: 0 0 4px 0;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1.58;
+  color: var(--search-snippet-color);
+}
+
+.snippetLoaded {
+  font-style: normal;
+  color: var(--search-snippet-color);
+}
+
+.snippetLoaded b {
+  font-weight: 600;
+  color: #3c4043;
+}
+
+/* Tags/Keywords - New structure */
+.result-tags {
+  margin: 8px 0 0 0;
+  padding: 0;
+  font-size: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.tag-pill {
+  background-color: #e8f0fe;
+  color: #1967d2;
+  font-weight: 400;
+  padding: 3px 10px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.tag-pill:hover {
+  background-color: #d2e3fc;
+  text-decoration: none;
+  color: #1967d2;
+}
+
+.more-tags {
+  display: contents;
+}
+
+.more-tags.hidden {
+  display: none;
+}
+
+.expandKeywordsBtn.btn-link {
+  color: var(--search-primary-color);
+  font-size: 12px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.expandKeywordsBtn.btn-link:hover {
+  text-decoration: underline;
+}
+
+/* Legacy Tags/Keywords */
+div.searchresults p.tags {
+  margin: 8px 0 0 0;
+  padding: 0;
+  font-size: 12px;
+}
+
+.tag.label {
+  background-color: #e8f0fe;
+  color: #1967d2;
+  font-weight: 400;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-right: 4px;
+  margin-bottom: 4px;
+  display: inline-block;
+}
+
+.tag.label:hover {
+  background-color: #d2e3fc;
+}
+
+.tag.label a {
+  color: inherit !important;
+}
+
+/* Metadata - New structure */
+.result-meta {
+  margin: 8px 0 0 0;
+  padding: 0;
+  font-size: 12px;
+  color: var(--search-meta-color);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: center;
+}
+
+.meta-item {
+  color: var(--search-meta-color);
+}
+
+.meta-separator::before {
+  content: "";
+}
+
+.meta-link {
+  color: var(--search-meta-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.meta-link:hover {
+  color: var(--search-primary-color);
+  text-decoration: underline;
+}
+
+.meta-vocabulary {
+  color: var(--search-meta-color);
+  font-style: italic;
+}
+
+.meta-ranking {
+  background-color: #f1f3f4;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+/* Legacy Metadata/URL info */
+div.searchresults p.urlinfo {
+  margin: 6px 0 0 0;
+  padding: 0;
+  font-size: 12px;
+  color: var(--search-meta-color);
+}
+
+div.searchresults p.urlinfo a {
+  color: var(--search-meta-color);
+  text-decoration: none;
+}
+
+div.searchresults p.urlinfo a:hover {
+  text-decoration: underline;
+}
+
+/* URL Actions - Hide by default, show on hover */
+.result-url-line .urlactions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.searchresults:hover .urlactions {
+  opacity: 1;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  color: var(--search-meta-color);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background-color: var(--search-hover-bg);
+  color: var(--search-primary-color);
+}
+
+.action-btn .glyphicon {
+  font-size: 12px;
+}
+
+.heuristic-badge {
+  display: inline-block;
+  width: 16px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.heuristic-badge.redundant {
+  background-color: #ffc107;
+}
+
+.heuristic-badge.new {
+  background-color: #28a745;
+}
+
+/* Legacy urlactions support */
+div.urlactions {
+  float: right;
+  clear: none;
+  margin: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+div.searchresults:hover div.urlactions {
+  opacity: 1;
+}
+
+div.urlactions a {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin: 0 2px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+div.urlactions a:hover {
+  opacity: 1;
+}
+
+/* ============================================
+   Pagination - Modern centered pagination
+   ============================================ */
+.search-pagination {
+  text-align: center;
+  margin: 32px 0;
+  max-width: var(--search-max-width);
+}
+
+#resNav {
+  text-align: center;
+  margin: 32px 0;
+  display: block !important;
+}
+
+.pagination-modern {
+  display: inline-flex;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  border-radius: 24px;
+  background-color: transparent;
+  box-shadow: none;
+  list-style: none;
+}
+
+.pagination-modern .page-item {
+  margin: 0;
+}
+
+.pagination-modern .page-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--search-primary-color);
+  padding: 10px 16px;
+  font-size: 14px;
+  border-radius: 20px;
+  min-width: 40px;
+  min-height: 40px;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.pagination-modern .page-link:hover {
+  background-color: var(--search-hover-bg);
+  color: var(--search-primary-color);
+}
+
+.pagination-modern .page-item.active .page-link {
+  background-color: var(--search-accent-color);
+  color: #fff;
+  font-weight: 500;
+}
+
+.pagination-modern .page-item.active .page-link:hover {
+  background-color: #3367d6;
+}
+
+.pagination-modern .page-item.disabled .page-link {
+  color: var(--search-meta-color);
+  cursor: not-allowed;
+  background: transparent;
+}
+
+.pagination-modern .page-link .glyphicon {
+  font-size: 10px;
+}
+
+/* Legacy pagination support */
+.pagination {
+  display: inline-flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.pagination > li {
+  margin: 0;
+}
+
+.pagination > li > a,
+.pagination > li > span {
+  border: none;
+  background: transparent;
+  color: var(--search-primary-color);
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 4px;
+  min-width: 40px;
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+
+.pagination > li > a:hover {
+  background-color: var(--search-hover-bg);
+  color: var(--search-primary-color);
+}
+
+.pagination > li.active > a,
+.pagination > li.active > a:hover {
+  background-color: var(--search-accent-color);
+  color: #fff;
+  border: none;
+}
+
+.pagination > li.disabled > a {
+  color: var(--search-meta-color);
+  cursor: not-allowed;
+}
+
+/* ============================================
+   Sidebar - Modern filters panel
+   ============================================ */
+.sidebar {
+  background: #fff;
+  border-left: 1px solid var(--search-border-color);
+  padding: 16px;
+  font-size: 13px;
+}
+
+/* Filter sections */
+.filter-section {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e8eaed;
+}
+
+.filter-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.filter-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #5f6368;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 12px 0;
+  padding: 0;
+  border: none;
+}
+
+/* Mode switch buttons (P2P/Local) */
+.mode-switch-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--search-border-color);
+  border-radius: 8px;
+  background: #fff;
+  color: #5f6368;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: left;
+}
+
+.mode-btn:hover {
+  background: var(--search-hover-bg);
+  border-color: #c6c6c6;
+}
+
+.mode-btn.active {
+  background: #e8f0fe;
+  border-color: #4285f4;
+  color: #1967d2;
+}
+
+.mode-btn .glyphicon {
+  font-size: 14px;
+}
+
+/* Content type filter chips */
+.content-type-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--search-border-color);
+  border-radius: 20px;
+  background: #fff;
+  color: #5f6368;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-chip:hover {
+  background: var(--search-hover-bg);
+  border-color: #c6c6c6;
+}
+
+.filter-chip.active {
+  background: #e8f0fe;
+  border-color: #4285f4;
+  color: #1967d2;
+}
+
+.filter-chip .glyphicon {
+  font-size: 12px;
+}
+
+/* Ranking switch (Context/Date) */
+.ranking-switch {
+  display: flex;
+  gap: 8px;
+}
+
+.ranking-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--search-border-color);
+  border-radius: 6px;
+  background: #fff;
+  color: #5f6368;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ranking-btn:hover {
+  background: var(--search-hover-bg);
+}
+
+.ranking-btn.active {
+  background: #e8f0fe;
+  border-color: #4285f4;
+  color: #1967d2;
+}
+
+/* Legacy sidebar styles */
+.sidebar h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #202124;
+  margin: 0 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--search-border-color);
+}
+
+.sidebar .menugroup {
+  margin-bottom: 20px;
+  padding: 0;
+  list-style: none;
+}
+
+.sidebar .menugroup li {
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar .menugroup li a {
+  display: block;
+  padding: 6px 0;
+  color: #5f6368;
+  text-decoration: none;
+  font-size: 13px;
+  transition: color 0.2s ease;
+}
+
+.sidebar .menugroup li a:hover {
+  color: var(--search-primary-color);
+}
+
+.sidebar .menugroup li a input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+/* Resource switch buttons */
+#resource-switch-form .btn-group {
+  margin-bottom: 12px;
+}
+
+#resource-switch-form .btn {
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+/* Content domain switch */
+.sidebar .btn-group-justified {
+  margin-bottom: 12px;
+}
+
+.sidebar .btn-group-xs .btn {
+  font-size: 11px;
+  padding: 6px 8px;
+}
+
+/* Tag cloud */
+#tagcloud {
+  line-height: 1.8;
+  margin: 16px 0;
+}
+
+#tagcloud a {
+  color: var(--search-primary-color);
+  text-decoration: none;
+  margin-right: 8px;
+}
+
+#tagcloud a:hover {
+  text-decoration: underline;
+}
+
+/* ============================================
+   Did you mean / Suggestions
+   ============================================ */
+body#yacysearch p b:first-child {
+  color: #ea4335;
+}
+
+/* ============================================
+   Image Results - Grid layout
+   ============================================ */
+.thumbcontainer {
+  margin: 8px;
+  width: 200px;
+  height: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+
+.thumbcontainer:hover {
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+}
+
+.thumblink {
+  width: 200px;
+  height: 200px;
+  line-height: 200px;
+}
+
+.thumblink img {
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* ============================================
+   Date Histogram
+   ============================================ */
+#datehistogram {
+  margin: 20px 0;
+  max-width: var(--search-max-width);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* ============================================
+   API/RSS icon
+   ============================================ */
+div#api {
+  right: 16px;
+}
+
+div#api:hover span {
+  border-radius: 8px;
+  border: 1px solid var(--search-border-color);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   Alerts and messages
+   ============================================ */
+.alert {
+  border-radius: 8px;
+  border: none;
+  max-width: var(--search-max-width);
+}
+
+.alert-danger {
+  background-color: #fce8e6;
+  color: #c5221f;
+}
+
+/* ============================================
+   Responsive design
+   ============================================ */
+@media (max-width: 991px) {
+  .sidebar {
+    border-left: none;
+    border-top: 1px solid var(--search-border-color);
+    margin-top: 24px;
+  }
+}
+
+@media (max-width: 767px) {
+  body#yacysearch .main {
+    padding: 0 12px;
+  }
+
+  h4.linktitle {
+    font-size: 18px;
+  }
+
+  div.searchresults p.snippet,
+  div.searchresults p.url a {
+    font-size: 13px;
+  }
+
+  .pagination > li > a {
+    padding: 6px 10px;
+    min-width: 32px;
+  }
+}
+
+/* ============================================
+   Geo/Map results
+   ============================================ */
+div.searchresults .highslide-caption {
+  font-size: 12px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 4px;
+}
+
+/* ============================================
+   Error images info
+   ============================================ */
+#imageErrorsInfo {
+  background-color: #fef7e0;
+  color: #856404;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin: 16px 0;
+  max-width: var(--search-max-width);
+}
+
+#imageErrorsInfo .btn {
+  margin-left: 8px;
+}
+
+/* ============================================
+   Audio results table styling
+   ============================================ */
+body#yacysearch table {
+  max-width: 100%;
+  border-collapse: collapse;
+}
+
+body#yacysearch table tr.TableHeader td {
+  background: #f8f9fa;
+  padding: 12px;
+  font-weight: 600;
+  border-bottom: 2px solid var(--search-border-color);
+}
+
+body#yacysearch table tr td {
+  padding: 12px;
+  border-bottom: 1px solid var(--search-border-color);
+}
+
+/* Audio controls */
+#audioControls {
+  margin-top: 8px;
+}
+
+#audioControls .btn {
+  border-radius: 4px;
+}
+
+/* ============================================
+   Typeahead suggestions
+   ============================================ */
+.twitter-typeahead {
+  width: 100%;
+}
+
+.tt-menu {
+  background: #fff;
+  border: 1px solid var(--search-border-color);
+  border-radius: 0 0 24px 24px;
+  box-shadow: 0 4px 6px rgba(32, 33, 36, 0.28);
+  padding: 8px 0;
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.tt-suggestion {
+  padding: 8px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #202124;
+}
+
+.tt-suggestion:hover,
+.tt-suggestion.tt-cursor {
+  background-color: var(--search-hover-bg);
+}
+
+/* ============================================
+   Animation for result appearance
+   ============================================ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+div.searchresults.fresh,
+article.searchresults.fresh {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.glyphicon-spin {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

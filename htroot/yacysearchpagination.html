@@ -1,22 +1,28 @@
 #(pagination)#
 	::
-	<span id="resNav" class="col-sm-12  col-md-12" style="display: inline;">
-		<ul id="paginationButtons" class="pagination#(hidePagination)#:: hidden#(/hidePagination)#">
-			<li id="prevpage" class="#(prevDisabled)#::disabled#(/prevDisabled)#">
-				<a title="Previous page" 
-					#(prevDisabled)#href="#[prevHref]#"::href="#"#(/prevDisabled)# 
-					#(prevDisabled)#accesskey="p"#(/prevDisabled)#>&laquo;</a>
+	<nav id="resNav" class="search-pagination" aria-label="Search results pages">
+		<ul id="paginationButtons" class="pagination pagination-modern#(hidePagination)#:: hidden#(/hidePagination)#">
+			<li id="prevpage" class="page-item #(prevDisabled)#::disabled#(/prevDisabled)#">
+				<a class="page-link" title="Previous page"
+					#(prevDisabled)#href="#[prevHref]#"::href="#" tabindex="-1"#(/prevDisabled)#
+					#(prevDisabled)#accesskey="p"#(/prevDisabled)#>
+					<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+					<span class="sr-only">Previous</span>
+				</a>
 			</li>
 			#{pages}#
-			<li class="#(active)#::active#(/active)#">
-				<a #(active)#href="#[href]#"::href="#"#(/active)#">#[pageNum]#</a>
+			<li class="page-item #(active)#::active#(/active)#">
+				<a class="page-link" #(active)#href="#[href]#"::href="#" aria-current="page"#(/active)#>#[pageNum]#</a>
 			</li>
 			#{/pages}#
-			<li id="nextpage" class="#(nextDisabled)#::disabled#(/nextDisabled)#">
-				<a title="Next page" 
-					#(nextDisabled)#href="#[nextHref]#"::href="#"#(/nextDisabled)# 
-					#(prevDisabled)#accesskey="n"#(/prevDisabled)#>&raquo;</a>
+			<li id="nextpage" class="page-item #(nextDisabled)#::disabled#(/nextDisabled)#">
+				<a class="page-link" title="Next page"
+					#(nextDisabled)#href="#[nextHref]#"::href="#" tabindex="-1"#(/nextDisabled)#
+					#(prevDisabled)#accesskey="n"#(/prevDisabled)#>
+					<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+					<span class="sr-only">Next</span>
+				</a>
 			</li>
 		</ul>
-	</span>
+	</nav>
 #(/pagination)#
