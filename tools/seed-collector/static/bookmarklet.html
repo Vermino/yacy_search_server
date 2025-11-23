@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YaCy Seed Collector - Browser Integration</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #22c55e;
+            --code-bg: #f1f5f9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-number {
+            background: var(--primary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .bookmarklet-btn {
+            display: inline-block;
+            padding: 14px 28px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.2s;
+            cursor: grab;
+        }
+
+        .bookmarklet-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .bookmarklet-btn:active {
+            cursor: grabbing;
+        }
+
+        .instructions {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--code-bg);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: 0.875em;
+        }
+
+        pre {
+            background: var(--code-bg);
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .config-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        label {
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        input[type="text"] {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .test-section {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--code-bg);
+            border-radius: 8px;
+        }
+
+        .test-result {
+            margin-top: 0.5rem;
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .test-result.success {
+            display: block;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .test-result.error {
+            display: block;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .mobile-section {
+            margin-top: 1rem;
+        }
+
+        .mobile-section p {
+            margin-bottom: 0.5rem;
+        }
+
+        ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>YaCy Seed Collector</h1>
+        <p class="subtitle">Add URLs to your YaCy search index while browsing</p>
+
+        <div class="card">
+            <h2><span class="step-number">1</span> Configure Your Server</h2>
+            <div class="config-form">
+                <div class="form-group">
+                    <label for="serverUrl">Seed Collector URL</label>
+                    <input type="text" id="serverUrl" value="http://localhost:8091" placeholder="http://localhost:8091">
+                </div>
+                <button class="btn" onclick="updateBookmarklet()">Update Bookmarklet</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2><span class="step-number">2</span> Install Bookmarklet</h2>
+            <p>Drag this button to your bookmarks bar:</p>
+            <br>
+            <a id="bookmarklet" class="bookmarklet-btn" href="#">+ Add to YaCy Seeds</a>
+
+            <div class="instructions">
+                <strong>How to use:</strong>
+                <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                    <li>Drag the blue button above to your browser's bookmarks bar</li>
+                    <li>When you find an interesting page, click the bookmarklet</li>
+                    <li>The URL will be sent to your seed collector</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2><span class="step-number">3</span> Test Connection</h2>
+            <p>Make sure your seed collector is running:</p>
+            <div class="test-section">
+                <button class="btn" onclick="testConnection()">Test Connection</button>
+                <div id="testResult" class="test-result"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Manual Code</h2>
+            <p>If drag-and-drop doesn't work, copy this code and create a bookmark manually:</p>
+            <pre id="bookmarkletCode"></pre>
+        </div>
+
+        <div class="card">
+            <h2>API Usage</h2>
+            <pre>
+# Add a seed with curl
+curl -X POST <span id="apiUrl">http://localhost:8091</span>/seed \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com", "tags": ["tech"]}'
+
+# View your seed queue
+curl <span id="queueUrl">http://localhost:8091</span>/queue
+
+# Get statistics
+curl <span id="statsUrl">http://localhost:8091</span>/queue/stats</pre>
+        </div>
+
+        <div class="card">
+            <h2>Mobile Integration</h2>
+            <div class="mobile-section">
+                <p><strong>iOS Shortcut:</strong></p>
+                <ol style="margin-left: 1.5rem;">
+                    <li>Create a new Shortcut</li>
+                    <li>Add "Get URLs from Input"</li>
+                    <li>Add "Get Contents of URL" with POST to your seed collector</li>
+                    <li>Add to Share Sheet</li>
+                </ol>
+
+                <p style="margin-top: 1rem;"><strong>Android:</strong></p>
+                <ul>
+                    <li>Use HTTP Shortcuts app</li>
+                    <li>Or Tasker with HTTP Request action</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getBookmarkletCode(serverUrl) {
+            return `javascript:(function(){var t=document.title;fetch('${serverUrl}/seed',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:location.href,title:t})}).then(r=>r.json()).then(d=>alert('Added: '+d.message)).catch(e=>alert('Error: '+e))})();`;
+        }
+
+        function updateBookmarklet() {
+            const serverUrl = document.getElementById('serverUrl').value.replace(/\/$/, '');
+            const code = getBookmarkletCode(serverUrl);
+
+            document.getElementById('bookmarklet').href = code;
+            document.getElementById('bookmarkletCode').textContent = code;
+            document.getElementById('apiUrl').textContent = serverUrl;
+            document.getElementById('queueUrl').textContent = serverUrl;
+            document.getElementById('statsUrl').textContent = serverUrl;
+
+            // Save to localStorage
+            localStorage.setItem('seedCollectorUrl', serverUrl);
+        }
+
+        async function testConnection() {
+            const serverUrl = document.getElementById('serverUrl').value.replace(/\/$/, '');
+            const resultEl = document.getElementById('testResult');
+
+            try {
+                const response = await fetch(`${serverUrl}/health`);
+                const data = await response.json();
+
+                if (data.status === 'healthy') {
+                    resultEl.className = 'test-result success';
+                    resultEl.textContent = `Connected! Queue has ${data.queue_size} seeds.`;
+                } else {
+                    throw new Error('Unhealthy response');
+                }
+            } catch (e) {
+                resultEl.className = 'test-result error';
+                resultEl.textContent = `Connection failed: ${e.message}. Is the seed collector running?`;
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const saved = localStorage.getItem('seedCollectorUrl');
+            if (saved) {
+                document.getElementById('serverUrl').value = saved;
+            }
+            updateBookmarklet();
+        });
+    </script>
+</body>
+</html>

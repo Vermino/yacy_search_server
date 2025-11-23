@@ -1,0 +1,119 @@
+version: '3.8'
+
+# YaCy Search Server with Seed Collector and LLM Janitor
+#
+# Usage:
+#   docker-compose -f docker-compose.janitor.yml up -d
+#
+# Environment variables (create a .env file):
+#   LLM_API_KEY=your-openai-api-key
+#   LLM_MODEL=gpt-4o-mini
+#   YACY_ADMIN_PASSWORD=your-yacy-password
+#   PUBLIC_URL=https://your-domain.com:8091
+
+services:
+  # YaCy Search Server
+  yacy:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: yacy
+    ports:
+      - "8090:8090"
+      - "8443:8443"
+    volumes:
+      - yacy_data:/opt/yacy_search_server/DATA
+      - janitor_data:/opt/yacy_search_server/DATA/LISTS/janitor
+    environment:
+      - YACY_ADMIN_PASSWORD=${YACY_ADMIN_PASSWORD:-yacy}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  # Seed Collector Service
+  seed-collector:
+    build:
+      context: ./tools/seed-collector
+      dockerfile: Dockerfile
+    container_name: seed-collector
+    ports:
+      - "8091:8091"
+    volumes:
+      - janitor_data:/data
+    environment:
+      - QUEUE_FILE=/data/queued_seeds.jsonl
+      - HOST=0.0.0.0
+      - PORT=8091
+      - PUBLIC_URL=${PUBLIC_URL:-http://localhost:8091}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8091/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "2"
+
+  # LLM Janitor Service
+  janitor:
+    build:
+      context: ./tools/yacy-janitor
+      dockerfile: Dockerfile
+    container_name: yacy-janitor
+    volumes:
+      - janitor_data:/data
+    environment:
+      # YaCy connection
+      - YACY_URL=http://yacy:8090
+      - YACY_ADMIN_USER=admin
+      - YACY_ADMIN_PASSWORD=${YACY_ADMIN_PASSWORD:-yacy}
+      # LLM configuration
+      - LLM_PROVIDER=${LLM_PROVIDER:-openai}
+      - LLM_API_KEY=${LLM_API_KEY:-}
+      - LLM_MODEL=${LLM_MODEL:-gpt-4o-mini}
+      - LLM_BASE_URL=${LLM_BASE_URL:-}
+      # Data paths
+      - DATA_DIR=/data
+      - QUEUE_FILE=/data/queued_seeds.jsonl
+      - KEEP_HOSTS_FILE=/data/keep_hosts.txt
+      - BAN_HOSTS_FILE=/data/ban_hosts.txt
+      - MANUAL_REVIEW_FILE=/data/manual_review.jsonl
+      - CACHE_FILE=/data/classification_cache.json
+      # Scheduling (in minutes)
+      - HOST_SCAN_INTERVAL_MINUTES=${HOST_SCAN_INTERVAL:-60}
+      - CLASSIFICATION_INTERVAL_MINUTES=${CLASSIFICATION_INTERVAL:-15}
+      - SEED_INTAKE_INTERVAL_MINUTES=${SEED_INTAKE_INTERVAL:-5}
+      # Thresholds
+      - KEEP_CONFIDENCE_THRESHOLD=${KEEP_THRESHOLD:-0.7}
+      - BAN_CONFIDENCE_THRESHOLD=${BAN_THRESHOLD:-0.8}
+    depends_on:
+      yacy:
+        condition: service_healthy
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "2"
+
+volumes:
+  yacy_data:
+    name: yacy_data
+  janitor_data:
+    name: janitor_data
+
+networks:
+  default:
+    name: yacy_network
