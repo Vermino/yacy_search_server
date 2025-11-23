@@ -70,21 +70,19 @@ body#index::after {
 }
 
 /* ============================================
-   Header/Navbar - Minimal Modern Style
+   Header/Navbar - Ultra Minimal Style
    ============================================ */
 body#index .navbar {
-  position: fixed;
+  position: absolute;
   top: 0;
-  left: 0;
   right: 0;
+  left: auto;
   z-index: 1000;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  background: rgba(255, 255, 255, 0.85) !important;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  min-height: 60px;
-  padding: 8px 20px;
+  background: transparent !important;
+  border: none;
+  box-shadow: none;
+  min-height: auto;
+  padding: 16px 20px;
 }
 
 /* Hide the default navbar collapse and mobile toggle */
@@ -175,29 +173,35 @@ body#index .navbar-brand {
    Main Content Container
    ============================================ */
 body#index .container-fluid {
-  max-width: 800px;
+  max-width: 650px;
   margin: 0 auto;
-  padding: 100px 20px 40px;
+  padding: 0 20px;
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
 }
 
 body#index .starter-template {
   text-align: center;
+  width: 100%;
 }
 
 /* ============================================
-   Logo & Title
+   Logo & Title - Centered Above Search
    ============================================ */
 body#index h2.yacy {
-  margin: 20px 0;
+  margin: 0 0 24px 0;
   text-align: center;
 }
 
 body#index h2.yacy .yacylogo img {
-  max-width: 280px;
+  max-width: 200px;
   height: auto;
-  filter: drop-shadow(0 4px 20px rgba(22, 163, 74, 0.2));
+  filter: drop-shadow(0 4px 20px rgba(22, 163, 74, 0.15));
   transition: transform 0.3s ease;
 }
 
@@ -205,19 +209,21 @@ body#index h2.yacy .yacylogo:hover img {
   transform: scale(1.02);
 }
 
+/* Hide the text greeting under logo if present */
+body#index h2.yacy:not(:has(.yacylogo)) {
+  display: none;
+}
+
 /* ============================================
-   Search Form - Glassmorphism Card
+   Search Form - Simple Clean Style
    ============================================ */
 body#index form.search {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: var(--radius-xl);
-  padding: 40px;
-  margin: 40px auto;
-  max-width: 600px;
-  border: 1px solid rgba(229, 231, 235, 0.5);
-  box-shadow: var(--shadow-xl);
+  background: transparent;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 100%;
+  border: none;
+  box-shadow: none;
 }
 
 body#index fieldset.maininput {
@@ -289,15 +295,15 @@ body#index .yacysearch {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 12px;
-  margin-top: 24px;
+  gap: 10px;
+  margin-top: 20px;
 }
 
 body#index .yacysearch label {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
+  gap: 6px;
+  padding: 8px 16px;
   border: 2px solid #e5e7eb;
   border-radius: var(--radius-full);
   background: var(--bg-white);
@@ -309,15 +315,20 @@ body#index .yacysearch label {
 }
 
 body#index .yacysearch label:hover {
-  border-color: #d1d5db;
-  background: var(--bg-gray-50);
+  border-color: var(--primary-green);
+  background: #ecfdf5;
+  color: #047857;
 }
 
+/* Show radio as accent color */
 body#index .yacysearch input[type="radio"] {
-  display: none;
+  accent-color: var(--primary-green);
+  margin: 0;
+  width: 14px;
+  height: 14px;
 }
 
-body#index .yacysearch input[type="radio"]:checked + label,
+/* Style labels with checked radios (using :has for modern browsers) */
 body#index .yacysearch label:has(input[type="radio"]:checked) {
   background: linear-gradient(135deg, #ecfdf5, #d1fae5);
   border-color: var(--primary-green);
@@ -326,6 +337,9 @@ body#index .yacysearch label:has(input[type="radio"]:checked) {
 
 /* More options link */
 body#index .yacysearch a {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
   color: var(--text-muted);
   text-decoration: none;
   font-size: 14px;
@@ -334,6 +348,34 @@ body#index .yacysearch a {
 
 body#index .yacysearch a:hover {
   color: var(--primary-green);
+}
+
+/* Override any Bootstrap blue colors */
+body#index .btn-primary,
+body#index .btn-info {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
+  border-color: transparent !important;
+}
+
+body#index .btn-default {
+  background: var(--bg-white) !important;
+  border: 2px solid #e5e7eb !important;
+  color: var(--text-secondary) !important;
+}
+
+body#index .btn-default:hover,
+body#index .btn-default:focus {
+  background: #ecfdf5 !important;
+  border-color: var(--primary-green) !important;
+  color: #047857 !important;
+}
+
+body#index a {
+  color: var(--primary-green);
+}
+
+body#index a:hover {
+  color: var(--gradient-end);
 }
 
 /* ============================================

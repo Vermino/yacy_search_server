@@ -270,17 +270,27 @@ body#yacysearch .input-group-btn .btn:hover {
 /* ============================================
    Main Content Area
    ============================================ */
+body#yacysearch .starter-template {
+  padding-top: 80px;
+}
+
 body#yacysearch .main {
-  max-width: 1200px;
-  margin: 0 auto;
   padding: 24px;
   position: relative;
   z-index: 1;
 }
 
-body#yacysearch .row {
+/* Fix Bootstrap grid to work properly */
+body#yacysearch > .container-fluid > .row,
+body#yacysearch .starter-template > .row {
   display: flex;
-  gap: 32px;
+  flex-wrap: wrap;
+}
+
+/* Remove Bootstrap offsets that break the layout */
+body#yacysearch .col-sm-offset-4,
+body#yacysearch .col-md-offset-3 {
+  margin-left: 0;
 }
 
 /* ============================================
@@ -1340,17 +1350,17 @@ body#yacysearch .pro-tip-card {
   transform: rotate(-90deg);
 }
 
-/* Make sidebar narrower and better positioned */
-body#yacysearch .col-md-3,
-body#yacysearch .col-lg-3 {
-  max-width: 280px;
+/* Make sidebar and main content work properly */
+body#yacysearch .sidebar {
+  width: 280px;
   flex: 0 0 280px;
+  order: -1;
 }
 
-body#yacysearch .col-md-9,
-body#yacysearch .col-lg-9 {
+body#yacysearch .main {
   flex: 1;
   min-width: 0;
+  max-width: 900px;
 }
 
 /* ============================================
