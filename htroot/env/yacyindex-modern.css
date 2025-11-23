@@ -1,0 +1,513 @@
+/* yacyindex-modern.css - Modern YaCy Home Page with Glassmorphism */
+
+/* ============================================
+   CSS Variables - Green/Emerald Theme
+   ============================================ */
+:root {
+  --primary-green: #16a34a;
+  --primary-emerald: #059669;
+  --gradient-start: #16a34a;
+  --gradient-end: #047857;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  --bg-white: #ffffff;
+  --bg-gray-50: #f9fafb;
+  --bg-gray-100: #f3f4f6;
+  --border-color: rgba(229, 231, 235, 0.5);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+}
+
+/* ============================================
+   Base Layout & Background
+   ============================================ */
+body#index {
+  background: linear-gradient(135deg, #f8fafc 0%, #ecfdf5 50%, #d1fae5 100%);
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  position: relative;
+}
+
+/* Animated gradient orbs */
+body#index::before,
+body#index::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body#index::before {
+  top: -200px;
+  right: -200px;
+  width: 500px;
+  height: 500px;
+  background: linear-gradient(135deg, #22c55e, #059669);
+  animation: pulse 8s ease-in-out infinite;
+}
+
+body#index::after {
+  bottom: -200px;
+  left: -200px;
+  width: 500px;
+  height: 500px;
+  background: linear-gradient(45deg, #10b981, #16a34a);
+  animation: pulse 8s ease-in-out infinite 1s;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.1); opacity: 0.4; }
+}
+
+/* ============================================
+   Header/Navbar - Minimal Modern Style
+   ============================================ */
+body#index .navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  min-height: 60px;
+  padding: 8px 20px;
+}
+
+/* Hide the default navbar collapse and mobile toggle */
+body#index .navbar-toggle {
+  display: none !important;
+}
+
+body#index .navbar-collapse {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0;
+  margin: 0;
+  border: none;
+  box-shadow: none;
+  height: auto !important;
+  overflow: visible;
+}
+
+body#index .navbar-collapse.collapse {
+  display: flex !important;
+}
+
+/* Hide unnecessary nav items, keep only icons */
+body#index .navbar-collapse .nav.navbar-nav:first-child {
+  display: none;
+}
+
+body#index .navbar-collapse .navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  float: none;
+}
+
+body#index .navbar-right > li {
+  float: none;
+}
+
+/* Simplify header dropdowns to just icons */
+body#index .navbar-right #header_search > a span.hidden-sm,
+body#index .navbar-right #header_administration span.hidden-sm,
+body#index .navbar-right #header_administration span.hidden-md {
+  display: none !important;
+}
+
+body#index .navbar-right #header_search > a .visible-sm {
+  display: inline !important;
+}
+
+/* Icon buttons in navbar */
+body#index .navbar-right .dropdown > a,
+body#index .navbar-right .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--bg-gray-100);
+  border: none;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+body#index .navbar-right .dropdown > a:hover,
+body#index .navbar-right .btn:hover {
+  background: var(--bg-gray-100);
+  color: var(--primary-green);
+}
+
+body#index .navbar-right .dropdown > a .caret {
+  display: none;
+}
+
+body#index .navbar-right form {
+  margin: 0;
+}
+
+/* Logo styling - hidden on index as there's a main logo */
+body#index .navbar-brand {
+  display: none;
+}
+
+/* ============================================
+   Main Content Container
+   ============================================ */
+body#index .container-fluid {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 100px 20px 40px;
+  position: relative;
+  z-index: 1;
+}
+
+body#index .starter-template {
+  text-align: center;
+}
+
+/* ============================================
+   Logo & Title
+   ============================================ */
+body#index h2.yacy {
+  margin: 20px 0;
+  text-align: center;
+}
+
+body#index h2.yacy .yacylogo img {
+  max-width: 280px;
+  height: auto;
+  filter: drop-shadow(0 4px 20px rgba(22, 163, 74, 0.2));
+  transition: transform 0.3s ease;
+}
+
+body#index h2.yacy .yacylogo:hover img {
+  transform: scale(1.02);
+}
+
+/* ============================================
+   Search Form - Glassmorphism Card
+   ============================================ */
+body#index form.search {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  margin: 40px auto;
+  max-width: 600px;
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  box-shadow: var(--shadow-xl);
+}
+
+body#index fieldset.maininput {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Search input group */
+body#index .input-group {
+  display: flex;
+  align-items: stretch;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 2px solid #e5e7eb;
+  background: var(--bg-white);
+  transition: all 0.3s ease;
+}
+
+body#index .input-group:focus-within {
+  border-color: var(--primary-green);
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+}
+
+body#index .searchinput {
+  flex: 1;
+  font-size: 18px;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 16px 24px;
+  background: transparent;
+  box-shadow: none !important;
+}
+
+body#index .searchinput:focus {
+  outline: none;
+  box-shadow: none !important;
+}
+
+/* Search button */
+body#index .input-group-btn {
+  display: flex;
+  align-items: stretch;
+}
+
+body#index .input-group-btn .btn-primary {
+  border: none !important;
+  border-radius: 0 !important;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  color: white;
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+body#index .input-group-btn .btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* ============================================
+   Content Type Radio Buttons - Modern Pills
+   ============================================ */
+body#index .yacysearch {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+body#index .yacysearch label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: 2px solid #e5e7eb;
+  border-radius: var(--radius-full);
+  background: var(--bg-white);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+body#index .yacysearch label:hover {
+  border-color: #d1d5db;
+  background: var(--bg-gray-50);
+}
+
+body#index .yacysearch input[type="radio"] {
+  display: none;
+}
+
+body#index .yacysearch input[type="radio"]:checked + label,
+body#index .yacysearch label:has(input[type="radio"]:checked) {
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  border-color: var(--primary-green);
+  color: #047857;
+}
+
+/* More options link */
+body#index .yacysearch a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+body#index .yacysearch a:hover {
+  color: var(--primary-green);
+}
+
+/* ============================================
+   Search Options Table (expanded view)
+   ============================================ */
+body#index table[role="presentation"] {
+  margin: 20px auto;
+  text-align: left;
+}
+
+body#index table[role="presentation"] td {
+  padding: 8px 12px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+body#index table[role="presentation"] label {
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+body#index table[role="presentation"] input[type="radio"],
+body#index table[role="presentation"] input[type="checkbox"] {
+  accent-color: var(--primary-green);
+  margin-right: 6px;
+}
+
+body#index table[role="presentation"] input[type="text"] {
+  border: 2px solid #e5e7eb;
+  border-radius: var(--radius-lg);
+  padding: 8px 12px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+body#index table[role="presentation"] input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary-green);
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+}
+
+/* ============================================
+   Query Operators Help Section
+   ============================================ */
+body#index h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 24px 0 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+body#index dl {
+  text-align: left;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+body#index dt {
+  font-weight: 600;
+  color: var(--primary-green);
+  margin-bottom: 4px;
+}
+
+body#index dd {
+  margin-bottom: 12px;
+  margin-left: 0;
+  padding-left: 16px;
+  border-left: 2px solid #ecfdf5;
+}
+
+body#index dd a {
+  color: var(--primary-green);
+  text-decoration: none;
+}
+
+body#index dd a:hover {
+  text-decoration: underline;
+}
+
+/* ============================================
+   Header Dropdown Menus - Green Theme
+   ============================================ */
+body#index .dropdown-menu {
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+}
+
+body#index .dropdown-menu > li > a {
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+body#index .dropdown-menu > li > a:hover {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+body#index .dropdown-menu .divider {
+  background: #e5e7eb;
+  margin: 8px 0;
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+@media (max-width: 767px) {
+  body#index .container-fluid {
+    padding: 80px 16px 20px;
+  }
+
+  body#index form.search {
+    padding: 24px;
+    margin: 24px auto;
+  }
+
+  body#index .searchinput {
+    font-size: 16px;
+    padding: 14px 16px;
+  }
+
+  body#index .input-group-btn .btn-primary {
+    padding: 14px 20px;
+    font-size: 14px;
+  }
+
+  body#index h2.yacy .yacylogo img {
+    max-width: 200px;
+  }
+
+  body#index .yacysearch {
+    gap: 8px;
+  }
+
+  body#index .yacysearch label {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+}
+
+/* ============================================
+   Typeahead Suggestions Dropdown
+   ============================================ */
+body#index .tt-menu {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  margin-top: 8px;
+  padding: 8px;
+}
+
+body#index .tt-suggestion {
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+body#index .tt-suggestion:hover,
+body#index .tt-suggestion.tt-cursor {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+body#index .tt-suggestion strong {
+  color: var(--primary-green);
+}
