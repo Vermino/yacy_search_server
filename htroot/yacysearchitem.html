@@ -1,6 +1,6 @@
 #(content)#::
   <article class="searchresults" data-ranking="#[ranking]#" data-nav-generation="#[nav-generation]#">
-    <!-- URL displayed first (Google-style) -->
+    <!-- URL Line with domain and actions -->
     <div class="result-url-line">
       #(favicon)#::
       <img width="16" height="16" src="#[faviconUrl]#" id="f#[urlhash]#" class="favicon" alt="" />
@@ -8,7 +8,7 @@
       <cite class="result-cite">
         <a href="#[link]#" id="url#[urlhash]#" target="#[target]#" #(noreferrer)#::rel="noreferrer"#(/noreferrer)#>#[urlname]#</a>
       </cite>
-      <!-- Action buttons (visible on hover) -->
+      <!-- Action buttons -->
       <div class="urlactions">
         #(heuristic)#::
         <span class="heuristic-badge redundant" title="heuristic:#[name]# (redundant)"></span>::
@@ -16,15 +16,15 @@
         #(/heuristic)#
         #(authorized)#::
         #(bookmark)#::
-          <a href="#[bookmarklink]#" class="action-btn bookmarklink" title="Bookmark"><span class="glyphicon glyphicon-bookmark"></span></a>
+          <a href="#[bookmarklink]#" class="action-btn secondary bookmarklink" title="Bookmark"><span class="glyphicon glyphicon-bookmark"></span></a>
         #(/bookmark)#
         #(recommend)#
           ::
-          <a href="#[recommendlink]#" class="action-btn recommendlink" title="Recommend"><span class="glyphicon glyphicon-thumbs-up"></span></a>
-          <a href="#[deletelink]#" class="action-btn deletelink" title="Delete"><span class="glyphicon glyphicon-trash"></span></a>
+          <a href="#[recommendlink]#" class="action-btn secondary recommendlink" title="Recommend"><span class="glyphicon glyphicon-thumbs-up"></span></a>
+          <a href="#[deletelink]#" class="action-btn secondary deletelink" title="Delete"><span class="glyphicon glyphicon-trash"></span></a>
         #(/recommend)#
         #(blacklist)#::
-          <a href="#[blacklistlink]#" class="action-btn blacklistlink" title="Blacklist host"><span class="glyphicon glyphicon-ban-circle"></span></a>
+          <a href="#[blacklistlink]#" class="action-btn secondary blacklistlink" title="Blacklist"><span class="glyphicon glyphicon-ban-circle"></span></a>
         #(/blacklist)#
         #(/authorized)#
       </div>
@@ -35,8 +35,25 @@
       <a href="#[link]#" target="#[target]#" #(noreferrer)#::rel="noreferrer"#(/noreferrer)#>#[title]#</a>
     </h4>
 
-    <!-- Snippet/Description -->
+    <!-- Description/Snippet -->
     <p class="snippet"><span class="snippetLoaded" id="h#[urlhash]#">#[description]#</span></p>
+
+    <!-- Metadata Pills Row -->
+    <div class="result-meta">
+      #(showDate)#::<span class="meta-pill date"><span class="glyphicon glyphicon-calendar"></span> #[date]#</span>#(/showDate)#
+      #(showEvent)#::<span class="meta-pill date"><span class="glyphicon glyphicon-time"></span> #[date]#</span>#(/showEvent)#
+      #(showSize)#::<span class="meta-pill size"><span class="glyphicon glyphicon-file"></span> #[sizename]#</span>#(/showSize)#
+      #(showMetadata)#::<a href="solr/select?q=id:%22#[urlhash]#%22&start=0&rows=1&core=collection1&wt=html&omitHeader=true" target="_blank" class="meta-link">Metadata</a>#(/showMetadata)#
+      #(showParser)#::<a href="ViewFile.html?urlHash=#[urlhash]#&amp;words=#[words]#" target="_blank" class="meta-link">Parser</a>#(/showParser)#
+      #(showCitation)#::<a href="api/citation.html?hash=#[urlhash]#&filter=true" target="_blank" class="meta-link">Citations</a>#(/showCitation)#
+      #(showPictures)#::<a href="yacysearch.html?contentdom=image#(authSearch)#::&auth#(/authSearch)#&url=#[link]#&query=#[former]#+inurl:#[link]#" target="_blank" class="meta-link"><span class="glyphicon glyphicon-picture"></span> Pictures</a>#(/showPictures)#
+      #(showCache)#::<a href="CacheResource_p.html?url=#[link]#" target="_blank" class="meta-link">Cached</a>#(/showCache)#
+      #(showProxy)#::<a href="proxy.html?url=#[link]#" target="_blank" class="meta-link">Proxy</a>#(/showProxy)#
+      #(showIndexBrowser)#::<a href="IndexBrowser_p.html?path=#[link]#" class="meta-link" title="Browse index"><span class="glyphicon glyphicon-folder-open"></span></a>#(/showIndexBrowser)#
+      #(showVocabulary)#::<span class="meta-pill category">#{vocabulary}##[name]#:#[terms]# #{/vocabulary}#</span>#(/showVocabulary)#
+      #(showSnapshots)#::<a href="#[link]#" target="_blank" class="meta-link">#[extension]# Snapshot</a>#(/showSnapshots)#
+      #(showRanking)#::<span class="meta-pill category" title="Ranking score">Score: #[ranking]#</span>#(/showRanking)#
+    </div>
 
     <!-- Tags/Keywords -->
     #(showKeywords)#::
@@ -46,30 +63,20 @@
       <span id="moreKeywords#[urlhash]#" class="more-tags hidden">
         #{keywords}#<a href="#[tagurl]#" class="tag-pill">#[tagword]#</a>#{/keywords}#
       </span>
-      <button class="expandKeywordsBtn btn-link" type="button"
+      <button class="action-btn secondary" type="button"
         aria-controls="moreKeywords#[urlhash]#" aria-expanded="false" title="Show all tags"
-        onclick="toggleMoreTags(this, 'moreKeywords#[urlhash]#')">
-        <span class="expand-text">more</span>
+        onclick="toggleMoreTags(this, 'moreKeywords#[urlhash]#')" style="padding:6px 12px;font-size:12px;">
+        more tags
       </button>
       #(/moreKeywords)#
     </div>
     #(/showKeywords)#
 
-    <!-- Metadata footer -->
-    <div class="result-meta">
-      #(showDate)#::<span class="meta-item" title="Last known modification date">#[date]#</span>#(/showDate)#
-      #(showEvent)#::<span class="meta-item">on #[date]#</span>#(/showEvent)#
-      #(showSize)#::<span class="meta-item meta-separator">#[sizename]#</span>#(/showSize)#
-      #(showMetadata)#::<a href="solr/select?q=id:%22#[urlhash]#%22&start=0&rows=1&core=collection1&wt=html&omitHeader=true" target="_blank" class="meta-link">Metadata</a>#(/showMetadata)#
-      #(showParser)#::<a href="ViewFile.html?urlHash=#[urlhash]#&amp;words=#[words]#" target="_blank" class="meta-link">Parser</a>#(/showParser)#
-      #(showCitation)#::<a href="api/citation.html?hash=#[urlhash]#&filter=true" target="_blank" class="meta-link">Citations</a>#(/showCitation)#
-      #(showPictures)#::<a href="yacysearch.html?contentdom=image#(authSearch)#::&auth#(/authSearch)#&url=#[link]#&query=#[former]#+inurl:#[link]#" target="_blank" class="meta-link">Pictures</a>#(/showPictures)#
-      #(showCache)#::<a href="CacheResource_p.html?url=#[link]#" target="_blank" class="meta-link">Cached</a>#(/showCache)#
-      #(showProxy)#::<a href="proxy.html?url=#[link]#" target="_blank" class="meta-link">Proxy</a>#(/showProxy)#
-      #(showIndexBrowser)#::<a href="IndexBrowser_p.html?path=#[link]#" class="meta-link" title="Browse index"><span class="glyphicon glyphicon-folder-open"></span></a>#(/showIndexBrowser)#
-      #(showVocabulary)#::<span class="meta-vocabulary">#{vocabulary}##[name]#:#[terms]# #{/vocabulary}#</span>#(/showVocabulary)#
-      #(showSnapshots)#::<a href="#[link]#" target="_blank" class="meta-link">#[extension]# Snapshot</a>#(/showSnapshots)#
-      #(showRanking)#::<span class="meta-item meta-ranking" title="Raw ranking score value">Score: #[ranking]#</span>#(/showRanking)#
+    <!-- Action Buttons -->
+    <div class="result-actions">
+      <a href="#[link]#" target="#[target]#" class="action-btn primary" #(noreferrer)#::rel="noreferrer"#(/noreferrer)#>
+        <span class="glyphicon glyphicon-new-window"></span> Visit Site
+      </a>
     </div>
   </article>
   ::
