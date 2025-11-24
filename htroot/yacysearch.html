@@ -239,6 +239,22 @@ document.getElementById("Enter").innerHTML = "search again";
 	<button id="hideErrorImagesBtn" class="btn btn-default btn-sm hidden" onclick="hideErrThumbnails()" title="Hide links to images that could not be rendered">Hide</button>
 </div>
 
+<!-- Rich Results Carousel for Recipes/Videos -->
+<div id="richResultsCarousel" class="rich-carousel hidden">
+  <div class="carousel-header">
+    <h3 class="carousel-title"><span class="glyphicon glyphicon-cutlery"></span> Recipes</h3>
+    <div class="carousel-nav">
+      <button class="carousel-btn prev" onclick="scrollCarousel(-1)" title="Previous"><span class="glyphicon glyphicon-chevron-left"></span></button>
+      <button class="carousel-btn next" onclick="scrollCarousel(1)" title="Next"><span class="glyphicon glyphicon-chevron-right"></span></button>
+    </div>
+  </div>
+  <div class="carousel-track-container">
+    <div class="carousel-track" id="carouselTrack">
+      <!-- Recipe cards will be inserted here by JavaScript -->
+    </div>
+  </div>
+</div>
+
 <!-- linklist begin -->
 #(resultTable)#::<table width="100%"><tr class="TableHeader"><td width="30%">Media</td><td width="70%">URL</td></tr>
 ::<table width="100%">
@@ -327,6 +343,90 @@ function latestinfo() {
   self.xmlHttpReq.send(null);
 }
 window.setTimeout(latestinfo, 500); // we need that to get a correct pagination bar at the end of the page
+
+// Rich Results Carousel functionality
+function initRichResultsCarousel() {
+  var recipeResults = document.querySelectorAll('article.searchresults.content-recipe');
+  var videoResults = document.querySelectorAll('article.searchresults.content-video');
+  var carousel = document.getElementById('richResultsCarousel');
+  var track = document.getElementById('carouselTrack');
+  var title = carousel ? carousel.querySelector('.carousel-title') : null;
+
+  if (!carousel || !track) return;
+
+  // Determine which type to show (recipes take priority, then videos)
+  var results = recipeResults.length > 0 ? recipeResults : videoResults;
+  var isRecipe = recipeResults.length > 0;
+
+  if (results.length < 2) {
+    carousel.classList.add('hidden');
+    return;
+  }
+
+  // Update title based on content type
+  if (title) {
+    if (isRecipe) {
+      title.innerHTML = '<span class="glyphicon glyphicon-cutlery"></span> Recipes';
+    } else {
+      title.innerHTML = '<span class="glyphicon glyphicon-play-circle"></span> Videos';
+    }
+  }
+
+  // Create carousel cards from search results
+  track.innerHTML = '';
+  results.forEach(function(result, index) {
+    if (index >= 8) return; // Max 8 items in carousel
+
+    var thumbnail = result.querySelector('.result-thumbnail img');
+    var titleEl = result.querySelector('h4.linktitle a');
+    var urlEl = result.querySelector('cite.result-cite a');
+    var readTimeEl = result.querySelector('.stat-item.time');
+    var trustEl = result.querySelector('.stat-item.trust');
+
+    var imgSrc = thumbnail ? thumbnail.src : '';
+    var titleText = titleEl ? titleEl.textContent : 'Untitled';
+    var link = titleEl ? titleEl.href : '#';
+    var domain = urlEl ? new URL(urlEl.href).hostname.replace('www.', '') : '';
+    var readTime = readTimeEl ? readTimeEl.textContent.trim() : '';
+    var trust = trustEl ? trustEl.textContent.trim() : '';
+
+    var card = document.createElement('a');
+    card.className = 'carousel-card';
+    card.href = link;
+    card.target = '_blank';
+    card.innerHTML =
+      '<div class="card-image">' +
+        (imgSrc ? '<img src="' + imgSrc + '" alt="" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=no-image><span class=glyphicon glyphicon-picture></span></div>\'">' : '<div class="no-image"><span class="glyphicon glyphicon-picture"></span></div>') +
+        (isRecipe ? '' : '<div class="play-overlay"><span class="glyphicon glyphicon-play"></span></div>') +
+      '</div>' +
+      '<div class="card-content">' +
+        '<div class="card-title">' + titleText + '</div>' +
+        '<div class="card-source">' + domain + '</div>' +
+        '<div class="card-meta">' +
+          (readTime ? '<span class="card-time"><span class="glyphicon glyphicon-time"></span> ' + readTime + '</span>' : '') +
+        '</div>' +
+      '</div>';
+
+    track.appendChild(card);
+
+    // Hide the original result from main list if it's in carousel
+    if (index < 4) {
+      result.style.display = 'none';
+    }
+  });
+
+  carousel.classList.remove('hidden');
+}
+
+function scrollCarousel(direction) {
+  var track = document.getElementById('carouselTrack');
+  if (!track) return;
+  var scrollAmount = 280 * direction;
+  track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+}
+
+// Initialize carousel after DOM is ready and results are loaded
+window.setTimeout(initRichResultsCarousel, 100);
 </script>
 
 #%env/templates/footer.template%#
