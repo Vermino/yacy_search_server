@@ -242,6 +242,10 @@ public enum CollectionSchema implements SchemaDeclaration {
     recipe_author_s(SolrType.string, true, true, false, false, false, "author name from schema.org/Recipe"),
     recipe_image_s(SolrType.string, true, true, false, false, false, "image URL from schema.org/Recipe"),
 
+    // Generic schema.org detection
+    schema_org_primary_type_s(SolrType.string, true, true, false, false, false, "Primary schema.org type derived from structured data"),
+    schema_org_types_sxt(SolrType.string, true, true, true, false, false, "All detected schema.org @type values"),
+
     // link structure for ranking
     cr_host_count_i(SolrType.num_integer, true, true, false, false, false, "the number of documents within a single host"),
     cr_host_chance_d(SolrType.num_double, true, true, false, false, false, "the chance to click on this page when randomly clicking on links within on one host"),

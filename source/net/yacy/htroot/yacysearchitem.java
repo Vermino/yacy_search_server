@@ -35,6 +35,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
@@ -340,13 +341,54 @@ public class yacysearchitem {
                 }
                 prop.putHTML("content_ogType", ogType);
 
+                String schemaPrimaryType = null;
+                final Object schemaPrimaryObj = result.getFieldValue(CollectionSchema.schema_org_primary_type_s.getSolrFieldName());
+                if (schemaPrimaryObj != null) {
+                    schemaPrimaryType = schemaPrimaryObj.toString();
+                }
+                final Set<String> schemaTypes = new HashSet<>();
+                final Collection<Object> schemaTypeValues = result.getFieldValues(CollectionSchema.schema_org_types_sxt.getSolrFieldName());
+                if (schemaTypeValues != null) {
+                    for (final Object type : schemaTypeValues) {
+                        if (type != null) schemaTypes.add(type.toString());
+                    }
+                }
+                if (schemaPrimaryType == null && !schemaTypes.isEmpty()) {
+                    schemaPrimaryType = schemaTypes.iterator().next();
+                }
+
                 // Determine content category for styling (video, recipe, article, product, event, default)
                 String contentCategory = "default";
                 final String resultUrlLower = resultUrlstring.toLowerCase();
                 final String titleLower = result.dc_title().toLowerCase();
 
+                if (schemaPrimaryType != null) {
+                    final String schemaTypeLower = schemaPrimaryType.toLowerCase();
+                    if (schemaTypeLower.contains("recipe")) {
+                        contentCategory = "recipe";
+                    } else if (schemaTypeLower.contains("howto")) {
+                        contentCategory = "howto";
+                    } else if (schemaTypeLower.contains("faqpage")) {
+                        contentCategory = "faq";
+                    } else if (schemaTypeLower.contains("qapage") || schemaTypeLower.contains("discussionforumposting")) {
+                        contentCategory = "qa";
+                    } else if (schemaTypeLower.contains("product")) {
+                        contentCategory = "product";
+                    } else if (schemaTypeLower.contains("softwareapplication")) {
+                        contentCategory = "software";
+                    } else if (schemaTypeLower.contains("videoobject")) {
+                        contentCategory = "video";
+                    } else if (schemaTypeLower.contains("article") || schemaTypeLower.contains("blogposting") || schemaTypeLower.contains("newsarticle")) {
+                        contentCategory = "article";
+                    } else if (schemaTypeLower.contains("event")) {
+                        contentCategory = "event";
+                    } else if (schemaTypeLower.contains("organization") || schemaTypeLower.contains("localbusiness")) {
+                        contentCategory = "organization";
+                    }
+                }
+
                 // Video detection - check og:type, known video sites, URL patterns
-                if (ogType.contains("video") ||
+                if (contentCategory.equals("video") || ogType.contains("video") ||
                     resultUrlLower.contains("youtube.com") || resultUrlLower.contains("youtu.be") ||
                     resultUrlLower.contains("vimeo.com") || resultUrlLower.contains("dailymotion.com") ||
                     resultUrlLower.contains("tiktok.com") || resultUrlLower.contains("twitch.tv") ||
@@ -425,7 +467,12 @@ public class yacysearchitem {
                 prop.put("content_isVideo", contentCategory.equals("video") ? 1 : 0);
                 prop.put("content_isRecipe", contentCategory.equals("recipe") ? 1 : 0);
                 prop.put("content_isArticle", contentCategory.equals("article") ? 1 : 0);
+                prop.put("content_isHowTo", contentCategory.equals("howto") ? 1 : 0);
+                prop.put("content_isFaq", contentCategory.equals("faq") ? 1 : 0);
+                prop.put("content_isQa", contentCategory.equals("qa") ? 1 : 0);
                 prop.put("content_isProduct", contentCategory.equals("product") ? 1 : 0);
+                prop.put("content_isSoftware", contentCategory.equals("software") ? 1 : 0);
+                prop.put("content_isOrganization", contentCategory.equals("organization") ? 1 : 0);
                 prop.put("content_isEvent", contentCategory.equals("event") ? 1 : 0);
                 prop.put("content_isAudio", contentCategory.equals("audio") ? 1 : 0);
 

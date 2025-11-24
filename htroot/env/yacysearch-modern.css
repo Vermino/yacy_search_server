@@ -898,6 +898,31 @@ article.searchresults:hover .result-thumbnail img {
   color: white;
 }
 
+.content-type-badge.howto {
+  background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+  color: white;
+}
+
+.content-type-badge.faq {
+  background: linear-gradient(135deg, #6b7280, #9ca3af);
+  color: white;
+}
+
+.content-type-badge.qa {
+  background: linear-gradient(135deg, #9333ea, #a855f7);
+  color: white;
+}
+
+.content-type-badge.software {
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  color: white;
+}
+
+.content-type-badge.organization {
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: white;
+}
+
 /* Video play overlay on thumbnail */
 .video-play-overlay {
   position: absolute;

@@ -731,6 +731,11 @@ public class CollectionConfiguration extends SchemaConfiguration implements Seri
             final Integer recipeRatingCount = html.getRecipeRatingCount();
             if (recipeRatingCount != null) this.add(doc, CollectionSchema.recipe_rating_count_i, recipeRatingCount.intValue());
 
+            final Set<String> schemaOrgTypes = html.getSchemaOrgTypes();
+            if (!schemaOrgTypes.isEmpty()) this.add(doc, CollectionSchema.schema_org_types_sxt, schemaOrgTypes.toArray(new String[schemaOrgTypes.size()]));
+            final String primarySchemaType = html.getSchemaOrgPrimaryType();
+            if (primarySchemaType != null) this.add(doc, CollectionSchema.schema_org_primary_type_s, primarySchemaType);
+
             final List<String> articles = html.getArticles();
             this.add(doc, CollectionSchema.articlecount_i, articles.size());
             if (articles.size() > 0) this.add(doc, CollectionSchema.article_txt, articles);
