@@ -5,7 +5,12 @@
 	  document.getElementById("progressbar").setAttribute('class',"progress-bar progress-bar-success");
 	  window.setTimeout(fadeOutBar, 500);
   }
-</script>  
+</script>
+
+<!-- Sidebar toggle button -->
+<button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle sidebar">
+  <span class="glyphicon glyphicon-chevron-left"></span>
+</button>
 
 #(resource-switches)#::
 <div class="filter-section" id="search-mode-section">
@@ -340,4 +345,24 @@ function toggleFilterSection(sectionId) {
     }
   }
 }
+
+function toggleSidebar() {
+  var sidebar = document.querySelector('.sidebar');
+  if (sidebar) {
+    sidebar.classList.toggle('collapsed');
+    // Save state to localStorage
+    localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+  }
+}
+
+// Restore sidebar state on page load
+(function() {
+  var sidebarCollapsed = localStorage.getItem('sidebarCollapsed');
+  if (sidebarCollapsed === 'true') {
+    var sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+      sidebar.classList.add('collapsed');
+    }
+  }
+})();
 </script>

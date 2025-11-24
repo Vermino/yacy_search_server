@@ -108,25 +108,13 @@ Use the RSS search result format to add static searches to your RSS reader, if y
 <!-- body -->
 </div> <!-- close the starter-template, to open a row -->
 
-  <div class="row search-results-row">
-    <div class="col-sm-8 col-md-9 main">
-#(topmenu)#
-<form class="search small" name="searchform" method="get" accept-charset="UTF-8">
-::
-<form class="search small" name="searchform" method="get" accept-charset="UTF-8">
-#(/topmenu)#
-
+<!-- Search form - will be moved to navbar via script -->
+<form class="search small" id="navbar-searchform" name="searchform" method="get" accept-charset="UTF-8">
   <div class="input-group">
-    <input name="query" id="search" type="text" class="form-control searchinput typeahead" size="40" maxlength="200" 
+    <input name="query" id="search" type="text" class="form-control searchinput typeahead" size="40" maxlength="200"
     	placeholder="#[promoteSearchPageGreeting]#" value="#[former]#" #(focus)#::autofocus="autofocus"#(/focus)# onFocus="this.select()" onclick="document.getElementById('Enter').innerHTML = 'search'"/>
     <div class="input-group-btn">
        <button id="Enter" name="Enter" class="btn btn-default" type="submit">search</button>
-       #(resortEnabled)#::
-       <a id="resortCached" class="btn btn-default" style="visibility: hidden;" role="button" href="#[url]#" 
-       		title="Refresh sorting. Depending on their rank, some results fetched in background may then appear on this page.">
-        	<span  class="glyphicon glyphicon-sort"></span>
-       </a>
-       #(/resortEnabled)#
     </div>
   </div>
     #(authSearch)#::
@@ -146,6 +134,19 @@ Use the RSS search result format to add static searches to your RSS reader, if y
     <input type="hidden" name="meanCount" value="#[meanCount]#" />
     <input id="timezoneOffset" type="hidden" name="timezoneOffset" value=""><script>document.getElementById("timezoneOffset").value = new Date().getTimezoneOffset();</script>
 </form>
+<script>
+// Move search form into navbar
+(function() {
+  var form = document.getElementById('navbar-searchform');
+  var container = document.getElementById('navbar-search-container');
+  if (form && container) {
+    container.appendChild(form);
+  }
+})();
+</script>
+
+  <div class="row search-results-row">
+    <div class="col-sm-8 col-md-9 main">
 
 <!-- type the number of results and navigation bar -->
 #(num-results)#
