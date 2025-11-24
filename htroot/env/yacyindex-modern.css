@@ -1,0 +1,884 @@
+/* yacyindex-modern.css - Modern YaCy Home Page with Glassmorphism */
+
+/* ============================================
+   CSS Variables - Green/Emerald Theme
+   ============================================ */
+:root {
+  --primary-green: #16a34a;
+  --primary-emerald: #059669;
+  --gradient-start: #16a34a;
+  --gradient-end: #047857;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  --bg-white: #ffffff;
+  --bg-gray-50: #f9fafb;
+  --bg-gray-100: #f3f4f6;
+  --border-color: rgba(229, 231, 235, 0.5);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+}
+
+/* ============================================
+   Base Layout & Background
+   ============================================ */
+body#index {
+  background: linear-gradient(135deg, #f8fafc 0%, #ecfdf5 50%, #d1fae5 100%);
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  position: relative;
+}
+
+/* Animated gradient orbs */
+body#index::before,
+body#index::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body#index::before {
+  top: -200px;
+  right: -200px;
+  width: 500px;
+  height: 500px;
+  background: linear-gradient(135deg, #22c55e, #059669);
+  animation: pulse 8s ease-in-out infinite;
+}
+
+body#index::after {
+  bottom: -200px;
+  left: -200px;
+  width: 500px;
+  height: 500px;
+  background: linear-gradient(45deg, #10b981, #16a34a);
+  animation: pulse 8s ease-in-out infinite 1s;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.1); opacity: 0.4; }
+}
+
+/* ============================================
+   Header/Navbar - Top Banner Style (Google-like)
+   ============================================ */
+body#index .navbar {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  left: 0 !important;
+  z-index: 1000;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  min-height: 56px !important;
+  height: 56px !important;
+  padding: 0 16px !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+}
+
+/* Hide mobile toggle */
+body#index .navbar-toggle {
+  display: none !important;
+}
+
+/* Navbar container */
+body#index .navbar > .container-fluid {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Show navbar collapse as flex row */
+body#index .navbar-collapse {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  height: auto !important;
+  width: auto !important;
+  float: none !important;
+}
+
+body#index .navbar-collapse.collapse {
+  display: flex !important;
+}
+
+/* Hide left nav items */
+body#index .navbar-collapse .nav.navbar-nav:first-child {
+  display: none !important;
+}
+
+/* Show right navbar with icon buttons - horizontal row */
+body#index .navbar-collapse .navbar-right {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+  margin: 0 !important;
+  float: none !important;
+}
+
+body#index .navbar-right > li {
+  display: block !important;
+  float: none !important;
+}
+
+/* Hide text labels - icons only */
+body#index .navbar-right #header_search > a span.hidden-sm,
+body#index .navbar-right #header_administration span.hidden-sm,
+body#index .navbar-right #header_administration span.hidden-md,
+body#index .navbar-right span:not(.glyphicon) {
+  display: none !important;
+}
+
+body#index .navbar-right .caret {
+  display: none !important;
+}
+
+/* Icon buttons - circular style */
+body#index .navbar-right .dropdown > a,
+body#index .navbar-right .btn {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0 !important;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: none !important;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+body#index .navbar-right .dropdown > a:hover,
+body#index .navbar-right .btn:hover {
+  background: #ecfdf5;
+  color: var(--primary-green);
+}
+
+body#index .navbar-right form {
+  margin: 0 !important;
+}
+
+/* Logo styling - hidden on index as there's a main centered logo */
+body#index .navbar-brand {
+  display: none !important;
+}
+
+/* Hide navbar header on frontpage */
+body#index .navbar-header {
+  display: none !important;
+}
+
+/* ============================================
+   Main Content Container - Centered Google Style
+   ============================================ */
+body#index .container-fluid {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: auto !important;
+  height: auto !important;
+  background: transparent !important;
+  padding-top: 120px;
+  padding-bottom: 40px;
+}
+
+body#index .starter-template {
+  text-align: center;
+  width: 100%;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  min-height: auto !important;
+}
+
+/* ============================================
+   Logo & Title - Perfectly Centered Above Search
+   ============================================ */
+body#index h2.yacy {
+  margin: 0 0 32px 0;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+body#index h2.yacy .yacylogo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+body#index h2.yacy .yacylogo img {
+  max-width: 180px;
+  height: auto;
+  filter: drop-shadow(0 4px 20px rgba(22, 163, 74, 0.15));
+  transition: transform 0.3s ease;
+}
+
+body#index h2.yacy .yacylogo:hover img {
+  transform: scale(1.02);
+}
+
+/* Hide the text greeting under logo if present */
+body#index h2.yacy:not(:has(.yacylogo)) {
+  display: none;
+}
+
+/* ============================================
+   Search Form - Clean Google-like Style
+   ============================================ */
+body#index form.search {
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  max-width: 100%;
+  border: none !important;
+  box-shadow: none !important;
+  width: 100%;
+}
+
+body#index fieldset.maininput {
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+}
+
+/* Search input group - Google style */
+body#index .input-group {
+  display: flex;
+  align-items: center;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.12);
+  border: 1px solid #dfe1e5;
+  background: var(--bg-white) !important;
+  transition: all 0.3s ease;
+  height: 48px;
+}
+
+body#index .input-group:hover {
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.2);
+}
+
+body#index .input-group:focus-within {
+  border-color: transparent;
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.2);
+}
+
+body#index .searchinput {
+  flex: 1;
+  font-size: 16px;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 20px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  height: 46px;
+  line-height: 46px;
+  color: var(--text-primary) !important;
+}
+
+body#index .searchinput::placeholder {
+  color: var(--text-muted);
+}
+
+body#index .searchinput:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: var(--text-primary) !important;
+}
+
+/* Search button - aligned properly */
+body#index .input-group-btn {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+body#index .input-group-btn .btn-primary {
+  border: none !important;
+  border-radius: 0 24px 24px 0 !important;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
+  color: white !important;
+  padding: 0 28px !important;
+  font-size: 15px;
+  font-weight: 600;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+body#index .input-group-btn .btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* ============================================
+   Content Type Radio Buttons - Modern Pills
+   ============================================ */
+body#index .yacysearch {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+body#index .yacysearch label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: var(--radius-full);
+  background: var(--bg-white);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+body#index .yacysearch label:hover {
+  border-color: var(--primary-green);
+  background: #ecfdf5;
+  color: #047857;
+}
+
+/* Show radio as accent color */
+body#index .yacysearch input[type="radio"] {
+  accent-color: var(--primary-green);
+  margin: 0;
+  width: 14px;
+  height: 14px;
+}
+
+/* Style labels with checked radios (using :has for modern browsers) */
+body#index .yacysearch label:has(input[type="radio"]:checked) {
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  border-color: var(--primary-green);
+  color: #047857;
+}
+
+/* More options link */
+body#index .yacysearch a {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+body#index .yacysearch a:hover {
+  color: var(--primary-green);
+}
+
+/* Override any Bootstrap blue colors */
+body#index .btn-primary,
+body#index .btn-info {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
+  border-color: transparent !important;
+}
+
+body#index .btn-default {
+  background: var(--bg-white) !important;
+  border: 2px solid #e5e7eb !important;
+  color: var(--text-secondary) !important;
+}
+
+body#index .btn-default:hover,
+body#index .btn-default:focus {
+  background: #ecfdf5 !important;
+  border-color: var(--primary-green) !important;
+  color: #047857 !important;
+}
+
+body#index a {
+  color: var(--primary-green);
+}
+
+body#index a:hover {
+  color: var(--gradient-end);
+}
+
+/* ============================================
+   Search Options Table (expanded view)
+   ============================================ */
+body#index table[role="presentation"] {
+  margin: 20px auto;
+  text-align: left;
+}
+
+body#index table[role="presentation"] td {
+  padding: 8px 12px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+body#index table[role="presentation"] label {
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+body#index table[role="presentation"] input[type="radio"],
+body#index table[role="presentation"] input[type="checkbox"] {
+  accent-color: var(--primary-green);
+  margin-right: 6px;
+}
+
+body#index table[role="presentation"] input[type="text"] {
+  border: 2px solid #e5e7eb;
+  border-radius: var(--radius-lg);
+  padding: 8px 12px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+body#index table[role="presentation"] input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary-green);
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+}
+
+/* ============================================
+   Query Operators Help Section
+   ============================================ */
+body#index h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 24px 0 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+body#index dl {
+  text-align: left;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+body#index dt {
+  font-weight: 600;
+  color: var(--primary-green);
+  margin-bottom: 4px;
+}
+
+body#index dd {
+  margin-bottom: 12px;
+  margin-left: 0;
+  padding-left: 16px;
+  border-left: 2px solid #ecfdf5;
+}
+
+body#index dd a {
+  color: var(--primary-green);
+  text-decoration: none;
+}
+
+body#index dd a:hover {
+  text-decoration: underline;
+}
+
+/* ============================================
+   Header Dropdown Menus - Green Theme
+   ============================================ */
+body#index .dropdown-menu {
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+}
+
+body#index .dropdown-menu > li > a {
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+body#index .dropdown-menu > li > a:hover {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+body#index .dropdown-menu .divider {
+  background: #e5e7eb;
+  margin: 8px 0;
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+@media (max-width: 767px) {
+  body#index .container-fluid {
+    padding: 80px 16px 20px;
+  }
+
+  body#index form.search {
+    padding: 24px;
+    margin: 24px auto;
+  }
+
+  body#index .searchinput {
+    font-size: 16px;
+    padding: 14px 16px;
+  }
+
+  body#index .input-group-btn .btn-primary {
+    padding: 14px 20px;
+    font-size: 14px;
+  }
+
+  body#index h2.yacy .yacylogo img {
+    max-width: 200px;
+  }
+
+  body#index .yacysearch {
+    gap: 8px;
+  }
+
+  body#index .yacysearch label {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+}
+
+/* ============================================
+   Typeahead Suggestions Dropdown
+   ============================================ */
+body#index .tt-menu {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  margin-top: 8px;
+  padding: 8px;
+}
+
+body#index .tt-suggestion {
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+body#index .tt-suggestion:hover,
+body#index .tt-suggestion.tt-cursor {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+body#index .tt-suggestion strong {
+  color: var(--primary-green);
+}
+
+/* ============================================
+   Override All Blue Bootstrap Colors
+   ============================================ */
+body#index .btn-info,
+body#index .btn-primary,
+body#index .label-info,
+body#index .label-primary,
+body#index .bg-info,
+body#index .bg-primary {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
+  border-color: transparent !important;
+  color: white !important;
+}
+
+body#index .text-info,
+body#index .text-primary {
+  color: var(--primary-green) !important;
+}
+
+body#index .panel-info,
+body#index .panel-primary {
+  border-color: var(--primary-green) !important;
+}
+
+body#index .panel-info > .panel-heading,
+body#index .panel-primary > .panel-heading {
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5) !important;
+  border-color: var(--primary-green) !important;
+  color: #047857 !important;
+}
+
+body#index .progress-bar-info,
+body#index .progress-bar {
+  background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)) !important;
+}
+
+/* ============================================
+   Hide Footer and Unnecessary Content
+   ============================================ */
+body#index footer,
+body#index .footer,
+body#index #footer {
+  display: none !important;
+}
+
+/* Hide any help/info/donation content */
+body#index .help-block,
+body#index .help-text,
+body#index .info-box,
+body#index [id*="help"],
+body#index p:has(a[href*="donate"]),
+body#index div:has(a[href*="donate"]),
+body#index a[href*="donate"] {
+  display: none !important;
+}
+
+/* ============================================
+   Additional Background Cleanup
+   ============================================ */
+body#index .form-control:focus {
+  border-color: var(--primary-green) !important;
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1) !important;
+}
+
+body#index .input-group-addon {
+  background: var(--bg-gray-100) !important;
+  border-color: #e5e7eb !important;
+}
+
+/* Ensure no blue anywhere */
+body#index [class*="btn-info"],
+body#index [class*="bg-info"],
+body#index [class*="text-info"],
+body#index [class*="border-info"] {
+  --bs-info: var(--primary-green) !important;
+}
+
+/* Clean container background */
+body#index .row,
+body#index .col-xs-12,
+body#index .col-sm-12,
+body#index .col-md-12,
+body#index .col-lg-12 {
+  background: transparent !important;
+}
+
+/* ============================================
+   Dark Mode Support - DISABLED FOR NOW
+   ============================================
+@media (prefers-color-scheme: dark) {
+  body#index {
+    background: linear-gradient(135deg, #0f172a 0%, #064e3b 50%, #022c22 100%);
+  }
+
+  /* Dark mode gradient orbs */
+  body#index::before {
+    background: linear-gradient(135deg, #059669, #047857);
+    opacity: 0.2;
+  }
+
+  body#index::after {
+    background: linear-gradient(45deg, #047857, #059669);
+    opacity: 0.2;
+  }
+
+  /* Navbar icon buttons */
+  body#index .navbar-right .dropdown > a,
+  body#index .navbar-right .btn {
+    background: rgba(55, 65, 81, 0.8);
+    color: #d1d5db;
+  }
+
+  body#index .navbar-right .dropdown > a:hover,
+  body#index .navbar-right .btn:hover {
+    background: rgba(55, 65, 81, 1);
+    color: #10b981;
+  }
+
+  /* Search input group */
+  body#index .input-group {
+    background: rgba(31, 41, 55, 0.9);
+    border-color: rgba(75, 85, 99, 0.5);
+  }
+
+  body#index .input-group:focus-within {
+    border-color: #10b981;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+  }
+
+  body#index .searchinput {
+    color: #f9fafb;
+  }
+
+  body#index .searchinput::placeholder {
+    color: #9ca3af;
+  }
+
+  /* Content type pills */
+  body#index .yacysearch label {
+    background: rgba(31, 41, 55, 0.9);
+    border-color: rgba(75, 85, 99, 0.5);
+    color: #d1d5db;
+  }
+
+  body#index .yacysearch label:hover {
+    background: rgba(6, 78, 59, 0.5);
+    border-color: #10b981;
+    color: #10b981;
+  }
+
+  body#index .yacysearch label:has(input[type="radio"]:checked) {
+    background: linear-gradient(135deg, rgba(6, 78, 59, 0.6), rgba(4, 120, 87, 0.6));
+    border-color: #10b981;
+    color: #10b981;
+  }
+
+  body#index .yacysearch a {
+    color: #9ca3af;
+  }
+
+  body#index .yacysearch a:hover {
+    color: #10b981;
+  }
+
+  /* Bootstrap button overrides */
+  body#index .btn-default {
+    background: rgba(31, 41, 55, 0.9) !important;
+    border-color: rgba(75, 85, 99, 0.5) !important;
+    color: #d1d5db !important;
+  }
+
+  body#index .btn-default:hover,
+  body#index .btn-default:focus {
+    background: rgba(6, 78, 59, 0.5) !important;
+    border-color: #10b981 !important;
+    color: #10b981 !important;
+  }
+
+  /* Links */
+  body#index a {
+    color: #10b981;
+  }
+
+  body#index a:hover {
+    color: #34d399;
+  }
+
+  /* Search options table */
+  body#index table[role="presentation"] td {
+    color: #d1d5db;
+  }
+
+  body#index table[role="presentation"] label {
+    color: #d1d5db;
+  }
+
+  body#index table[role="presentation"] input[type="text"] {
+    background: rgba(31, 41, 55, 0.9);
+    border-color: rgba(75, 85, 99, 0.5);
+    color: #f9fafb;
+  }
+
+  body#index table[role="presentation"] input[type="text"]:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+  }
+
+  /* Query operators help section */
+  body#index h4 {
+    color: #f9fafb;
+    border-top-color: rgba(75, 85, 99, 0.5);
+  }
+
+  body#index dl {
+    color: #d1d5db;
+  }
+
+  body#index dt {
+    color: #10b981;
+  }
+
+  body#index dd {
+    border-left-color: rgba(6, 78, 59, 0.5);
+  }
+
+  body#index dd a {
+    color: #10b981;
+  }
+
+  /* Dropdown menus */
+  body#index .dropdown-menu {
+    background: rgba(31, 41, 55, 0.98);
+    border-color: rgba(75, 85, 99, 0.5);
+  }
+
+  body#index .dropdown-menu > li > a {
+    color: #d1d5db;
+  }
+
+  body#index .dropdown-menu > li > a:hover {
+    background: rgba(6, 78, 59, 0.5);
+    color: #10b981;
+  }
+
+  body#index .dropdown-menu .divider {
+    background: rgba(75, 85, 99, 0.5);
+  }
+
+  /* Typeahead suggestions */
+  body#index .tt-menu {
+    background: rgba(31, 41, 55, 0.98);
+    border-color: rgba(75, 85, 99, 0.5);
+  }
+
+  body#index .tt-suggestion {
+    color: #d1d5db;
+  }
+
+  body#index .tt-suggestion:hover,
+  body#index .tt-suggestion.tt-cursor {
+    background: rgba(6, 78, 59, 0.5);
+    color: #10b981;
+  }
+
+  body#index .tt-suggestion strong {
+    color: #10b981;
+  }
+}
+*/

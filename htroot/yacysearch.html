@@ -6,6 +6,7 @@
   <link rel="alternate" type="application/rss+xml" title="Search for #[former]#" href="yacysearch.rss?query=#[formerEncoded]#" />
   <link rel="search" type="application/opensearchdescription+xml" title="YaCy '#[clientname]#'" href="#[thisaddress]#/opensearchdescription.xml" />
   <link rel="stylesheet" type="text/css" media="screen" href="env/highslide.css" />
+  <link rel="stylesheet" type="text/css" media="screen" href="env/yacysearch-modern.css" />
   <script type="text/javascript" src="js/ajax.js"></script>
   <script type="text/javascript" src="js/xml.js"></script>
   <script type="text/javascript" src="js/yacysearch.js"></script>
@@ -107,25 +108,13 @@ Use the RSS search result format to add static searches to your RSS reader, if y
 <!-- body -->
 </div> <!-- close the starter-template, to open a row -->
 
-  <div class="row">
-    <div class="col-sm-8 col-sm-offset-4 col-md-9 col-md-offset-3 main">
-#(topmenu)#
-<form class="search small" name="searchform" method="get" accept-charset="UTF-8" style="position:fixed;top:8px;z-index:1052;">
-::
-<form class="search small col-xs-9 col-sm-5 col-lg-5" name="searchform" method="get" accept-charset="UTF-8" style="position:fixed;top:8px;z-index:1052;">
-#(/topmenu)#
-
-  <div class="input-group" style="max-width:445px;">
-    <input name="query" id="search" type="text" class="form-control searchinput typeahead" size="40" maxlength="200" 
+<!-- Search form - will be moved to navbar via script -->
+<form class="search small" id="navbar-searchform" name="searchform" method="get" accept-charset="UTF-8">
+  <div class="input-group">
+    <input name="query" id="search" type="text" class="form-control searchinput typeahead" size="40" maxlength="200"
     	placeholder="#[promoteSearchPageGreeting]#" value="#[former]#" #(focus)#::autofocus="autofocus"#(/focus)# onFocus="this.select()" onclick="document.getElementById('Enter').innerHTML = 'search'"/>
     <div class="input-group-btn">
        <button id="Enter" name="Enter" class="btn btn-default" type="submit">search</button>
-       #(resortEnabled)#::
-       <a id="resortCached" class="btn btn-default" style="visibility: hidden;" role="button" href="#[url]#" 
-       		title="Refresh sorting. Depending on their rank, some results fetched in background may then appear on this page.">
-        	<span  class="glyphicon glyphicon-sort"></span>
-       </a>
-       #(/resortEnabled)#
     </div>
   </div>
     #(authSearch)#::
@@ -145,6 +134,19 @@ Use the RSS search result format to add static searches to your RSS reader, if y
     <input type="hidden" name="meanCount" value="#[meanCount]#" />
     <input id="timezoneOffset" type="hidden" name="timezoneOffset" value=""><script>document.getElementById("timezoneOffset").value = new Date().getTimezoneOffset();</script>
 </form>
+<script>
+// Move search form into navbar
+(function() {
+  var form = document.getElementById('navbar-searchform');
+  var container = document.getElementById('navbar-search-container');
+  if (form && container) {
+    container.appendChild(form);
+  }
+})();
+</script>
+
+  <div class="row search-results-row">
+    <div class="col-sm-8 col-md-9 main">
 
 <!-- type the number of results and navigation bar -->
 #(num-results)#
@@ -154,12 +156,17 @@ Use the RSS search result format to add static searches to your RSS reader, if y
 	<p>No Results. (length of search words must be at least 1 character)</p>
 	::
 	<div id="results"></div>
-    <div class="progress" style="margin-top:10px;margin-bottom:0px;">
-      <div class="progress-bar progress-bar-info" id="progressbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width:0%;">
-        <span style="position:absolute;display:block;text-align:left;width:85%;color:black;">&nbsp;&nbsp;&nbsp;<strong id="offset">#[offset]#</strong>-<strong id="itemscount">#[itemscount]#</strong> of <strong id="totalcount">#[totalcount]#</strong> 
-        #(globalresults)#::; (<strong id="localIndexCount">#[localIndexCount]#</strong> local, <strong id="remoteIndexCount">#[remoteIndexCount]#</strong> remote from <strong id="remotePeerCount">#[remotePeerCount]#</strong> YaCy peers).#(/globalresults)# 
-        	<span id="feedingStatus" style="visibility: hidden;" class="glyphicon glyphicon-transfer" title="YaCy server is fetching results from available data sources."></span>
-        </span>
+    <!-- Results stats and progress -->
+    <div class="search-stats-container" style="margin: 16px 0;">
+      <p class="search-stats" style="font-size:14px;color:#70757a;margin:0 0 8px 0;">
+        <span id="offset">#[offset]#</span>-<span id="itemscount">#[itemscount]#</span> of about <strong id="totalcount">#[totalcount]#</strong> results
+        #(globalresults)#::
+        <span class="stats-detail">(<span id="localIndexCount">#[localIndexCount]#</span> local, <span id="remoteIndexCount">#[remoteIndexCount]#</span> remote from <span id="remotePeerCount">#[remotePeerCount]#</span> peers)</span>
+        #(/globalresults)#
+        <span id="feedingStatus" style="visibility: hidden;" class="glyphicon glyphicon-refresh glyphicon-spin" title="Fetching results..."></span>
+      </p>
+      <div class="progress" style="height:3px;margin:0;border-radius:2px;">
+        <div class="progress-bar progress-bar-info" id="progressbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width:0%;transition:width 0.3s ease;"></div>
       </div>
     </div>
 	::
@@ -231,6 +238,22 @@ document.getElementById("Enter").innerHTML = "search again";
 	Failed to render <strong id="imageErrorsCount">0</strong> thumbnail(s).
 	<button id="showErrorImagesBtn" class="btn btn-default btn-sm" onclick="showErrThumbnails()" title="Show anyway links to images that could not be rendered">Show</button>
 	<button id="hideErrorImagesBtn" class="btn btn-default btn-sm hidden" onclick="hideErrThumbnails()" title="Hide links to images that could not be rendered">Hide</button>
+</div>
+
+<!-- Rich Results Carousel for Recipes/Videos -->
+<div id="richResultsCarousel" class="rich-carousel hidden">
+  <div class="carousel-header">
+    <h3 class="carousel-title"><span class="glyphicon glyphicon-cutlery"></span> Recipes</h3>
+    <div class="carousel-nav">
+      <button class="carousel-btn prev" onclick="scrollCarousel(-1)" title="Previous"><span class="glyphicon glyphicon-chevron-left"></span></button>
+      <button class="carousel-btn next" onclick="scrollCarousel(1)" title="Next"><span class="glyphicon glyphicon-chevron-right"></span></button>
+    </div>
+  </div>
+  <div class="carousel-track-container">
+    <div class="carousel-track" id="carouselTrack">
+      <!-- Recipe cards will be inserted here by JavaScript -->
+    </div>
+  </div>
 </div>
 
 <!-- linklist begin -->
@@ -321,6 +344,119 @@ function latestinfo() {
   self.xmlHttpReq.send(null);
 }
 window.setTimeout(latestinfo, 500); // we need that to get a correct pagination bar at the end of the page
+
+// Rich Results Carousel functionality
+function initRichResultsCarousel() {
+  var recipeResults = document.querySelectorAll('article.searchresults.content-recipe');
+  var videoResults = document.querySelectorAll('article.searchresults.content-video');
+  var carousel = document.getElementById('richResultsCarousel');
+  var track = document.getElementById('carouselTrack');
+  var title = carousel ? carousel.querySelector('.carousel-title') : null;
+
+  if (!carousel || !track) return;
+
+  // Determine which type to show (recipes take priority, then videos)
+  var results = recipeResults.length > 0 ? recipeResults : videoResults;
+  var isRecipe = recipeResults.length > 0;
+
+  if (results.length < 2) {
+    carousel.classList.add('hidden');
+    return;
+  }
+
+  // Update title based on content type
+  if (title) {
+    if (isRecipe) {
+      title.innerHTML = '<span class="glyphicon glyphicon-cutlery"></span> Recipes';
+    } else {
+      title.innerHTML = '<span class="glyphicon glyphicon-play-circle"></span> Videos';
+    }
+  }
+
+  // Create carousel cards from search results
+  track.innerHTML = '';
+  results.forEach(function(result, index) {
+    if (index >= 8) return; // Max 8 items in carousel
+
+    var thumbnail = result.querySelector('.result-thumbnail img');
+    var titleEl = result.querySelector('h4.linktitle a');
+    var urlEl = result.querySelector('cite.result-cite a');
+    var readTimeEl = result.querySelector('.stat-item.time');
+    var trustEl = result.querySelector('.stat-item.trust');
+
+    // Recipe-specific metadata
+    var recipeCookTimeEl = result.querySelector('.stat-item.recipe-time');
+    var recipeDifficultyEl = result.querySelector('.stat-item.recipe-difficulty');
+    var recipeServingsEl = result.querySelector('.stat-item.recipe-servings');
+
+    // Video-specific metadata
+    var videoPlatformEl = result.querySelector('.stat-item.video-platform');
+    var videoDurationEl = result.querySelector('.stat-item.video-duration');
+
+    var imgSrc = thumbnail ? thumbnail.src : '';
+    var titleText = titleEl ? titleEl.textContent : 'Untitled';
+    var link = titleEl ? titleEl.href : '#';
+    var domain = urlEl ? new URL(urlEl.href).hostname.replace('www.', '') : '';
+    var readTime = readTimeEl ? readTimeEl.textContent.trim() : '';
+
+    // Extract metadata text (remove icon text)
+    var cookTime = recipeCookTimeEl ? recipeCookTimeEl.textContent.trim() : '';
+    var difficulty = recipeDifficultyEl ? recipeDifficultyEl.textContent.trim() : '';
+    var servings = recipeServingsEl ? recipeServingsEl.textContent.trim() : '';
+    var platform = videoPlatformEl ? videoPlatformEl.textContent.trim() : '';
+    var duration = videoDurationEl ? videoDurationEl.textContent.trim() : '';
+
+    var card = document.createElement('a');
+    card.className = 'carousel-card';
+    card.href = link;
+    card.target = '_blank';
+
+    // Build metadata display based on content type
+    var metaHtml = '';
+    if (isRecipe) {
+      if (cookTime) metaHtml += '<span class="card-badge recipe-time"><span class="glyphicon glyphicon-time"></span> ' + cookTime + '</span>';
+      if (difficulty) metaHtml += '<span class="card-badge recipe-difficulty">' + difficulty + '</span>';
+      if (servings) metaHtml += '<span class="card-badge recipe-servings"><span class="glyphicon glyphicon-user"></span> ' + servings + '</span>';
+    } else {
+      if (platform) metaHtml += '<span class="card-badge video-platform">' + platform + '</span>';
+      if (duration) metaHtml += '<span class="card-badge video-duration"><span class="glyphicon glyphicon-time"></span> ' + duration + '</span>';
+    }
+
+    card.innerHTML =
+      '<div class="card-image">' +
+        (imgSrc ? '<img src="' + imgSrc + '" alt="" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=no-image><span class=glyphicon glyphicon-picture></span></div>\'">' : '<div class="no-image"><span class="glyphicon glyphicon-picture"></span></div>') +
+        (isRecipe ? '' : '<div class="play-overlay"><span class="glyphicon glyphicon-play"></span></div>') +
+      '</div>' +
+      '<div class="card-content">' +
+        '<div class="card-title">' + titleText + '</div>' +
+        '<div class="card-source">' + domain + '</div>' +
+        (metaHtml ? '<div class="card-meta">' + metaHtml + '</div>' : '') +
+      '</div>';
+
+    track.appendChild(card);
+
+    // Note: We keep original results visible in the main list
+    // The carousel is a featured view, not a replacement for search results
+  });
+
+  carousel.classList.remove('hidden');
+}
+
+function scrollCarousel(direction) {
+  var track = document.getElementById('carouselTrack');
+  if (!track) return;
+  var scrollAmount = 280 * direction;
+  track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+}
+
+// Initialize carousel after DOM is ready and results are loaded
+// Note: For AJAX mode (jsResort=true), initRichResultsCarousel() is called from yacysort.js after all results are fetched
+// For non-AJAX mode (server-side includes), initialize with a short delay to ensure results are in the DOM
+if (!document.getElementById('resultscontainer')) {
+  // Non-AJAX mode: results are server-side included, so wait a bit and initialize
+  window.setTimeout(initRichResultsCarousel, 500);
+}
+// For AJAX mode: the carousel will be initialized by yacysort.js after all results are loaded
 </script>
 
 #%env/templates/footer.template%#

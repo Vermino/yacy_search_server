@@ -385,7 +385,12 @@ div.urlactions {
 }
 
 h4.linktitle {
-  margin:2px;
+  margin: 2px;
+  padding-left: 0;
+}
+
+/* Legacy padding for div-based results */
+div.searchresults:not(article) h4.linktitle {
   padding-left: 20px;
 }
 
@@ -443,9 +448,18 @@ div.bookmark p {
   margin:1px;
 }
 
-div.searchresults p{
-  margin:2px 2px 2px 2px;
+div.searchresults p {
+  margin: 2px 2px 2px 2px;
+  padding-left: 0;
+}
+
+/* Legacy padding for old layout */
+div.searchresults:not(article) p {
   padding-left: 20px;
+}
+
+article.searchresults p {
+  padding-left: 0;
 }
 
 form.search.small div.yacylogo { /* The logo in yacysearch.html */
@@ -1097,9 +1111,33 @@ div#tagcloud {
  }
  
  
- /******* yacysearch.html ********** 
- 
- /* Higlight overall audio controls when playing all results */
+ /******* yacysearch.html **********/
+
+/* Modern search results base styles */
+body#yacysearch {
+  background-color: #fff;
+}
+
+body#yacysearch .main {
+  padding-top: 70px; /* Space for fixed search bar */
+}
+
+/* Search stats styling */
+.search-stats {
+  font-size: 14px;
+  color: #70757a;
+}
+
+.search-stats strong {
+  color: #202124;
+}
+
+.stats-detail {
+  font-size: 12px;
+  color: #9aa0a6;
+}
+
+/* Highlight overall audio controls when playing all results */
 #audioControls:not([data-current-track="-1"]) {
 	border-style: solid;
 	border-color: #1e90ff;

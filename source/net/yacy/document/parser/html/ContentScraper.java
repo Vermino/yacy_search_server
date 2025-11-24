@@ -228,6 +228,11 @@ public class ContentScraper extends AbstractScraper implements Scraper {
     private final LinkedHashSet<String> titles;
     private final List<String> articles;
     private final List<Date> startDates, endDates;
+    // schema.org/Recipe structured data
+    private String recipeName, recipeCookTime, recipePrepTime, recipeTotalTime;
+    private String recipeYield, recipeCategory, recipeCuisine, recipeAuthor, recipeImage;
+    private Double recipeRating;
+    private Integer recipeRatingCount;
     //private String headline;
     private List<String>[] headlines;
     private final ClusteredScoreMap<String> bold, italic, underline;
@@ -315,6 +320,18 @@ public class ContentScraper extends AbstractScraper implements Scraper {
         this.articles = new ArrayList<>();
         this.startDates = new ArrayList<>();
         this.endDates = new ArrayList<>();
+        // Initialize Recipe fields
+        this.recipeName = null;
+        this.recipeCookTime = null;
+        this.recipePrepTime = null;
+        this.recipeTotalTime = null;
+        this.recipeYield = null;
+        this.recipeCategory = null;
+        this.recipeCuisine = null;
+        this.recipeAuthor = null;
+        this.recipeImage = null;
+        this.recipeRating = null;
+        this.recipeRatingCount = null;
         this.headlines = (List<String>[]) Array.newInstance(ArrayList.class, 6);
         for (int i = 0; i < this.headlines.length; i++) this.headlines[i] = new ArrayList<>();
         this.bold = new ClusteredScoreMap<>(false);
@@ -682,6 +699,46 @@ public class ContentScraper extends AbstractScraper implements Scraper {
                             final Date endDate = ISO8601Formatter.FORMATTER.parse(propval, this.timezoneOffset).getTime();
                             this.endDates.add(endDate);
                         } catch (final ParseException e) {}
+                        break;
+
+                    // schema.org/Recipe properties
+                    case "name": // Recipe name (also used for other schema types, but safe to capture)
+                        if (this.recipeName == null) this.recipeName = propval;
+                        break;
+                    case "cookTime": // e.g., "PT30M" or "30 minutes"
+                        this.recipeCookTime = propval;
+                        break;
+                    case "prepTime": // e.g., "PT15M" or "15 minutes"
+                        this.recipePrepTime = propval;
+                        break;
+                    case "totalTime": // e.g., "PT45M" or "45 minutes"
+                        this.recipeTotalTime = propval;
+                        break;
+                    case "recipeYield": // e.g., "4 servings" or "12 cookies"
+                        this.recipeYield = propval;
+                        break;
+                    case "recipeCategory": // e.g., "dessert", "appetizer"
+                        this.recipeCategory = propval;
+                        break;
+                    case "recipeCuisine": // e.g., "Italian", "Mexican"
+                        this.recipeCuisine = propval;
+                        break;
+                    case "author": // Recipe author (could be in <meta itemprop="author" content="...">)
+                        if (this.recipeAuthor == null) this.recipeAuthor = propval;
+                        break;
+                    case "image": // Recipe image URL
+                        if (this.recipeImage == null) this.recipeImage = propval;
+                        break;
+                    case "ratingValue": // Rating value (e.g., "4.5")
+                        try {
+                            this.recipeRating = Double.parseDouble(propval);
+                        } catch (final NumberFormatException e) {}
+                        break;
+                    case "ratingCount": // Number of ratings (e.g., "123")
+                    case "reviewCount":
+                        try {
+                            this.recipeRatingCount = Integer.parseInt(propval);
+                        } catch (final NumberFormatException e) {}
                         break;
                 }
             }
@@ -1171,6 +1228,51 @@ public class ContentScraper extends AbstractScraper implements Scraper {
 
     public List<Date> getEndDates() {
         return this.endDates;
+    }
+
+    // schema.org/Recipe getters
+    public String getRecipeName() {
+        return this.recipeName;
+    }
+
+    public String getRecipeCookTime() {
+        return this.recipeCookTime;
+    }
+
+    public String getRecipePrepTime() {
+        return this.recipePrepTime;
+    }
+
+    public String getRecipeTotalTime() {
+        return this.recipeTotalTime;
+    }
+
+    public String getRecipeYield() {
+        return this.recipeYield;
+    }
+
+    public String getRecipeCategory() {
+        return this.recipeCategory;
+    }
+
+    public String getRecipeCuisine() {
+        return this.recipeCuisine;
+    }
+
+    public String getRecipeAuthor() {
+        return this.recipeAuthor;
+    }
+
+    public String getRecipeImage() {
+        return this.recipeImage;
+    }
+
+    public Double getRecipeRating() {
+        return this.recipeRating;
+    }
+
+    public Integer getRecipeRatingCount() {
+        return this.recipeRatingCount;
     }
 
     public DigestURL[] getFlash() {

@@ -5,52 +5,52 @@
 	  document.getElementById("progressbar").setAttribute('class',"progress-bar progress-bar-success");
 	  window.setTimeout(fadeOutBar, 500);
   }
-</script>  
+</script>
+
+<!-- Sidebar toggle button -->
+<button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle sidebar">
+  <span class="glyphicon glyphicon-chevron-left"></span>
+</button>
 
 #(resource-switches)#::
-<form
-  action="yacysearch.html" method="get" accept-charset="UTF-8" id="resource-switch-form"
-  data-trigger="hover" data-placement="right" data-container="body"
-  title="#(global)#Your search is done using only your own peer, locally.::Your search is done using peers in the YaCy P2P network.#(/global)#"
-  data-content="#(global)#You can switch to 'Peer-to-Peer Mode' which will cause that your search is done using the other peers in the YaCy network.::You can switch to 'Stealth Mode' which will switch off P2P, giving you full privacy. Expect less results then, because then only your own search index is used.#(/global)#"
-  onsubmit="document.getElementById('resourceSwitchFormQuery').value = document.getElementById('search').value;">
-    <input type="hidden" id="resourceSwitchFormQuery" name="query" value="#[former]#"/>
-    #(authSearch)#::
-  	<input type="hidden" name="auth" value=""/>
-  	#(/authSearch)#
-  	<input type="hidden" name="contentdom" value="#[contentdom]#" />
-    <input type="hidden" name="strictContentDom" value="#[strictContentDom]#" />
-    <input type="hidden" name="former" value="#[former]#" />
-    <input type="hidden" name="maximumRecords" value="#[maximumRecords]#" />
-    <input type="hidden" name="startRecord" value="#[startRecord]#" />
-    <input type="hidden" name="verify" value="#[search.verify]#" />
-    <input type="hidden" name="nav" value="#[search.navigation]#" />
-    <input type="hidden" name="prefermaskfilter" value="#[prefermaskfilter]#" />
-    <input type="hidden" name="depth" value="#[depth]#" />
-    <input type="hidden" name="constraint" value="#[constraint]#" />
-    <input type="hidden" name="meanCount" value="#[meanCount]#" />
-    <input id="contentDomTimezoneOffset" type="hidden" name="timezoneOffset" value=""><script>document.getElementById("contentDomTimezoneOffset").value = new Date().getTimezoneOffset();</script>
-	<div class="btn-group btn-group-justified hidden-sm hidden-md">
-		<div class="btn-group">
-			<button type="#(global)#submit::button#(/global)#" name="resource" value="global"
-				class="btn btn-lg #(global)#btn-default::btn-warning#(/global)#">Peer-to-Peer</button>
-		</div>
-		<div class="btn-group">
-			<button type="#(global)#button::submit#(/global)#" name="resource" value="local" 
-				class="btn btn-lg #(global)#btn-success::btn-default#(/global)#">#(global)#Stealth Mode::Privacy#(/global)#</button>
-		</div>
-	</div>
-	<div class="btn-group btn-group-justified hidden-lg">
-		<div class="btn-group">
-			<button type="#(global)#submit::button#(/global)#" name="resource" value="global"
-				class="btn btn-xs #(global)#btn-default::btn-warning#(/global)#">Peer-to-Peer</button>
-		</div>
-		<div class="btn-group">
-			<button type="#(global)#button::submit#(/global)#" name="resource" value="local" 
-				class="btn btn-xs #(global)#btn-success::btn-default#(/global)#">#(global)#Stealth&nbsp;Mode::Privacy#(/global)#</button>
-		</div>
-	</div>
-</form>
+<div class="filter-section" id="search-mode-section">
+  <h3 class="filter-title" onclick="toggleFilterSection('search-mode-section')">
+    <span>Search Mode</span>
+    <span class="glyphicon glyphicon-chevron-down collapse-icon"></span>
+  </h3>
+  <form action="yacysearch.html" method="get" accept-charset="UTF-8" id="resource-switch-form"
+    data-trigger="hover" data-placement="right" data-container="body"
+    title="#(global)#Your search is done using only your own peer, locally.::Your search is done using peers in the YaCy P2P network.#(/global)#"
+    data-content="#(global)#You can switch to 'Peer-to-Peer Mode' which will cause that your search is done using the other peers in the YaCy network.::You can switch to 'Stealth Mode' which will switch off P2P, giving you full privacy. Expect less results then, because then only your own search index is used.#(/global)#"
+    onsubmit="document.getElementById('resourceSwitchFormQuery').value = document.getElementById('search').value;">
+      <input type="hidden" id="resourceSwitchFormQuery" name="query" value="#[former]#"/>
+      #(authSearch)#::
+      <input type="hidden" name="auth" value=""/>
+      #(/authSearch)#
+      <input type="hidden" name="contentdom" value="#[contentdom]#" />
+      <input type="hidden" name="strictContentDom" value="#[strictContentDom]#" />
+      <input type="hidden" name="former" value="#[former]#" />
+      <input type="hidden" name="maximumRecords" value="#[maximumRecords]#" />
+      <input type="hidden" name="startRecord" value="#[startRecord]#" />
+      <input type="hidden" name="verify" value="#[search.verify]#" />
+      <input type="hidden" name="nav" value="#[search.navigation]#" />
+      <input type="hidden" name="prefermaskfilter" value="#[prefermaskfilter]#" />
+      <input type="hidden" name="depth" value="#[depth]#" />
+      <input type="hidden" name="constraint" value="#[constraint]#" />
+      <input type="hidden" name="meanCount" value="#[meanCount]#" />
+      <input id="contentDomTimezoneOffset" type="hidden" name="timezoneOffset" value=""><script>document.getElementById("contentDomTimezoneOffset").value = new Date().getTimezoneOffset();</script>
+    <div class="mode-switch-buttons">
+      <button type="#(global)#submit::button#(/global)#" name="resource" value="global"
+        class="mode-btn #(global)#::active#(/global)#" title="Search across the P2P network">
+        <span class="glyphicon glyphicon-globe"></span> P2P Network
+      </button>
+      <button type="#(global)#button::submit#(/global)#" name="resource" value="local"
+        class="mode-btn #(global)#active::#(/global)#" title="Search only your local index">
+        <span class="glyphicon glyphicon-home"></span> Local Only
+      </button>
+    </div>
+  </form>
+</div>
 <script>
 $('#resource-switch-form').popover()
 </script>
@@ -91,53 +91,64 @@ $('#resource-switch-form').popover()
 </form>
 #(/ranking-switches)#
 
-#(searchdomswitches)#::<p class="navbutton"></p>
-<form action="yacysearch.html" method="get" accept-charset="UTF-8" name="contentdomSwitchForm"
-	onsubmit="document.getElementById('contentdomSwitchFormQuery').value = document.getElementById('search').value;">
-    <input type="hidden" id="contentdomSwitchFormQuery" name="query" value="#[former]#"/>
-    #(authSearch)#::
-  	<input type="hidden" name="auth" value=""/>
-  	#(/authSearch)#
-    <input type="hidden" name="strictContentDom" value="#[strictContentDom]#" />
-    <input type="hidden" name="former" value="#[former]#" />
-    <input type="hidden" name="maximumRecords" value="#[maximumRecords]#" />
-    <input type="hidden" name="startRecord" value="#[startRecord]#" />
-    <input type="hidden" name="verify" value="#[search.verify]#" />
-    <input type="hidden" name="resource" value="#[resource]#" />
-    <input type="hidden" name="nav" value="#[search.navigation]#" />
-    <input type="hidden" name="prefermaskfilter" value="#[prefermaskfilter]#" />
-    <input type="hidden" name="depth" value="#[depth]#" />
-    <input type="hidden" name="constraint" value="#[constraint]#" />
-    <input type="hidden" name="meanCount" value="#[meanCount]#" />
-    <input id="contentDomTimezoneOffset" type="hidden" name="timezoneOffset" value=""><script>document.getElementById("contentDomTimezoneOffset").value = new Date().getTimezoneOffset();</script>
-	<div class="btn-group btn-group-justified">
-		#(searchtext)#::<div class="btn-group btn-group-xs">
-				<button type="#(check)#submit::button#(/check)#" name="contentdom" value="text" 
-					class="btn btn-default#(check)#:: active#(/check)#">Documents</button>
-			</div>
-		#(/searchtext)#
-		#(searchimage)#::<div class="btn-group btn-group-xs">
-					<button type="#(check)#submit::button#(/check)#" name="contentdom" value="image" 
- 						class="btn btn-default#(check)#:: active#(/check)#">Images</button>
-				</div>
-		#(/searchimage)#
-		#(searchaudio)#::<div class="btn-group btn-group-xs">
-				<button type="#(check)#submit::button#(/check)#" name="contentdom" value="audio" 
- 					class="btn btn-default#(check)#:: active#(/check)#">Audio</button>
-			</div>
-		#(/searchaudio)#
-		#(searchvideo)#::<div class="btn-group btn-group-xs">
-				<button type="#(check)#submit::button#(/check)#" name="contentdom" value="video" 
-					class="btn btn-default#(check)#:: active#(/check)#">Video</button>
-			</div>
-		#(/searchvideo)#
-		#(searchapp)#::<div class="btn-group btn-group-xs">
-				<button type="#(check)#submit::button#(/check)#" name="contentdom" value="app" 
-					class="btn btn-default#(check)#:: active#(/check)#">Apps</button>
-			</div>
-		#(/searchapp)#
-	</div>
-</form>
+#(searchdomswitches)#::
+<div class="filter-section" id="content-type-section">
+  <h3 class="filter-title" onclick="toggleFilterSection('content-type-section')">
+    <span>Content Type</span>
+    <span class="glyphicon glyphicon-chevron-down collapse-icon"></span>
+  </h3>
+  <form action="yacysearch.html" method="get" accept-charset="UTF-8" name="contentdomSwitchForm"
+    onsubmit="document.getElementById('contentdomSwitchFormQuery').value = document.getElementById('search').value;">
+      <input type="hidden" id="contentdomSwitchFormQuery" name="query" value="#[former]#"/>
+      #(authSearch)#::
+      <input type="hidden" name="auth" value=""/>
+      #(/authSearch)#
+      <input type="hidden" name="strictContentDom" value="#[strictContentDom]#" />
+      <input type="hidden" name="former" value="#[former]#" />
+      <input type="hidden" name="maximumRecords" value="#[maximumRecords]#" />
+      <input type="hidden" name="startRecord" value="#[startRecord]#" />
+      <input type="hidden" name="verify" value="#[search.verify]#" />
+      <input type="hidden" name="resource" value="#[resource]#" />
+      <input type="hidden" name="nav" value="#[search.navigation]#" />
+      <input type="hidden" name="prefermaskfilter" value="#[prefermaskfilter]#" />
+      <input type="hidden" name="depth" value="#[depth]#" />
+      <input type="hidden" name="constraint" value="#[constraint]#" />
+      <input type="hidden" name="meanCount" value="#[meanCount]#" />
+      <input id="contentDomTimezoneOffset" type="hidden" name="timezoneOffset" value=""><script>document.getElementById("contentDomTimezoneOffset").value = new Date().getTimezoneOffset();</script>
+    <div class="content-type-filters">
+      #(searchtext)#::
+      <button type="#(check)#submit::button#(/check)#" name="contentdom" value="text"
+        class="filter-chip #(check)#::active#(/check)#">
+        <span class="glyphicon glyphicon-file"></span> All
+      </button>
+      #(/searchtext)#
+      #(searchimage)#::
+      <button type="#(check)#submit::button#(/check)#" name="contentdom" value="image"
+        class="filter-chip #(check)#::active#(/check)#">
+        <span class="glyphicon glyphicon-picture"></span> Images
+      </button>
+      #(/searchimage)#
+      #(searchaudio)#::
+      <button type="#(check)#submit::button#(/check)#" name="contentdom" value="audio"
+        class="filter-chip #(check)#::active#(/check)#">
+        <span class="glyphicon glyphicon-music"></span> Audio
+      </button>
+      #(/searchaudio)#
+      #(searchvideo)#::
+      <button type="#(check)#submit::button#(/check)#" name="contentdom" value="video"
+        class="filter-chip #(check)#::active#(/check)#">
+        <span class="glyphicon glyphicon-film"></span> Video
+      </button>
+      #(/searchvideo)#
+      #(searchapp)#::
+      <button type="#(check)#submit::button#(/check)#" name="contentdom" value="app"
+        class="filter-chip #(check)#::active#(/check)#">
+        <span class="glyphicon glyphicon-th"></span> Apps
+      </button>
+      #(/searchapp)#
+    </div>
+  </form>
+</div>
 #(strictContentDomSwitch)#::
 <form action="yacysearch.html" method="get" accept-charset="UTF-8" name="strictContentdomSwitchForm"
 	onsubmit="document.getElementById('strictContentdomSwitchFormQuery').value = document.getElementById('search').value;">
@@ -317,3 +328,41 @@ function toggleVisibility(name, count) {
 <li>#[body]#</li>
 </ul>
 #(/nav-about)#
+
+<!-- Filter Section Toggle Script -->
+<script>
+function toggleFilterSection(sectionId) {
+  var section = document.getElementById(sectionId);
+  if (section) {
+    section.classList.toggle('collapsed');
+    var icon = section.querySelector('.collapse-icon');
+    if (icon) {
+      if (section.classList.contains('collapsed')) {
+        icon.className = 'glyphicon glyphicon-chevron-right collapse-icon';
+      } else {
+        icon.className = 'glyphicon glyphicon-chevron-down collapse-icon';
+      }
+    }
+  }
+}
+
+function toggleSidebar() {
+  var sidebar = document.querySelector('.sidebar');
+  if (sidebar) {
+    sidebar.classList.toggle('collapsed');
+    // Save state to localStorage
+    localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+  }
+}
+
+// Restore sidebar state on page load
+(function() {
+  var sidebarCollapsed = localStorage.getItem('sidebarCollapsed');
+  if (sidebarCollapsed === 'true') {
+    var sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+      sidebar.classList.add('collapsed');
+    }
+  }
+})();
+</script>

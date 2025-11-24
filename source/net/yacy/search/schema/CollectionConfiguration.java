@@ -707,6 +707,30 @@ public class CollectionConfiguration extends SchemaConfiguration implements Seri
             final List<Date> endDates = html.getEndDates();
             if (endDates.size() > 0) this.add(doc, CollectionSchema.endDates_dts, endDates.toArray(new Date[endDates.size()]));
 
+            // schema.org/Recipe structured data
+            final String recipeName = html.getRecipeName();
+            if (recipeName != null) this.add(doc, CollectionSchema.recipe_name_t, recipeName);
+            final String recipeCookTime = html.getRecipeCookTime();
+            if (recipeCookTime != null) this.add(doc, CollectionSchema.recipe_cook_time_s, recipeCookTime);
+            final String recipePrepTime = html.getRecipePrepTime();
+            if (recipePrepTime != null) this.add(doc, CollectionSchema.recipe_prep_time_s, recipePrepTime);
+            final String recipeTotalTime = html.getRecipeTotalTime();
+            if (recipeTotalTime != null) this.add(doc, CollectionSchema.recipe_total_time_s, recipeTotalTime);
+            final String recipeYield = html.getRecipeYield();
+            if (recipeYield != null) this.add(doc, CollectionSchema.recipe_yield_s, recipeYield);
+            final String recipeCategory = html.getRecipeCategory();
+            if (recipeCategory != null) this.add(doc, CollectionSchema.recipe_category_s, recipeCategory);
+            final String recipeCuisine = html.getRecipeCuisine();
+            if (recipeCuisine != null) this.add(doc, CollectionSchema.recipe_cuisine_s, recipeCuisine);
+            final String recipeAuthor = html.getRecipeAuthor();
+            if (recipeAuthor != null) this.add(doc, CollectionSchema.recipe_author_s, recipeAuthor);
+            final String recipeImage = html.getRecipeImage();
+            if (recipeImage != null) this.add(doc, CollectionSchema.recipe_image_s, recipeImage);
+            final Double recipeRating = html.getRecipeRating();
+            if (recipeRating != null) doc.setField(CollectionSchema.recipe_rating_d.getSolrFieldName(), recipeRating.doubleValue());
+            final Integer recipeRatingCount = html.getRecipeRatingCount();
+            if (recipeRatingCount != null) this.add(doc, CollectionSchema.recipe_rating_count_i, recipeRatingCount.intValue());
+
             final List<String> articles = html.getArticles();
             this.add(doc, CollectionSchema.articlecount_i, articles.size());
             if (articles.size() > 0) this.add(doc, CollectionSchema.article_txt, articles);

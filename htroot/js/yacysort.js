@@ -332,6 +332,10 @@ var processLatestInfo = function(latestInfo) {
 		}, processItem);
 	} else {
 		fetchingResults = false;
+		// Initialize rich results carousel after all results are loaded
+		if (typeof initRichResultsCarousel === 'function') {
+			initRichResultsCarousel();
+		}
 	}
 }
 

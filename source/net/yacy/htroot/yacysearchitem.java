@@ -68,6 +68,7 @@ import net.yacy.peers.NewsPool;
 import net.yacy.peers.Seed;
 import net.yacy.peers.graphics.ProfilingGraph;
 import net.yacy.search.EventTracker;
+import net.yacy.search.schema.CollectionSchema;
 import net.yacy.search.Switchboard;
 import net.yacy.search.SwitchboardConstants;
 import net.yacy.search.navigator.Navigator;
@@ -294,6 +295,250 @@ public class yacysearchitem {
                 prop.put("content_showSnapshots", snapshotPaths != null && snapshotPaths.size() > 0 && sb.getConfigBool("search.result.show.snapshots", true) ? 1 : 0);
                 prop.put("content_showVocabulary", sb.getConfigBool("search.result.show.vocabulary", true) ? 1 : 0);
                 prop.put("content_showRanking", sb.getConfigBool("search.result.show.ranking", false) ? 1 : 0);
+
+                // Reading time calculation (wordcount / 225 words per minute)
+                final int wordCount = result.wordCount();
+                final int readingTimeMinutes = Math.max(1, wordCount / 225);
+                prop.put("content_showReadingTime", sb.getConfigBool("search.result.show.readingtime", true) ? 1 : 0);
+                prop.put("content_showReadingTime_readingTime", readingTimeMinutes);
+                prop.put("content_showReadingTime_wordCount", wordCount);
+
+                // Trust score (normalized 0-100 using log scale for better distribution)
+                // Scores typically range from 0 to 100000+, log scale maps them more evenly
+                final double logScore = Math.log10(Math.max(1.0, result.score()));
+                final float trustScore = Math.min(100f, Math.max(0f, (float)(logScore / 5.0 * 100.0)));
+                prop.put("content_showTrustScore", sb.getConfigBool("search.result.show.trustscore", true) ? 1 : 0);
+                prop.put("content_showTrustScore_trustScore", String.format("%.0f", trustScore));
+
+                // Thumbnail URL (OpenGraph image or first image)
+                String thumbnailUrl = "";
+                boolean showThumbnail = sb.getConfigBool("search.result.show.thumbnail", true);
+                if (showThumbnail) {
+                    // Try OpenGraph image first
+                    final Object ogImage = result.getFieldValue(CollectionSchema.opengraph_image_s.getSolrFieldName());
+                    if (ogImage != null && !ogImage.toString().isEmpty()) {
+                        thumbnailUrl = ogImage.toString();
+                    } else if (result.limage() > 0) {
+                        // Fall back to first image
+                        try {
+                            thumbnailUrl = result.imageURL();
+                        } catch (final UnsupportedOperationException e) {
+                            thumbnailUrl = "";
+                        }
+                    }
+                }
+                prop.put("content_showThumbnail", showThumbnail && !thumbnailUrl.isEmpty() ? 1 : 0);
+                prop.putHTML("content_showThumbnail_thumbnailUrl", thumbnailUrl);
+                prop.put("content_showThumbnail_urlhash", urlhash);
+
+                // Content type detection for rich results
+                // OpenGraph type (article, video, product, etc.)
+                String ogType = "";
+                final Object ogTypeObj = result.getFieldValue(CollectionSchema.opengraph_type_s.getSolrFieldName());
+                if (ogTypeObj != null && !ogTypeObj.toString().isEmpty()) {
+                    ogType = ogTypeObj.toString().toLowerCase();
+                }
+                prop.putHTML("content_ogType", ogType);
+
+                // Determine content category for styling (video, recipe, article, product, event, default)
+                String contentCategory = "default";
+                final String resultUrlLower = resultUrlstring.toLowerCase();
+                final String titleLower = result.dc_title().toLowerCase();
+
+                // Video detection - check og:type, known video sites, URL patterns
+                if (ogType.contains("video") ||
+                    resultUrlLower.contains("youtube.com") || resultUrlLower.contains("youtu.be") ||
+                    resultUrlLower.contains("vimeo.com") || resultUrlLower.contains("dailymotion.com") ||
+                    resultUrlLower.contains("tiktok.com") || resultUrlLower.contains("twitch.tv") ||
+                    resultUrlLower.contains("rumble.com") || resultUrlLower.contains("bitchute.com") ||
+                    resultUrlLower.contains("/video/") || resultUrlLower.contains("/watch/") ||
+                    resultUrlLower.contains("/videos/") || resultUrlLower.endsWith(".mp4") ||
+                    resultUrlLower.endsWith(".webm") || resultUrlLower.endsWith(".avi")) {
+                    contentCategory = "video";
+                }
+                // Recipe detection - check URL patterns and title keywords
+                else if (resultUrlLower.contains("/recipe") || resultUrlLower.contains("/recipes/") ||
+                         resultUrlLower.contains("allrecipes.com") || resultUrlLower.contains("foodnetwork.com") ||
+                         resultUrlLower.contains("epicurious.com") || resultUrlLower.contains("tasty.co") ||
+                         resultUrlLower.contains("delish.com") || resultUrlLower.contains("bonappetit.com") ||
+                         resultUrlLower.contains("seriouseats.com") || resultUrlLower.contains("simplyrecipes.com") ||
+                         titleLower.contains("recipe") || titleLower.contains("how to cook") ||
+                         titleLower.contains("how to make")) {
+                    contentCategory = "recipe";
+                }
+                // Product detection
+                else if (ogType.contains("product") || ogType.contains("shop") ||
+                         resultUrlLower.contains("/product/") || resultUrlLower.contains("/shop/") ||
+                         resultUrlLower.contains("/buy/") || resultUrlLower.contains("amazon.com/dp/") ||
+                         resultUrlLower.contains("ebay.com/itm/")) {
+                    contentCategory = "product";
+                }
+                // Article/news detection
+                else if (ogType.contains("article") || ogType.contains("blog") || ogType.contains("news") ||
+                         resultUrlLower.contains("/article/") || resultUrlLower.contains("/blog/") ||
+                         resultUrlLower.contains("/news/") || resultUrlLower.contains("/post/")) {
+                    contentCategory = "article";
+                }
+                // Audio/music detection
+                else if (ogType.contains("music") || ogType.contains("audio") ||
+                         resultUrlLower.contains("spotify.com") || resultUrlLower.contains("soundcloud.com") ||
+                         resultUrlLower.endsWith(".mp3") || resultUrlLower.endsWith(".wav")) {
+                    contentCategory = "audio";
+                }
+                // Profile detection
+                else if (ogType.contains("profile") || ogType.contains("person")) {
+                    contentCategory = "profile";
+                }
+
+                // Check for event dates
+                final Collection<Object> startDates = result.getFieldValues(CollectionSchema.startDates_dts.getSolrFieldName());
+                final Collection<Object> endDates = result.getFieldValues(CollectionSchema.endDates_dts.getSolrFieldName());
+                boolean hasEventDates = (startDates != null && !startDates.isEmpty()) || (endDates != null && !endDates.isEmpty());
+                if (hasEventDates) {
+                    contentCategory = "event";
+                    prop.put("content_showEventDates", 1);
+                    if (startDates != null && !startDates.isEmpty()) {
+                        final Object startDate = startDates.iterator().next();
+                        if (startDate instanceof Date) {
+                            prop.put("content_showEventDates_startDate", GenericFormatter.RFC1123_SHORT_FORMATTER.format((Date) startDate));
+                        } else {
+                            prop.put("content_showEventDates_startDate", startDate.toString());
+                        }
+                    } else {
+                        prop.put("content_showEventDates_startDate", "");
+                    }
+                    if (endDates != null && !endDates.isEmpty()) {
+                        final Object endDate = endDates.iterator().next();
+                        if (endDate instanceof Date) {
+                            prop.put("content_showEventDates_endDate", GenericFormatter.RFC1123_SHORT_FORMATTER.format((Date) endDate));
+                        } else {
+                            prop.put("content_showEventDates_endDate", endDate.toString());
+                        }
+                    } else {
+                        prop.put("content_showEventDates_endDate", "");
+                    }
+                } else {
+                    prop.put("content_showEventDates", 0);
+                }
+
+                prop.put("content_contentCategory", contentCategory);
+                prop.put("content_isVideo", contentCategory.equals("video") ? 1 : 0);
+                prop.put("content_isRecipe", contentCategory.equals("recipe") ? 1 : 0);
+                prop.put("content_isArticle", contentCategory.equals("article") ? 1 : 0);
+                prop.put("content_isProduct", contentCategory.equals("product") ? 1 : 0);
+                prop.put("content_isEvent", contentCategory.equals("event") ? 1 : 0);
+                prop.put("content_isAudio", contentCategory.equals("audio") ? 1 : 0);
+
+                // Extract enhanced metadata for recipes from schema.org structured data
+                if (contentCategory.equals("recipe")) {
+                    // Get Recipe data from schema.org fields
+                    final Object recipeCookTimeObj = result.getFieldValue(CollectionSchema.recipe_cook_time_s.getSolrFieldName());
+                    final Object recipePrepTimeObj = result.getFieldValue(CollectionSchema.recipe_prep_time_s.getSolrFieldName());
+                    final Object recipeTotalTimeObj = result.getFieldValue(CollectionSchema.recipe_total_time_s.getSolrFieldName());
+                    final Object recipeYieldObj = result.getFieldValue(CollectionSchema.recipe_yield_s.getSolrFieldName());
+                    final Object recipeRatingObj = result.getFieldValue(CollectionSchema.recipe_rating_d.getSolrFieldName());
+                    final Object recipeRatingCountObj = result.getFieldValue(CollectionSchema.recipe_rating_count_i.getSolrFieldName());
+
+                    // Format cook time (prefer totalTime, fallback to cookTime, fallback to regex)
+                    String cookTime = "";
+                    if (recipeTotalTimeObj != null) {
+                        cookTime = formatDuration(recipeTotalTimeObj.toString());
+                    } else if (recipeCookTimeObj != null) {
+                        cookTime = formatDuration(recipeCookTimeObj.toString());
+                    } else {
+                        // Fallback to regex extraction from title/description if schema.org data not available
+                        final String descriptionText = result.snippet();
+                        final String descriptionLower = descriptionText != null ? descriptionText.toLowerCase() : "";
+                        final String combinedText = titleLower + " " + descriptionLower;
+                        java.util.regex.Pattern timePattern = java.util.regex.Pattern.compile("(\\d+)\\s*(min|minute|minutes|hr|hrs|hour|hours)", java.util.regex.Pattern.CASE_INSENSITIVE);
+                        java.util.regex.Matcher timeMatcher = timePattern.matcher(combinedText);
+                        if (timeMatcher.find()) {
+                            final String num = timeMatcher.group(1);
+                            final String unit = timeMatcher.group(2).toLowerCase();
+                            if (unit.startsWith("min")) {
+                                cookTime = num + " min";
+                            } else {
+                                cookTime = num + " hr" + (Integer.parseInt(num) > 1 ? "s" : "");
+                            }
+                        }
+                    }
+
+                    // Format servings from recipeYield
+                    String servings = "";
+                    if (recipeYieldObj != null) {
+                        final String yieldText = recipeYieldObj.toString();
+                        // If it's just a number, add "servings"
+                        if (yieldText.matches("\\d+")) {
+                            servings = yieldText + " servings";
+                        } else {
+                            servings = yieldText; // Use as-is if it already has text
+                        }
+                    }
+
+                    // Calculate difficulty based on rating (if available) or use "Easy" as default
+                    String difficulty = "";
+                    if (recipeRatingObj != null) {
+                        final double rating = ((Number) recipeRatingObj).doubleValue();
+                        if (rating >= 4.5) {
+                            difficulty = "Popular"; // High rated = popular/well-tested
+                        } else if (rating >= 3.5) {
+                            difficulty = "Good";
+                        }
+                    }
+
+                    prop.put("content_recipeCookTime", cookTime.isEmpty() ? 0 : 1);
+                    prop.put("content_recipeCookTime_recipeCookTime", cookTime);
+                    prop.put("content_recipeDifficulty", difficulty.isEmpty() ? 0 : 1);
+                    prop.put("content_recipeDifficulty_recipeDifficulty", difficulty);
+                    prop.put("content_recipeServings", servings.isEmpty() ? 0 : 1);
+                    prop.put("content_recipeServings_recipeServings", servings);
+                    prop.put("content_hasRecipeMeta", (!cookTime.isEmpty() || !servings.isEmpty() || !difficulty.isEmpty()) ? 1 : 0);
+                } else {
+                    prop.put("content_recipeCookTime", 0);
+                    prop.put("content_recipeDifficulty", 0);
+                    prop.put("content_recipeServings", 0);
+                    prop.put("content_hasRecipeMeta", 0);
+                }
+
+                // Extract enhanced metadata for videos
+                if (contentCategory.equals("video")) {
+                    // Determine video platform
+                    String platform = "Video";
+                    if (resultUrlLower.contains("youtube.com") || resultUrlLower.contains("youtu.be")) {
+                        platform = "YouTube";
+                    } else if (resultUrlLower.contains("vimeo.com")) {
+                        platform = "Vimeo";
+                    } else if (resultUrlLower.contains("dailymotion.com")) {
+                        platform = "Dailymotion";
+                    } else if (resultUrlLower.contains("tiktok.com")) {
+                        platform = "TikTok";
+                    } else if (resultUrlLower.contains("twitch.tv")) {
+                        platform = "Twitch";
+                    } else if (resultUrlLower.contains("rumble.com")) {
+                        platform = "Rumble";
+                    }
+
+                    // Extract video duration (look for patterns like "5:30", "1:23:45" in title/description)
+                    String duration = "";
+                    final String descriptionText = result.snippet();
+                    final String descriptionLower = descriptionText != null ? descriptionText.toLowerCase() : "";
+                    final String combinedText = titleLower + " " + descriptionLower;
+                    java.util.regex.Pattern durationPattern = java.util.regex.Pattern.compile("(\\d+):(\\d{2})(:(\\d{2}))?");
+                    java.util.regex.Matcher durationMatcher = durationPattern.matcher(combinedText);
+                    if (durationMatcher.find()) {
+                        duration = durationMatcher.group(0);
+                    }
+
+                    prop.put("content_videoPlatform", platform.isEmpty() ? 0 : 1);
+                    prop.put("content_videoPlatform_videoPlatform", platform);
+                    prop.put("content_videoDuration", duration.isEmpty() ? 0 : 1);
+                    prop.put("content_videoDuration_videoDuration", duration);
+                    prop.put("content_hasVideoMeta", (!platform.isEmpty() || !duration.isEmpty()) ? 1 : 0);
+                } else {
+                    prop.put("content_videoPlatform", 0);
+                    prop.put("content_videoDuration", 0);
+                    prop.put("content_hasVideoMeta", 0);
+                }
 
                 if (showEvent) prop.put("content_showEvent_date", GenericFormatter.RFC1123_SHORT_FORMATTER.format(events[0]));
                 if (showKeywords) { // tokenize keywords
@@ -838,6 +1083,60 @@ public class yacysearchitem {
 		    prop.put("content_item", "0");
 		}
 	}
+
+    /**
+     * Formats an ISO 8601 duration (e.g., "PT30M", "PT1H30M") into human-readable format.
+     * Falls back to returning the input as-is if it's already in text format.
+     * @param duration ISO 8601 duration string or plain text
+     * @return Formatted duration string (e.g., "30 min", "1 hr 30 min")
+     */
+    private static String formatDuration(final String duration) {
+        if (duration == null || duration.isEmpty()) {
+            return "";
+        }
+
+        // Check if it's an ISO 8601 duration (starts with PT)
+        if (duration.startsWith("PT") || duration.startsWith("P")) {
+            try {
+                // Parse ISO 8601 duration format like PT30M, PT1H30M, P1DT2H30M
+                String d = duration.toUpperCase();
+                int hours = 0;
+                int minutes = 0;
+
+                // Extract hours
+                int hIndex = d.indexOf('H');
+                if (hIndex > 0) {
+                    int tIndex = d.indexOf('T');
+                    if (tIndex >= 0 && tIndex < hIndex) {
+                        hours = Integer.parseInt(d.substring(tIndex + 1, hIndex));
+                    }
+                }
+
+                // Extract minutes
+                int mIndex = d.indexOf('M');
+                if (mIndex > 0 && d.charAt(mIndex - 1) != 'P') { // Not a month indicator
+                    int startIndex = hIndex > 0 ? hIndex + 1 : d.indexOf('T') + 1;
+                    if (startIndex > 0 && startIndex < mIndex) {
+                        minutes = Integer.parseInt(d.substring(startIndex, mIndex));
+                    }
+                }
+
+                // Format output
+                if (hours > 0 && minutes > 0) {
+                    return hours + " hr " + minutes + " min";
+                } else if (hours > 0) {
+                    return hours + " hr" + (hours > 1 ? "s" : "");
+                } else if (minutes > 0) {
+                    return minutes + " min";
+                }
+            } catch (final Exception e) {
+                // If parsing fails, fall through to return original
+            }
+        }
+
+        // Return as-is if not ISO 8601 or if it already looks like formatted text
+        return duration;
+    }
 
     private static String shorten(final String s, final int length) {
         final String ret;

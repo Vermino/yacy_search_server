@@ -229,6 +229,19 @@ public enum CollectionSchema implements SchemaDeclaration {
     opengraph_url_s(SolrType.text_general, true, true, false, false, false, "Open Graph Metadata from og:url metadata field, see http://ogp.me/ns#"),
     opengraph_image_s(SolrType.text_general, true, true, false, false, false, "Open Graph Metadata from og:image metadata field, see http://ogp.me/ns#"),
 
+    // schema.org/Recipe structured data
+    recipe_name_t(SolrType.text_general, true, true, false, false, true, "Recipe name from schema.org/Recipe or itemprop=name"),
+    recipe_cook_time_s(SolrType.string, true, true, false, false, false, "cookTime from schema.org/Recipe (ISO 8601 duration or text)"),
+    recipe_prep_time_s(SolrType.string, true, true, false, false, false, "prepTime from schema.org/Recipe (ISO 8601 duration or text)"),
+    recipe_total_time_s(SolrType.string, true, true, false, false, false, "totalTime from schema.org/Recipe (ISO 8601 duration or text)"),
+    recipe_yield_s(SolrType.string, true, true, false, false, false, "recipeYield or servings from schema.org/Recipe"),
+    recipe_category_s(SolrType.string, true, true, false, false, false, "recipeCategory from schema.org/Recipe (e.g., dessert, appetizer)"),
+    recipe_cuisine_s(SolrType.string, true, true, false, false, false, "recipeCuisine from schema.org/Recipe (e.g., Italian, Mexican)"),
+    recipe_rating_d(SolrType.num_double, true, true, false, false, false, "aggregateRating.ratingValue from schema.org/Recipe"),
+    recipe_rating_count_i(SolrType.num_integer, true, true, false, false, false, "aggregateRating.ratingCount from schema.org/Recipe"),
+    recipe_author_s(SolrType.string, true, true, false, false, false, "author name from schema.org/Recipe"),
+    recipe_image_s(SolrType.string, true, true, false, false, false, "image URL from schema.org/Recipe"),
+
     // link structure for ranking
     cr_host_count_i(SolrType.num_integer, true, true, false, false, false, "the number of documents within a single host"),
     cr_host_chance_d(SolrType.num_double, true, true, false, false, false, "the chance to click on this page when randomly clicking on links within on one host"),

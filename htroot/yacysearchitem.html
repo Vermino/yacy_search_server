@@ -1,61 +1,149 @@
 #(content)#::
-  <div class="searchresults" data-ranking="#[ranking]#" data-nav-generation="#[nav-generation]#">
-  <h4 class="linktitle">
-  #(favicon)#::
-  <img width="16" height="16" src="#[faviconUrl]#" id="f#[urlhash]#" class="favicon" style="width:16px; height:16px;" alt="" />
-  #(/favicon)#  
-  <a href="#[link]#" target="#[target]#" #(noreferrer)#::rel="noreferrer"#(/noreferrer)#>#[title]#</a></h4>
-  <div class="urlactions">
-    #(heuristic)#::
-    <img width="16" height="9" src="env/grafics/heuristic_redundant.gif" title="heuristic:#[name]# (redundant)" style="width:16px; height:9px;" alt="heuristic:#[name]# (redundant)"/>::
-    <img width="16" height="9" src="env/grafics/heuristic_new.gif" title="heuristic:#[name]# (new link)" style="width:16px; height:9px;" alt="heuristic:#[name]# (new link)"/>
-    #(/heuristic)#
-    #(authorized)#::
-    #(bookmark)#::
-      <a href="#[bookmarklink]#" class="bookmarklink" title="bookmark"><img width="11" height="11" src="env/grafics/empty.gif" title="bookmark" alt="bookmark" class="recommendIcon" /></a>
-    #(/bookmark)#
-    #(recommend)#
-      <img width="11" height="11" src="env/grafics/empty.gif" title="" alt="recommend" class="recommendIcon" />
-      <img width="11" height="11" src="env/grafics/empty.gif" title="" alt="delete" class="deleteIcon" />
-      ::
-      <a href="#[recommendlink]#" class="recommendlink" title="recommend"><img width="11" height="11" src="env/grafics/empty.gif" title="recommend" alt="recommend" class="recommendIcon" /></a>
-      <a href="#[deletelink]#" title="delete" class="deletelink" ><img width="11" height="11" src="env/grafics/empty.gif" title="delete" alt="delete" class="deleteIcon" /></a>
-    #(/recommend)#
-    #(blacklist)#::
-      <a href="#[blacklistlink]#" title="blacklist host" class="blacklistlink"><img width="11" height="11" src="env/grafics/empty.gif" title="blacklist host" alt="blacklist host" /></a>
-    #(/blacklist)#
-    #(/authorized)#
-  </div>
-  <p class="url"><a href="#[link]#" id="url#[urlhash]#" target="#[target]#" #(noreferrer)#::rel="noreferrer"#(/noreferrer)#>#[urlname]#</a></p>
-  <p class="snippet"><span class="snippetLoaded" id="h#[urlhash]#">#[description]#</span></p>
-  #(showKeywords)#::<p class="tags">Tags: #{keywords}#<span class="tag label label-default"><a href="#[tagurl]#" style="color: inherit; text-decoration: inherit;">#[tagword]#</a></span> #{/keywords}#
-  		#(moreKeywords)#::<span id="moreKeywords#[urlhash]#" class="hidden">
-  				#{keywords}#<span class="tag label label-default"><a href="#[tagurl]#" style="color: inherit; text-decoration: inherit;">#[tagword]#</a></span> #{/keywords}#
-  			</span>
-  		<button class="expandKeywordsBtn btn btn-default btn-xs" type="button" 
-  			aria-controls="moreKeywords#[urlhash]#" aria-expanded="false" title="Show all"
-  			onclick="toggleMoreTags(this, 'moreKeywords#[urlhash]#')">
-  			<span class="glyphicon"></span>
-  		</button>
-  		#(/moreKeywords)#
-  	</p>
-  #(/showKeywords)#
-  <p class="urlinfo">
-  #(showDate)#::<span title="Last known modification date">#[date]#</span>#(/showDate)#
-  #(showEvent)#::on #[date]##(/showEvent)#
-  #(showSize)#::<span role="separator" aria-orientation="vertical">&nbsp;|&nbsp;</span>#[sizename]##(/showSize)#
-  #(showMetadata)#::<span role="separator" aria-orientation="vertical">&nbsp;|&nbsp;</span><a href="solr/select?q=id:%22#[urlhash]#%22&start=0&rows=1&core=collection1&wt=html&omitHeader=true" target="_blank">Metadata</a>#(/showMetadata)#
-  #(showParser)#::<span role="separator" aria-orientation="vertical">&nbsp;|&nbsp;</span><a href="ViewFile.html?urlHash=#[urlhash]#&amp;words=#[words]#" target="_blank">Parser</a>#(/showParser)#
-  #(showCitation)#::<span role="separator" aria-orientation="vertical">&nbsp;|&nbsp;</span><a href="api/citation.html?hash=#[urlhash]#&filter=true" target="_blank">Citations</a>#(/showCitation)#
-  #(showPictures)#::<span role="separator" aria-orientation="vertical">&nbsp;|&nbsp;</span><a href="yacysearch.html?contentdom=image#(authSearch)#::&auth#(/authSearch)#&url=#[link]#&query=#[former]#+inurl:#[link]#" target="_blank">Pictures</a>#(/showPictures)#
-  #(showCache)#::<span role="separator" aria-orientation="vertical">&nbsp;|&nbsp;</span><a href="CacheResource_p.html?url=#[link]#" target="_blank">Cache</a>#(/showCache)#
-  #(showProxy)#::<span role="separator" aria-orientation="vertical">&nbsp;|&nbsp;</span><a href="proxy.html?url=#[link]#" target="_blank">View via proxy</a>#(/showProxy)#
-  #(showIndexBrowser)#::<span role="separator" aria-orientation="vertical">&nbsp;|&nbsp;</span><a href="IndexBrowser_p.html?path=#[link]#"><img src="env/grafics/minitree.png" width="15" height="8" title="Browse index" alt="Browse index"/></a>#(/showIndexBrowser)#
-  #(showVocabulary)#::<br/>#{vocabulary}##[name]#:#[terms]# #{/vocabulary}##(/showVocabulary)#
-  #(showSnapshots)#::<span role="separator" aria-orientation="vertical">&nbsp;|&nbsp;</span><a href="#[link]#" target="_blank">#[extension]# Snapshot</a>#(/showSnapshots)#
-  #(showRanking)#::<span role="separator" aria-orientation="vertical">&nbsp;|&nbsp;</span><span title="Raw ranking score value">Ranking: #[ranking]#</span>#(/showRanking)#
-  </p>
-  </div>
+  <article class="searchresults content-#[contentCategory]#" data-ranking="#[ranking]#" data-nav-generation="#[nav-generation]#" data-content-type="#[contentCategory]#">
+    <!-- Content Type Badge -->
+    #(isVideo)#::
+    <div class="content-type-badge video"><span class="glyphicon glyphicon-play-circle"></span> Video</div>
+    #(/isVideo)#
+    #(isRecipe)#::
+    <div class="content-type-badge recipe"><span class="glyphicon glyphicon-cutlery"></span> Recipe</div>
+    #(/isRecipe)#
+    #(isEvent)#::
+    <div class="content-type-badge event"><span class="glyphicon glyphicon-calendar"></span> Event</div>
+    #(/isEvent)#
+    #(isProduct)#::
+    <div class="content-type-badge product"><span class="glyphicon glyphicon-shopping-cart"></span> Product</div>
+    #(/isProduct)#
+    #(isAudio)#::
+    <div class="content-type-badge audio"><span class="glyphicon glyphicon-music"></span> Audio</div>
+    #(/isAudio)#
+
+    <div class="result-content">
+      <!-- Left sidebar: Thumbnail + Key Stats -->
+      <div class="result-sidebar">
+        #(showThumbnail)#::
+        <div class="result-thumbnail">
+          <img src="ViewImage.png?maxwidth=140&amp;maxheight=100&amp;isStatic=true&amp;quadratic&amp;url=#[thumbnailUrl]#" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"/>
+          #(isVideo)#::
+          <div class="video-play-overlay"><span class="glyphicon glyphicon-play"></span></div>
+          #(/isVideo)#
+        </div>
+        #(/showThumbnail)#
+        <!-- Key Stats under thumbnail -->
+        <div class="result-stats">
+          #(showTrustScore)#::
+          <div class="stat-item trust" title="Trust Score: #[trustScore]#%">
+            <span class="glyphicon glyphicon-ok-sign"></span> #[trustScore]#%
+          </div>
+          #(/showTrustScore)#
+          #(showReadingTime)#::
+          <div class="stat-item time" title="#[wordCount]# words">
+            <span class="glyphicon glyphicon-time"></span> #[readingTime]# min
+          </div>
+          #(/showReadingTime)#
+          #(showCitation)#::
+          <a href="api/citation.html?hash=#[urlhash]#&filter=true" target="_blank" class="stat-item link" title="View citations">
+            <span class="glyphicon glyphicon-link"></span> Cite
+          </a>
+          #(/showCitation)#
+          #(showEventDates)#::
+          <div class="stat-item event-date" title="Event Date">
+            <span class="glyphicon glyphicon-calendar"></span>
+            <span class="event-date-text">#[startDate]##(endDate)#::&ndash; #[endDate]##(/endDate)#</span>
+          </div>
+          #(/showEventDates)#
+          #(hasRecipeMeta)#::
+          #(recipeCookTime)#::<div class="stat-item recipe-time" title="Cooking Time"><span class="glyphicon glyphicon-time"></span> #[recipeCookTime]#</div>::#(/recipeCookTime)#
+          #(recipeDifficulty)#::<div class="stat-item recipe-difficulty" title="Difficulty"><span class="glyphicon glyphicon-signal"></span> #[recipeDifficulty]#</div>::#(/recipeDifficulty)#
+          #(recipeServings)#::<div class="stat-item recipe-servings" title="Servings"><span class="glyphicon glyphicon-user"></span> #[recipeServings]#</div>::#(/recipeServings)#
+          #(/hasRecipeMeta)#
+          #(hasVideoMeta)#::
+          #(videoPlatform)#::<div class="stat-item video-platform" title="Platform"><span class="glyphicon glyphicon-facetime-video"></span> #[videoPlatform]#</div>::#(/videoPlatform)#
+          #(videoDuration)#::<div class="stat-item video-duration" title="Duration"><span class="glyphicon glyphicon-time"></span> #[videoDuration]#</div>::#(/videoDuration)#
+          #(/hasVideoMeta)#
+        </div>
+      </div>
+
+      <div class="result-body">
+        <!-- URL Line with domain and actions -->
+        <div class="result-url-line">
+          #(favicon)#::
+          <img width="16" height="16" src="#[faviconUrl]#" id="f#[urlhash]#" class="favicon" alt="" />
+          #(/favicon)#
+          <cite class="result-cite">
+            <a href="#[link]#" id="url#[urlhash]#" target="#[target]#" #(noreferrer)#::rel="noreferrer"#(/noreferrer)#>#[urlname]#</a>
+          </cite>
+          <!-- Action buttons -->
+          <div class="urlactions">
+            #(heuristic)#::
+            <span class="heuristic-badge redundant" title="heuristic:#[name]# (redundant)"></span>::
+            <span class="heuristic-badge new" title="heuristic:#[name]# (new link)"></span>
+            #(/heuristic)#
+            #(authorized)#::
+            #(bookmark)#::
+              <a href="#[bookmarklink]#" class="action-btn secondary bookmarklink" title="Bookmark"><span class="glyphicon glyphicon-bookmark"></span></a>
+            #(/bookmark)#
+            #(recommend)#
+              ::
+              <a href="#[recommendlink]#" class="action-btn secondary recommendlink" title="Recommend"><span class="glyphicon glyphicon-thumbs-up"></span></a>
+              <a href="#[deletelink]#" class="action-btn secondary deletelink" title="Delete"><span class="glyphicon glyphicon-trash"></span></a>
+            #(/recommend)#
+            #(blacklist)#::
+              <a href="#[blacklistlink]#" class="action-btn secondary blacklistlink" title="Blacklist"><span class="glyphicon glyphicon-ban-circle"></span></a>
+            #(/blacklist)#
+            #(/authorized)#
+          </div>
+        </div>
+
+        <!-- Title -->
+        <h4 class="linktitle">
+          <a href="#[link]#" target="#[target]#" #(noreferrer)#::rel="noreferrer"#(/noreferrer)#>#[title]#</a>
+        </h4>
+
+        <!-- Description/Snippet -->
+        <p class="snippet"><span class="snippetLoaded" id="h#[urlhash]#">#[description]#</span></p>
+
+        <!-- Metadata Pills Row (secondary metadata) -->
+        <div class="result-meta">
+          #(showDate)#::<span class="meta-pill date"><span class="glyphicon glyphicon-calendar"></span> #[date]#</span>#(/showDate)#
+          #(showEvent)#::<span class="meta-pill date"><span class="glyphicon glyphicon-time"></span> #[date]#</span>#(/showEvent)#
+          #(showSize)#::<span class="meta-pill size"><span class="glyphicon glyphicon-file"></span> #[sizename]#</span>#(/showSize)#
+          #(showMetadata)#::<a href="solr/select?q=id:%22#[urlhash]#%22&start=0&rows=1&core=collection1&wt=html&omitHeader=true" target="_blank" class="meta-link">Metadata</a>#(/showMetadata)#
+          #(showParser)#::<a href="ViewFile.html?urlHash=#[urlhash]#&amp;words=#[words]#" target="_blank" class="meta-link">Parser</a>#(/showParser)#
+          #(showPictures)#::<a href="yacysearch.html?contentdom=image#(authSearch)#::&auth#(/authSearch)#&url=#[link]#&query=#[former]#+inurl:#[link]#" target="_blank" class="meta-link"><span class="glyphicon glyphicon-picture"></span> Pictures</a>#(/showPictures)#
+          #(showCache)#::<a href="CacheResource_p.html?url=#[link]#" target="_blank" class="meta-link">Cached</a>#(/showCache)#
+          #(showProxy)#::<a href="proxy.html?url=#[link]#" target="_blank" class="meta-link">Proxy</a>#(/showProxy)#
+          #(showIndexBrowser)#::<a href="IndexBrowser_p.html?path=#[link]#" class="meta-link" title="Browse index"><span class="glyphicon glyphicon-folder-open"></span></a>#(/showIndexBrowser)#
+          #(showVocabulary)#::<span class="meta-pill category">#{vocabulary}##[name]#:#[terms]# #{/vocabulary}#</span>#(/showVocabulary)#
+          #(showSnapshots)#::<a href="#[link]#" target="_blank" class="meta-link">#[extension]# Snapshot</a>#(/showSnapshots)#
+          #(showRanking)#::<span class="meta-pill category" title="Ranking score">Score: #[ranking]#</span>#(/showRanking)#
+        </div>
+
+        <!-- Tags/Keywords -->
+        #(showKeywords)#::
+        <div class="result-tags">
+          #{keywords}#<a href="#[tagurl]#" class="tag-pill">#[tagword]#</a>#{/keywords}#
+          #(moreKeywords)#::
+          <span id="moreKeywords#[urlhash]#" class="more-tags hidden">
+            #{keywords}#<a href="#[tagurl]#" class="tag-pill">#[tagword]#</a>#{/keywords}#
+          </span>
+          <button class="action-btn secondary" type="button"
+            aria-controls="moreKeywords#[urlhash]#" aria-expanded="false" title="Show all tags"
+            onclick="toggleMoreTags(this, 'moreKeywords#[urlhash]#')" style="padding:6px 12px;font-size:12px;">
+            more tags
+          </button>
+          #(/moreKeywords)#
+        </div>
+        #(/showKeywords)#
+
+        <!-- Action Buttons -->
+        <div class="result-actions">
+          <a href="#[link]#" target="#[target]#" class="action-btn primary" #(noreferrer)#::rel="noreferrer"#(/noreferrer)#>
+            <span class="glyphicon glyphicon-new-window"></span> Visit Site
+          </a>
+        </div>
+      </div><!-- /result-body -->
+    </div><!-- /result-content -->
+  </article>
   ::
   #(item)#::<div class="thumbcontainer">
     <a href="#[hrefFullPreview]#" target="#[target]#" class="thumblink" onclick="return hs.expand(this)">
@@ -67,59 +155,35 @@
   #(item)#::
   <tr class="#(col)#TableCellLight::TableCellDark#(/col)#">
   	<td>#[name]#</td>
-  	<td><a href="#[href]#" target="#[target]#" #(noreferrer)#::rel="noreferrer"#(/noreferrer)#>#[hrefshort]#</a>
-  	<td class="text-center">#(embed)#::#(list)#::<ul class="embeddedAudios list-unstyled">#(/list)#
-  		#{audioSources}#
-  			#(list)#::<li>#(/list)#
-  			<audio src="#[href]#"
-  				title="#[title]#"
-				preload="none" controls="controls"
-				onplaying="handleAudioPlaying(event)"
-				onpause="handleAudioPause(event)"
-				onerror="handleAudioLoadError(event)"
-				onended="handleAudioEnded(event)">Not supported
-			</audio>
-			#(list)#::</li>#(/list)#
-		#{/audioSources}#
-		#(list)#::</ul>#(/list)#
-  		#(moreAudios)#::
-  			<ul id="expandableAudios_#[urlhash]#" class="list-unstyled hidden">
-			#{audioSources}#<li>
-  			<audio src="#[href]#"
-  				title="#[title]#"
-  				class="hidden"
-				preload="none" controls="controls"
-				onplaying="handleAudioPlaying(event)"
-				onpause="handleAudioPause(event)"
-				onerror="handleAudioLoadError(event)"
-				onended="handleAudioEnded(event)">Not supported
-			</audio></li>#{/audioSources}#
-			</ul>
-			<ul class="list-unstyled">
-				<li>
-					<span id="hiddenCount_#[urlhash]#">#[hiddenCount]# more...</span>
-  					<button class="expandAudiosBtn btn btn-default btn-xs hidden" type="button"
-  						aria-controls="expandableAudios_#[urlhash]#" aria-expanded="false" 
-  						title="Show #[expandableCount]# more" 
-  						data-title-collapsed="Show #[expandableCount]# more" 
-  						data-title-expanded="Show only the first #[firstLimit]#"
-  						onclick="toggleExpandableAudios(this, 'expandableAudios_#[urlhash]#', 'hiddenCount_#[urlhash]#', 'evenMoreCount_#[urlhash]#')">
-  						<span class="glyphicon"></span>
-  					</button>
-					#(evenMore)#<span id="evenMoreCount_#[urlhash]#" class="hidden">#[count]# more...</span>#(/evenMore)#
-				</li>
-			</ul>
-  		#(/moreAudios)##(/embed)#
-	</td>
-  </tr>#(/item)#
+  	<td><a href="#[link]#" target="_blank">#[link]#</a></td>
+  	<td>#[urlSize]#</td>
+  	<td>
+  	  <a href="yacysearch.html?contentdom=audio&amp;url=#[link]#&amp;verify=false&amp;contentdom=audio" target="_blank"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+      <a href="#[link]#" target="_blank"><span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span></a>
+    </td>
+  </tr>
+  #(/item)#
   ::
-  #(item)#::<tr class="#(col)#TableCellLight::TableCellDark#(/col)#"><td>#[name]#</td><td><a href="#[href]#" target="#[target]#" #(noreferrer)#::rel="noreferrer"#(/noreferrer)#>#[hrefshort]#</a></tr>#(/item)#
+  #(item)#::
+  <tr class="#(col)#TableCellLight::TableCellDark#(/col)#">
+  	<td>#[name]#</td>
+  	<td><a href="#[link]#" target="_blank">#[link]#</a></td>
+  	<td>#[urlSize]#</td>
+  	<td>
+  	  <a href="yacysearch.html?contentdom=video&amp;url=#[link]#&amp;verify=false&amp;contentdom=video" target="_blank"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+      <a href="#[link]#" target="_blank"><span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span></a>
+    </td>
+  </tr>
+  #(/item)#
   ::
-  #(item)#::<tr class="#(col)#TableCellLight::TableCellDark#(/col)#"><td>#[name]#</td><td><a href="#[href]#" target="#[target]#" #(noreferrer)#::rel="noreferrer"#(/noreferrer)#>#[hrefshort]#</a></tr>#(/item)#
+  #(item)#::
+  <tr class="#(col)#TableCellLight::TableCellDark#(/col)#">
+  	<td><a href="#[link]#" target="_blank">#[name]#</a></td>
+  	<td><a href="#[link]#" target="_blank">#[link]#</a></td>
+  	<td>#[urlSize]#</td>
+  	<td>
+  	  <a href="yacysearch.html?contentdom=app&amp;url=#[link]#&amp;verify=false&amp;contentdom=app" target="_blank"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+    </td>
+  </tr>
+  #(/item)#
 #(/content)#
-
-#(statistics)#::
-  <script type="text/javascript">
-	statistics("#[offset]#", "#[itemscount]#", "#[itemsperpage]#", "#[totalcount]#", "#[localIndexCount]#", "#[remoteIndexCount]#", "#[remotePeerCount]#", "#[navurlBase]#", #[localQuery]#, #[feedRunning]#);
-  </script>
-#(/statistics)#
