@@ -429,6 +429,89 @@ public class yacysearchitem {
                 prop.put("content_isEvent", contentCategory.equals("event") ? 1 : 0);
                 prop.put("content_isAudio", contentCategory.equals("audio") ? 1 : 0);
 
+                // Extract enhanced metadata for recipes
+                if (contentCategory.equals("recipe")) {
+                    final String descriptionLower = result.dc_description().toLowerCase();
+                    final String combinedText = titleLower + " " + descriptionLower;
+
+                    // Extract cooking time (look for patterns like "30 min", "1 hour", "2 hrs")
+                    String cookTime = "";
+                    java.util.regex.Pattern timePattern = java.util.regex.Pattern.compile("(\\d+)\\s*(min|minute|minutes|hr|hrs|hour|hours)", java.util.regex.Pattern.CASE_INSENSITIVE);
+                    java.util.regex.Matcher timeMatcher = timePattern.matcher(combinedText);
+                    if (timeMatcher.find()) {
+                        final String num = timeMatcher.group(1);
+                        final String unit = timeMatcher.group(2).toLowerCase();
+                        if (unit.startsWith("min")) {
+                            cookTime = num + " min";
+                        } else {
+                            cookTime = num + " hr" + (Integer.parseInt(num) > 1 ? "s" : "");
+                        }
+                    }
+
+                    // Extract difficulty (easy, quick, simple, etc.)
+                    String difficulty = "";
+                    if (combinedText.contains("easy") || combinedText.contains("simple") || combinedText.contains("quick")) {
+                        difficulty = "Easy";
+                    } else if (combinedText.contains("advanced") || combinedText.contains("complex") || combinedText.contains("gourmet")) {
+                        difficulty = "Advanced";
+                    } else if (combinedText.contains("intermediate") || combinedText.contains("medium")) {
+                        difficulty = "Medium";
+                    }
+
+                    // Extract servings (look for patterns like "serves 4", "4 servings")
+                    String servings = "";
+                    java.util.regex.Pattern servingsPattern = java.util.regex.Pattern.compile("(serves?|servings?)\\s*(\\d+)|( \\d+)\\s*(serves?|servings?)", java.util.regex.Pattern.CASE_INSENSITIVE);
+                    java.util.regex.Matcher servingsMatcher = servingsPattern.matcher(combinedText);
+                    if (servingsMatcher.find()) {
+                        String num = servingsMatcher.group(2) != null ? servingsMatcher.group(2) : servingsMatcher.group(3);
+                        if (num != null && !num.trim().isEmpty()) {
+                            servings = num.trim() + " servings";
+                        }
+                    }
+
+                    prop.put("content_recipeCookTime", cookTime);
+                    prop.put("content_recipeDifficulty", difficulty);
+                    prop.put("content_recipeServings", servings);
+                    prop.put("content_hasRecipeMeta", (!cookTime.isEmpty() || !difficulty.isEmpty() || !servings.isEmpty()) ? 1 : 0);
+                } else {
+                    prop.put("content_hasRecipeMeta", 0);
+                }
+
+                // Extract enhanced metadata for videos
+                if (contentCategory.equals("video")) {
+                    // Determine video platform
+                    String platform = "Video";
+                    if (resultUrlLower.contains("youtube.com") || resultUrlLower.contains("youtu.be")) {
+                        platform = "YouTube";
+                    } else if (resultUrlLower.contains("vimeo.com")) {
+                        platform = "Vimeo";
+                    } else if (resultUrlLower.contains("dailymotion.com")) {
+                        platform = "Dailymotion";
+                    } else if (resultUrlLower.contains("tiktok.com")) {
+                        platform = "TikTok";
+                    } else if (resultUrlLower.contains("twitch.tv")) {
+                        platform = "Twitch";
+                    } else if (resultUrlLower.contains("rumble.com")) {
+                        platform = "Rumble";
+                    }
+
+                    // Extract video duration (look for patterns like "5:30", "1:23:45" in title/description)
+                    String duration = "";
+                    final String descriptionLower = result.dc_description().toLowerCase();
+                    final String combinedText = titleLower + " " + descriptionLower;
+                    java.util.regex.Pattern durationPattern = java.util.regex.Pattern.compile("(\\d+):(\\d{2})(:(\\d{2}))?");
+                    java.util.regex.Matcher durationMatcher = durationPattern.matcher(combinedText);
+                    if (durationMatcher.find()) {
+                        duration = durationMatcher.group(0);
+                    }
+
+                    prop.put("content_videoPlatform", platform);
+                    prop.put("content_videoDuration", duration);
+                    prop.put("content_hasVideoMeta", (!duration.isEmpty()) ? 1 : 0);
+                } else {
+                    prop.put("content_hasVideoMeta", 0);
+                }
+
                 if (showEvent) prop.put("content_showEvent_date", GenericFormatter.RFC1123_SHORT_FORMATTER.format(events[0]));
                 if (showKeywords) { // tokenize keywords
                     final StringTokenizer stoc = new StringTokenizer(result.dc_subject()," ");

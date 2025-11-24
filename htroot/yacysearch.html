@@ -383,17 +383,44 @@ function initRichResultsCarousel() {
     var readTimeEl = result.querySelector('.stat-item.time');
     var trustEl = result.querySelector('.stat-item.trust');
 
+    // Recipe-specific metadata
+    var recipeCookTimeEl = result.querySelector('.stat-item.recipe-time');
+    var recipeDifficultyEl = result.querySelector('.stat-item.recipe-difficulty');
+    var recipeServingsEl = result.querySelector('.stat-item.recipe-servings');
+
+    // Video-specific metadata
+    var videoPlatformEl = result.querySelector('.stat-item.video-platform');
+    var videoDurationEl = result.querySelector('.stat-item.video-duration');
+
     var imgSrc = thumbnail ? thumbnail.src : '';
     var titleText = titleEl ? titleEl.textContent : 'Untitled';
     var link = titleEl ? titleEl.href : '#';
     var domain = urlEl ? new URL(urlEl.href).hostname.replace('www.', '') : '';
     var readTime = readTimeEl ? readTimeEl.textContent.trim() : '';
-    var trust = trustEl ? trustEl.textContent.trim() : '';
+
+    // Extract metadata text (remove icon text)
+    var cookTime = recipeCookTimeEl ? recipeCookTimeEl.textContent.trim() : '';
+    var difficulty = recipeDifficultyEl ? recipeDifficultyEl.textContent.trim() : '';
+    var servings = recipeServingsEl ? recipeServingsEl.textContent.trim() : '';
+    var platform = videoPlatformEl ? videoPlatformEl.textContent.trim() : '';
+    var duration = videoDurationEl ? videoDurationEl.textContent.trim() : '';
 
     var card = document.createElement('a');
     card.className = 'carousel-card';
     card.href = link;
     card.target = '_blank';
+
+    // Build metadata display based on content type
+    var metaHtml = '';
+    if (isRecipe) {
+      if (cookTime) metaHtml += '<span class="card-badge recipe-time"><span class="glyphicon glyphicon-time"></span> ' + cookTime + '</span>';
+      if (difficulty) metaHtml += '<span class="card-badge recipe-difficulty">' + difficulty + '</span>';
+      if (servings) metaHtml += '<span class="card-badge recipe-servings"><span class="glyphicon glyphicon-user"></span> ' + servings + '</span>';
+    } else {
+      if (platform) metaHtml += '<span class="card-badge video-platform">' + platform + '</span>';
+      if (duration) metaHtml += '<span class="card-badge video-duration"><span class="glyphicon glyphicon-time"></span> ' + duration + '</span>';
+    }
+
     card.innerHTML =
       '<div class="card-image">' +
         (imgSrc ? '<img src="' + imgSrc + '" alt="" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=no-image><span class=glyphicon glyphicon-picture></span></div>\'">' : '<div class="no-image"><span class="glyphicon glyphicon-picture"></span></div>') +
@@ -402,9 +429,7 @@ function initRichResultsCarousel() {
       '<div class="card-content">' +
         '<div class="card-title">' + titleText + '</div>' +
         '<div class="card-source">' + domain + '</div>' +
-        '<div class="card-meta">' +
-          (readTime ? '<span class="card-time"><span class="glyphicon glyphicon-time"></span> ' + readTime + '</span>' : '') +
-        '</div>' +
+        (metaHtml ? '<div class="card-meta">' + metaHtml + '</div>' : '') +
       '</div>';
 
     track.appendChild(card);
