@@ -451,7 +451,13 @@ function scrollCarousel(direction) {
 }
 
 // Initialize carousel after DOM is ready and results are loaded
-window.setTimeout(initRichResultsCarousel, 100);
+// Note: For AJAX mode (jsResort=true), initRichResultsCarousel() is called from yacysort.js after all results are fetched
+// For non-AJAX mode (server-side includes), initialize with a short delay to ensure results are in the DOM
+if (!document.getElementById('resultscontainer')) {
+  // Non-AJAX mode: results are server-side included, so wait a bit and initialize
+  window.setTimeout(initRichResultsCarousel, 500);
+}
+// For AJAX mode: the carousel will be initialized by yacysort.js after all results are loaded
 </script>
 
 #%env/templates/footer.template%#
