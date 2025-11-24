@@ -692,3 +692,186 @@ body#index .col-md-12,
 body#index .col-lg-12 {
   background: transparent !important;
 }
+
+/* ============================================
+   Dark Mode Support
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  body#index {
+    background: linear-gradient(135deg, #0f172a 0%, #064e3b 50%, #022c22 100%);
+  }
+
+  /* Dark mode gradient orbs */
+  body#index::before {
+    background: linear-gradient(135deg, #059669, #047857);
+    opacity: 0.2;
+  }
+
+  body#index::after {
+    background: linear-gradient(45deg, #047857, #059669);
+    opacity: 0.2;
+  }
+
+  /* Navbar icon buttons */
+  body#index .navbar-right .dropdown > a,
+  body#index .navbar-right .btn {
+    background: rgba(55, 65, 81, 0.8);
+    color: #d1d5db;
+  }
+
+  body#index .navbar-right .dropdown > a:hover,
+  body#index .navbar-right .btn:hover {
+    background: rgba(55, 65, 81, 1);
+    color: #10b981;
+  }
+
+  /* Search input group */
+  body#index .input-group {
+    background: rgba(31, 41, 55, 0.9);
+    border-color: rgba(75, 85, 99, 0.5);
+  }
+
+  body#index .input-group:focus-within {
+    border-color: #10b981;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+  }
+
+  body#index .searchinput {
+    color: #f9fafb;
+  }
+
+  body#index .searchinput::placeholder {
+    color: #9ca3af;
+  }
+
+  /* Content type pills */
+  body#index .yacysearch label {
+    background: rgba(31, 41, 55, 0.9);
+    border-color: rgba(75, 85, 99, 0.5);
+    color: #d1d5db;
+  }
+
+  body#index .yacysearch label:hover {
+    background: rgba(6, 78, 59, 0.5);
+    border-color: #10b981;
+    color: #10b981;
+  }
+
+  body#index .yacysearch label:has(input[type="radio"]:checked) {
+    background: linear-gradient(135deg, rgba(6, 78, 59, 0.6), rgba(4, 120, 87, 0.6));
+    border-color: #10b981;
+    color: #10b981;
+  }
+
+  body#index .yacysearch a {
+    color: #9ca3af;
+  }
+
+  body#index .yacysearch a:hover {
+    color: #10b981;
+  }
+
+  /* Bootstrap button overrides */
+  body#index .btn-default {
+    background: rgba(31, 41, 55, 0.9) !important;
+    border-color: rgba(75, 85, 99, 0.5) !important;
+    color: #d1d5db !important;
+  }
+
+  body#index .btn-default:hover,
+  body#index .btn-default:focus {
+    background: rgba(6, 78, 59, 0.5) !important;
+    border-color: #10b981 !important;
+    color: #10b981 !important;
+  }
+
+  /* Links */
+  body#index a {
+    color: #10b981;
+  }
+
+  body#index a:hover {
+    color: #34d399;
+  }
+
+  /* Search options table */
+  body#index table[role="presentation"] td {
+    color: #d1d5db;
+  }
+
+  body#index table[role="presentation"] label {
+    color: #d1d5db;
+  }
+
+  body#index table[role="presentation"] input[type="text"] {
+    background: rgba(31, 41, 55, 0.9);
+    border-color: rgba(75, 85, 99, 0.5);
+    color: #f9fafb;
+  }
+
+  body#index table[role="presentation"] input[type="text"]:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+  }
+
+  /* Query operators help section */
+  body#index h4 {
+    color: #f9fafb;
+    border-top-color: rgba(75, 85, 99, 0.5);
+  }
+
+  body#index dl {
+    color: #d1d5db;
+  }
+
+  body#index dt {
+    color: #10b981;
+  }
+
+  body#index dd {
+    border-left-color: rgba(6, 78, 59, 0.5);
+  }
+
+  body#index dd a {
+    color: #10b981;
+  }
+
+  /* Dropdown menus */
+  body#index .dropdown-menu {
+    background: rgba(31, 41, 55, 0.98);
+    border-color: rgba(75, 85, 99, 0.5);
+  }
+
+  body#index .dropdown-menu > li > a {
+    color: #d1d5db;
+  }
+
+  body#index .dropdown-menu > li > a:hover {
+    background: rgba(6, 78, 59, 0.5);
+    color: #10b981;
+  }
+
+  body#index .dropdown-menu .divider {
+    background: rgba(75, 85, 99, 0.5);
+  }
+
+  /* Typeahead suggestions */
+  body#index .tt-menu {
+    background: rgba(31, 41, 55, 0.98);
+    border-color: rgba(75, 85, 99, 0.5);
+  }
+
+  body#index .tt-suggestion {
+    color: #d1d5db;
+  }
+
+  body#index .tt-suggestion:hover,
+  body#index .tt-suggestion.tt-cursor {
+    background: rgba(6, 78, 59, 0.5);
+    color: #10b981;
+  }
+
+  body#index .tt-suggestion strong {
+    color: #10b981;
+  }
+}

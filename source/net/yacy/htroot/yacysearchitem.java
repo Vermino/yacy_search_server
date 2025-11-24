@@ -68,6 +68,7 @@ import net.yacy.peers.NewsPool;
 import net.yacy.peers.Seed;
 import net.yacy.peers.graphics.ProfilingGraph;
 import net.yacy.search.EventTracker;
+import net.yacy.search.schema.CollectionSchema;
 import net.yacy.search.Switchboard;
 import net.yacy.search.SwitchboardConstants;
 import net.yacy.search.navigator.Navigator;
@@ -294,6 +295,39 @@ public class yacysearchitem {
                 prop.put("content_showSnapshots", snapshotPaths != null && snapshotPaths.size() > 0 && sb.getConfigBool("search.result.show.snapshots", true) ? 1 : 0);
                 prop.put("content_showVocabulary", sb.getConfigBool("search.result.show.vocabulary", true) ? 1 : 0);
                 prop.put("content_showRanking", sb.getConfigBool("search.result.show.ranking", false) ? 1 : 0);
+
+                // Reading time calculation (wordcount / 225 words per minute)
+                final int wordCount = result.wordCount();
+                final int readingTimeMinutes = Math.max(1, wordCount / 225);
+                prop.put("content_showReadingTime", sb.getConfigBool("search.result.show.readingtime", true) ? 1 : 0);
+                prop.put("content_showReadingTime_readingTime", readingTimeMinutes);
+                prop.put("content_showReadingTime_wordCount", wordCount);
+
+                // Trust score (normalized 0-100 based on ranking score)
+                final float trustScore = Math.min(100f, Math.max(0f, result.score() / 100000f * 100f));
+                prop.put("content_showTrustScore", sb.getConfigBool("search.result.show.trustscore", true) ? 1 : 0);
+                prop.put("content_showTrustScore_trustScore", String.format("%.0f", trustScore));
+
+                // Thumbnail URL (OpenGraph image or first image)
+                String thumbnailUrl = "";
+                boolean showThumbnail = sb.getConfigBool("search.result.show.thumbnail", true);
+                if (showThumbnail) {
+                    // Try OpenGraph image first
+                    final Object ogImage = result.getFieldValue(CollectionSchema.opengraph_image_s.getSolrFieldName());
+                    if (ogImage != null && !ogImage.toString().isEmpty()) {
+                        thumbnailUrl = ogImage.toString();
+                    } else if (result.limage() > 0) {
+                        // Fall back to first image
+                        try {
+                            thumbnailUrl = result.imageURL();
+                        } catch (final UnsupportedOperationException e) {
+                            thumbnailUrl = "";
+                        }
+                    }
+                }
+                prop.put("content_showThumbnail", showThumbnail && !thumbnailUrl.isEmpty() ? 1 : 0);
+                prop.putHTML("content_showThumbnail_thumbnailUrl", thumbnailUrl);
+                prop.put("content_showThumbnail_urlhash", urlhash);
 
                 if (showEvent) prop.put("content_showEvent_date", GenericFormatter.RFC1123_SHORT_FORMATTER.format(events[0]));
                 if (showKeywords) { // tokenize keywords
