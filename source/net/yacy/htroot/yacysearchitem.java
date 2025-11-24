@@ -402,14 +402,19 @@ public class yacysearchitem {
                 }
                 // Heuristic fallback classification (only when schema didn't provide a category)
                 else if (!hasSchemaContentCategory) {
-                    // Recipe detection - check URL patterns and title keywords
-                    if (resultUrlLower.contains("/recipe") || resultUrlLower.contains("/recipes/") ||
+                    // How-to detection first to avoid misclassifying "how to" guides as recipes
+                    if (titleLower.startsWith("how to ") || titleLower.contains(" how to ") ||
+                        titleLower.contains("how-to") || resultUrlLower.contains("/how-to") ||
+                        resultUrlLower.contains("/howto")) {
+                        contentCategory = "howto";
+                    }
+                    // Recipe detection - tighten heuristics to recipe-focused domains/keywords
+                    else if (resultUrlLower.contains("/recipe") || resultUrlLower.contains("/recipes/") ||
                         resultUrlLower.contains("allrecipes.com") || resultUrlLower.contains("foodnetwork.com") ||
                         resultUrlLower.contains("epicurious.com") || resultUrlLower.contains("tasty.co") ||
                         resultUrlLower.contains("delish.com") || resultUrlLower.contains("bonappetit.com") ||
                         resultUrlLower.contains("seriouseats.com") || resultUrlLower.contains("simplyrecipes.com") ||
-                        titleLower.contains("recipe") || titleLower.contains("how to cook") ||
-                        titleLower.contains("how to make")) {
+                        titleLower.contains("recipe")) {
                         contentCategory = "recipe";
                     }
                     // Product detection
