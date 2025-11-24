@@ -387,6 +387,8 @@ public class yacysearchitem {
                     }
                 }
 
+                final boolean hasSchemaContentCategory = !"default".equals(contentCategory);
+
                 // Video detection - check og:type, known video sites, URL patterns
                 if (contentCategory.equals("video") || ogType.contains("video") ||
                     resultUrlLower.contains("youtube.com") || resultUrlLower.contains("youtu.be") ||
@@ -398,38 +400,41 @@ public class yacysearchitem {
                     resultUrlLower.endsWith(".webm") || resultUrlLower.endsWith(".avi")) {
                     contentCategory = "video";
                 }
-                // Recipe detection - check URL patterns and title keywords
-                else if (resultUrlLower.contains("/recipe") || resultUrlLower.contains("/recipes/") ||
-                         resultUrlLower.contains("allrecipes.com") || resultUrlLower.contains("foodnetwork.com") ||
-                         resultUrlLower.contains("epicurious.com") || resultUrlLower.contains("tasty.co") ||
-                         resultUrlLower.contains("delish.com") || resultUrlLower.contains("bonappetit.com") ||
-                         resultUrlLower.contains("seriouseats.com") || resultUrlLower.contains("simplyrecipes.com") ||
-                         titleLower.contains("recipe") || titleLower.contains("how to cook") ||
-                         titleLower.contains("how to make")) {
-                    contentCategory = "recipe";
-                }
-                // Product detection
-                else if (ogType.contains("product") || ogType.contains("shop") ||
-                         resultUrlLower.contains("/product/") || resultUrlLower.contains("/shop/") ||
-                         resultUrlLower.contains("/buy/") || resultUrlLower.contains("amazon.com/dp/") ||
-                         resultUrlLower.contains("ebay.com/itm/")) {
-                    contentCategory = "product";
-                }
-                // Article/news detection
-                else if (ogType.contains("article") || ogType.contains("blog") || ogType.contains("news") ||
-                         resultUrlLower.contains("/article/") || resultUrlLower.contains("/blog/") ||
-                         resultUrlLower.contains("/news/") || resultUrlLower.contains("/post/")) {
-                    contentCategory = "article";
-                }
-                // Audio/music detection
-                else if (ogType.contains("music") || ogType.contains("audio") ||
-                         resultUrlLower.contains("spotify.com") || resultUrlLower.contains("soundcloud.com") ||
-                         resultUrlLower.endsWith(".mp3") || resultUrlLower.endsWith(".wav")) {
-                    contentCategory = "audio";
-                }
-                // Profile detection
-                else if (ogType.contains("profile") || ogType.contains("person")) {
-                    contentCategory = "profile";
+                // Heuristic fallback classification (only when schema didn't provide a category)
+                else if (!hasSchemaContentCategory) {
+                    // Recipe detection - check URL patterns and title keywords
+                    if (resultUrlLower.contains("/recipe") || resultUrlLower.contains("/recipes/") ||
+                        resultUrlLower.contains("allrecipes.com") || resultUrlLower.contains("foodnetwork.com") ||
+                        resultUrlLower.contains("epicurious.com") || resultUrlLower.contains("tasty.co") ||
+                        resultUrlLower.contains("delish.com") || resultUrlLower.contains("bonappetit.com") ||
+                        resultUrlLower.contains("seriouseats.com") || resultUrlLower.contains("simplyrecipes.com") ||
+                        titleLower.contains("recipe") || titleLower.contains("how to cook") ||
+                        titleLower.contains("how to make")) {
+                        contentCategory = "recipe";
+                    }
+                    // Product detection
+                    else if (ogType.contains("product") || ogType.contains("shop") ||
+                            resultUrlLower.contains("/product/") || resultUrlLower.contains("/shop/") ||
+                            resultUrlLower.contains("/buy/") || resultUrlLower.contains("amazon.com/dp/") ||
+                            resultUrlLower.contains("ebay.com/itm/")) {
+                        contentCategory = "product";
+                    }
+                    // Article/news detection
+                    else if (ogType.contains("article") || ogType.contains("blog") || ogType.contains("news") ||
+                            resultUrlLower.contains("/article/") || resultUrlLower.contains("/blog/") ||
+                            resultUrlLower.contains("/news/") || resultUrlLower.contains("/post/")) {
+                        contentCategory = "article";
+                    }
+                    // Audio/music detection
+                    else if (ogType.contains("music") || ogType.contains("audio") ||
+                            resultUrlLower.contains("spotify.com") || resultUrlLower.contains("soundcloud.com") ||
+                            resultUrlLower.endsWith(".mp3") || resultUrlLower.endsWith(".wav")) {
+                        contentCategory = "audio";
+                    }
+                    // Profile detection
+                    else if (ogType.contains("profile") || ogType.contains("person")) {
+                        contentCategory = "profile";
+                    }
                 }
 
                 // Check for event dates
