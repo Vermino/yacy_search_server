@@ -429,51 +429,67 @@ public class yacysearchitem {
                 prop.put("content_isEvent", contentCategory.equals("event") ? 1 : 0);
                 prop.put("content_isAudio", contentCategory.equals("audio") ? 1 : 0);
 
-                // Extract enhanced metadata for recipes
+                // Extract enhanced metadata for recipes from schema.org structured data
                 if (contentCategory.equals("recipe")) {
-                    final String descriptionText = result.snippet();
-                    final String descriptionLower = descriptionText != null ? descriptionText.toLowerCase() : "";
-                    final String combinedText = titleLower + " " + descriptionLower;
+                    // Get Recipe data from schema.org fields
+                    final Object recipeCookTimeObj = result.getFieldValue(CollectionSchema.recipe_cook_time_s.getSolrFieldName());
+                    final Object recipePrepTimeObj = result.getFieldValue(CollectionSchema.recipe_prep_time_s.getSolrFieldName());
+                    final Object recipeTotalTimeObj = result.getFieldValue(CollectionSchema.recipe_total_time_s.getSolrFieldName());
+                    final Object recipeYieldObj = result.getFieldValue(CollectionSchema.recipe_yield_s.getSolrFieldName());
+                    final Object recipeRatingObj = result.getFieldValue(CollectionSchema.recipe_rating_d.getSolrFieldName());
+                    final Object recipeRatingCountObj = result.getFieldValue(CollectionSchema.recipe_rating_count_i.getSolrFieldName());
 
-                    // Extract cooking time (look for patterns like "30 min", "1 hour", "2 hrs")
+                    // Format cook time (prefer totalTime, fallback to cookTime, fallback to regex)
                     String cookTime = "";
-                    java.util.regex.Pattern timePattern = java.util.regex.Pattern.compile("(\\d+)\\s*(min|minute|minutes|hr|hrs|hour|hours)", java.util.regex.Pattern.CASE_INSENSITIVE);
-                    java.util.regex.Matcher timeMatcher = timePattern.matcher(combinedText);
-                    if (timeMatcher.find()) {
-                        final String num = timeMatcher.group(1);
-                        final String unit = timeMatcher.group(2).toLowerCase();
-                        if (unit.startsWith("min")) {
-                            cookTime = num + " min";
-                        } else {
-                            cookTime = num + " hr" + (Integer.parseInt(num) > 1 ? "s" : "");
+                    if (recipeTotalTimeObj != null) {
+                        cookTime = formatDuration(recipeTotalTimeObj.toString());
+                    } else if (recipeCookTimeObj != null) {
+                        cookTime = formatDuration(recipeCookTimeObj.toString());
+                    } else {
+                        // Fallback to regex extraction from title/description if schema.org data not available
+                        final String descriptionText = result.snippet();
+                        final String descriptionLower = descriptionText != null ? descriptionText.toLowerCase() : "";
+                        final String combinedText = titleLower + " " + descriptionLower;
+                        java.util.regex.Pattern timePattern = java.util.regex.Pattern.compile("(\\d+)\\s*(min|minute|minutes|hr|hrs|hour|hours)", java.util.regex.Pattern.CASE_INSENSITIVE);
+                        java.util.regex.Matcher timeMatcher = timePattern.matcher(combinedText);
+                        if (timeMatcher.find()) {
+                            final String num = timeMatcher.group(1);
+                            final String unit = timeMatcher.group(2).toLowerCase();
+                            if (unit.startsWith("min")) {
+                                cookTime = num + " min";
+                            } else {
+                                cookTime = num + " hr" + (Integer.parseInt(num) > 1 ? "s" : "");
+                            }
                         }
                     }
 
-                    // Extract difficulty (easy, quick, simple, etc.)
-                    String difficulty = "";
-                    if (combinedText.contains("easy") || combinedText.contains("simple") || combinedText.contains("quick")) {
-                        difficulty = "Easy";
-                    } else if (combinedText.contains("advanced") || combinedText.contains("complex") || combinedText.contains("gourmet")) {
-                        difficulty = "Advanced";
-                    } else if (combinedText.contains("intermediate") || combinedText.contains("medium")) {
-                        difficulty = "Medium";
+                    // Format servings from recipeYield
+                    String servings = "";
+                    if (recipeYieldObj != null) {
+                        final String yieldText = recipeYieldObj.toString();
+                        // If it's just a number, add "servings"
+                        if (yieldText.matches("\\d+")) {
+                            servings = yieldText + " servings";
+                        } else {
+                            servings = yieldText; // Use as-is if it already has text
+                        }
                     }
 
-                    // Extract servings (look for patterns like "serves 4", "4 servings")
-                    String servings = "";
-                    java.util.regex.Pattern servingsPattern = java.util.regex.Pattern.compile("(serves?|servings?)\\s*(\\d+)|( \\d+)\\s*(serves?|servings?)", java.util.regex.Pattern.CASE_INSENSITIVE);
-                    java.util.regex.Matcher servingsMatcher = servingsPattern.matcher(combinedText);
-                    if (servingsMatcher.find()) {
-                        String num = servingsMatcher.group(2) != null ? servingsMatcher.group(2) : servingsMatcher.group(3);
-                        if (num != null && !num.trim().isEmpty()) {
-                            servings = num.trim() + " servings";
+                    // Calculate difficulty based on rating (if available) or use "Easy" as default
+                    String difficulty = "";
+                    if (recipeRatingObj != null) {
+                        final double rating = ((Number) recipeRatingObj).doubleValue();
+                        if (rating >= 4.5) {
+                            difficulty = "Popular"; // High rated = popular/well-tested
+                        } else if (rating >= 3.5) {
+                            difficulty = "Good";
                         }
                     }
 
                     prop.put("content_recipeCookTime", cookTime);
                     prop.put("content_recipeDifficulty", difficulty);
                     prop.put("content_recipeServings", servings);
-                    prop.put("content_hasRecipeMeta", (!cookTime.isEmpty() || !difficulty.isEmpty() || !servings.isEmpty()) ? 1 : 0);
+                    prop.put("content_hasRecipeMeta", (!cookTime.isEmpty() || !servings.isEmpty() || !difficulty.isEmpty()) ? 1 : 0);
                 } else {
                     prop.put("content_hasRecipeMeta", 0);
                 }
@@ -1057,6 +1073,60 @@ public class yacysearchitem {
 		    prop.put("content_item", "0");
 		}
 	}
+
+    /**
+     * Formats an ISO 8601 duration (e.g., "PT30M", "PT1H30M") into human-readable format.
+     * Falls back to returning the input as-is if it's already in text format.
+     * @param duration ISO 8601 duration string or plain text
+     * @return Formatted duration string (e.g., "30 min", "1 hr 30 min")
+     */
+    private static String formatDuration(final String duration) {
+        if (duration == null || duration.isEmpty()) {
+            return "";
+        }
+
+        // Check if it's an ISO 8601 duration (starts with PT)
+        if (duration.startsWith("PT") || duration.startsWith("P")) {
+            try {
+                // Parse ISO 8601 duration format like PT30M, PT1H30M, P1DT2H30M
+                String d = duration.toUpperCase();
+                int hours = 0;
+                int minutes = 0;
+
+                // Extract hours
+                int hIndex = d.indexOf('H');
+                if (hIndex > 0) {
+                    int tIndex = d.indexOf('T');
+                    if (tIndex >= 0 && tIndex < hIndex) {
+                        hours = Integer.parseInt(d.substring(tIndex + 1, hIndex));
+                    }
+                }
+
+                // Extract minutes
+                int mIndex = d.indexOf('M');
+                if (mIndex > 0 && d.charAt(mIndex - 1) != 'P') { // Not a month indicator
+                    int startIndex = hIndex > 0 ? hIndex + 1 : d.indexOf('T') + 1;
+                    if (startIndex > 0 && startIndex < mIndex) {
+                        minutes = Integer.parseInt(d.substring(startIndex, mIndex));
+                    }
+                }
+
+                // Format output
+                if (hours > 0 && minutes > 0) {
+                    return hours + " hr " + minutes + " min";
+                } else if (hours > 0) {
+                    return hours + " hr" + (hours > 1 ? "s" : "");
+                } else if (minutes > 0) {
+                    return minutes + " min";
+                }
+            } catch (final Exception e) {
+                // If parsing fails, fall through to return original
+            }
+        }
+
+        // Return as-is if not ISO 8601 or if it already looks like formatted text
+        return duration;
+    }
 
     private static String shorten(final String s, final int length) {
         final String ret;
