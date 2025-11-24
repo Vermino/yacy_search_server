@@ -486,11 +486,17 @@ public class yacysearchitem {
                         }
                     }
 
-                    prop.put("content_recipeCookTime", cookTime);
-                    prop.put("content_recipeDifficulty", difficulty);
-                    prop.put("content_recipeServings", servings);
+                    prop.put("content_recipeCookTime", cookTime.isEmpty() ? 0 : 1);
+                    prop.put("content_recipeCookTime_recipeCookTime", cookTime);
+                    prop.put("content_recipeDifficulty", difficulty.isEmpty() ? 0 : 1);
+                    prop.put("content_recipeDifficulty_recipeDifficulty", difficulty);
+                    prop.put("content_recipeServings", servings.isEmpty() ? 0 : 1);
+                    prop.put("content_recipeServings_recipeServings", servings);
                     prop.put("content_hasRecipeMeta", (!cookTime.isEmpty() || !servings.isEmpty() || !difficulty.isEmpty()) ? 1 : 0);
                 } else {
+                    prop.put("content_recipeCookTime", 0);
+                    prop.put("content_recipeDifficulty", 0);
+                    prop.put("content_recipeServings", 0);
                     prop.put("content_hasRecipeMeta", 0);
                 }
 
@@ -523,10 +529,14 @@ public class yacysearchitem {
                         duration = durationMatcher.group(0);
                     }
 
-                    prop.put("content_videoPlatform", platform);
-                    prop.put("content_videoDuration", duration);
-                    prop.put("content_hasVideoMeta", (!duration.isEmpty()) ? 1 : 0);
+                    prop.put("content_videoPlatform", platform.isEmpty() ? 0 : 1);
+                    prop.put("content_videoPlatform_videoPlatform", platform);
+                    prop.put("content_videoDuration", duration.isEmpty() ? 0 : 1);
+                    prop.put("content_videoDuration_videoDuration", duration);
+                    prop.put("content_hasVideoMeta", (!platform.isEmpty() || !duration.isEmpty()) ? 1 : 0);
                 } else {
+                    prop.put("content_videoPlatform", 0);
+                    prop.put("content_videoDuration", 0);
                     prop.put("content_hasVideoMeta", 0);
                 }
 
