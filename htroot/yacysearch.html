@@ -434,10 +434,8 @@ function initRichResultsCarousel() {
 
     track.appendChild(card);
 
-    // Hide the original result from main list if it's in carousel
-    if (index < 4) {
-      result.style.display = 'none';
-    }
+    // Note: We keep original results visible in the main list
+    // The carousel is a featured view, not a replacement for search results
   });
 
   carousel.classList.remove('hidden');
