@@ -303,8 +303,10 @@ public class yacysearchitem {
                 prop.put("content_showReadingTime_readingTime", readingTimeMinutes);
                 prop.put("content_showReadingTime_wordCount", wordCount);
 
-                // Trust score (normalized 0-100 based on ranking score)
-                final float trustScore = Math.min(100f, Math.max(0f, result.score() / 100000f * 100f));
+                // Trust score (normalized 0-100 using log scale for better distribution)
+                // Scores typically range from 0 to 100000+, log scale maps them more evenly
+                final double logScore = Math.log10(Math.max(1.0, result.score()));
+                final float trustScore = Math.min(100f, Math.max(0f, (float)(logScore / 5.0 * 100.0)));
                 prop.put("content_showTrustScore", sb.getConfigBool("search.result.show.trustscore", true) ? 1 : 0);
                 prop.put("content_showTrustScore_trustScore", String.format("%.0f", trustScore));
 

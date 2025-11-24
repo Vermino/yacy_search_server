@@ -474,14 +474,22 @@ div.searchresults:hover {
   border-color: rgba(22, 163, 74, 0.2);
 }
 
-/* Result layout with thumbnail space */
+/* Result layout with sidebar */
 .result-content {
   display: flex;
   gap: 20px;
 }
 
-.result-thumbnail {
+/* Left sidebar with thumbnail and stats */
+.result-sidebar {
   flex-shrink: 0;
+  width: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.result-thumbnail {
   width: 140px;
   height: 100px;
   border-radius: var(--radius-lg);
@@ -505,20 +513,51 @@ article.searchresults:hover .result-thumbnail img {
   min-width: 0;
 }
 
-/* URL Line with favicon */
-.result-url-line {
+/* Stats under thumbnail */
+.result-stats {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.result-url-line .favicon {
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
-  flex-shrink: 0;
+.result-stats .stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
 }
+
+.result-stats .stat-item.trust {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+}
+
+.result-stats .stat-item.time {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.result-stats .stat-item.link {
+  background: #f3f4f6;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.result-stats .stat-item.link:hover {
+  background: var(--primary-green);
+  color: white;
+  text-decoration: none;
+}
+
+.result-stats .stat-item .glyphicon {
+  font-size: 11px;
+}
+
+/* URL Line with favicon - see consolidated styles below */
 
 cite.result-cite {
   font-style: normal;
@@ -732,6 +771,8 @@ p.snippet {
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
+  flex-wrap: nowrap;
+  max-width: 100%;
 }
 
 .result-url-line .favicon {
@@ -739,6 +780,7 @@ p.snippet {
   height: 16px;
   flex-shrink: 0;
   vertical-align: middle;
+  border-radius: 4px;
 }
 
 .result-cite {
@@ -747,6 +789,7 @@ p.snippet {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: calc(100% - 200px);
 }
 
 /* URL Actions - Visible on hover */
@@ -755,9 +798,9 @@ p.snippet {
   align-items: center;
   flex-shrink: 0;
   gap: 4px;
-  opacity: 0;
+  opacity: 0.4;
   transition: opacity 0.2s ease;
-  margin-left: auto;
+  margin-left: 8px;
 }
 
 article.searchresults:hover .urlactions,
@@ -766,15 +809,29 @@ div.searchresults:hover .urlactions {
 }
 
 .urlactions .action-btn {
-  padding: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
   background: var(--bg-gray-50);
   color: var(--text-muted);
   border-radius: 8px;
+  border: 1px solid transparent;
+  text-decoration: none;
+}
+
+.urlactions .action-btn .glyphicon {
+  font-size: 14px;
+  line-height: 1;
 }
 
 .urlactions .action-btn:hover {
   background: var(--bg-gray-100);
   color: var(--primary-green);
+  border-color: var(--primary-green);
+  text-decoration: none;
 }
 
 /* ============================================
@@ -1889,8 +1946,8 @@ body#yacysearch .btn-group .btn-default.active {
 }
 
 /* ============================================
-   Dark Mode Support
-   ============================================ */
+   Dark Mode Support - DISABLED FOR NOW
+   ============================================
 @media (prefers-color-scheme: dark) {
   :root {
     --text-primary: #f9fafb;
@@ -2102,3 +2159,4 @@ body#yacysearch .btn-group .btn-default.active {
     color: var(--primary-green);
   }
 }
+*/

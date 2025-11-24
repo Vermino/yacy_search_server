@@ -1,12 +1,32 @@
 #(content)#::
   <article class="searchresults" data-ranking="#[ranking]#" data-nav-generation="#[nav-generation]#">
     <div class="result-content">
-      <!-- Thumbnail -->
-      #(showThumbnail)#::
-      <div class="result-thumbnail">
-        <img src="ViewImage.png?maxwidth=140&amp;maxheight=100&amp;isStatic=true&amp;quadratic&amp;url=#[thumbnailUrl]#" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"/>
+      <!-- Left sidebar: Thumbnail + Key Stats -->
+      <div class="result-sidebar">
+        #(showThumbnail)#::
+        <div class="result-thumbnail">
+          <img src="ViewImage.png?maxwidth=140&amp;maxheight=100&amp;isStatic=true&amp;quadratic&amp;url=#[thumbnailUrl]#" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"/>
+        </div>
+        #(/showThumbnail)#
+        <!-- Key Stats under thumbnail -->
+        <div class="result-stats">
+          #(showTrustScore)#::
+          <div class="stat-item trust" title="Trust Score: #[trustScore]#%">
+            <span class="glyphicon glyphicon-ok-sign"></span> #[trustScore]#%
+          </div>
+          #(/showTrustScore)#
+          #(showReadingTime)#::
+          <div class="stat-item time" title="#[wordCount]# words">
+            <span class="glyphicon glyphicon-time"></span> #[readingTime]# min
+          </div>
+          #(/showReadingTime)#
+          #(showCitation)#::
+          <a href="api/citation.html?hash=#[urlhash]#&filter=true" target="_blank" class="stat-item link" title="View citations">
+            <span class="glyphicon glyphicon-link"></span> Cite
+          </a>
+          #(/showCitation)#
+        </div>
       </div>
-      #(/showThumbnail)#
 
       <div class="result-body">
         <!-- URL Line with domain and actions -->
@@ -17,12 +37,6 @@
           <cite class="result-cite">
             <a href="#[link]#" id="url#[urlhash]#" target="#[target]#" #(noreferrer)#::rel="noreferrer"#(/noreferrer)#>#[urlname]#</a>
           </cite>
-          <!-- Trust Score Badge -->
-          #(showTrustScore)#::
-          <span class="trust-score" title="Trust Score: #[trustScore]#%">
-            <span class="glyphicon glyphicon-ok-sign"></span> #[trustScore]#%
-          </span>
-          #(/showTrustScore)#
           <!-- Action buttons -->
           <div class="urlactions">
             #(heuristic)#::
@@ -53,15 +67,13 @@
         <!-- Description/Snippet -->
         <p class="snippet"><span class="snippetLoaded" id="h#[urlhash]#">#[description]#</span></p>
 
-        <!-- Metadata Pills Row -->
+        <!-- Metadata Pills Row (secondary metadata) -->
         <div class="result-meta">
-          #(showReadingTime)#::<span class="meta-pill reading-time" title="#[wordCount]# words"><span class="glyphicon glyphicon-time"></span> #[readingTime]# min read</span>#(/showReadingTime)#
           #(showDate)#::<span class="meta-pill date"><span class="glyphicon glyphicon-calendar"></span> #[date]#</span>#(/showDate)#
           #(showEvent)#::<span class="meta-pill date"><span class="glyphicon glyphicon-time"></span> #[date]#</span>#(/showEvent)#
           #(showSize)#::<span class="meta-pill size"><span class="glyphicon glyphicon-file"></span> #[sizename]#</span>#(/showSize)#
           #(showMetadata)#::<a href="solr/select?q=id:%22#[urlhash]#%22&start=0&rows=1&core=collection1&wt=html&omitHeader=true" target="_blank" class="meta-link">Metadata</a>#(/showMetadata)#
           #(showParser)#::<a href="ViewFile.html?urlHash=#[urlhash]#&amp;words=#[words]#" target="_blank" class="meta-link">Parser</a>#(/showParser)#
-          #(showCitation)#::<a href="api/citation.html?hash=#[urlhash]#&filter=true" target="_blank" class="meta-link">Citations</a>#(/showCitation)#
           #(showPictures)#::<a href="yacysearch.html?contentdom=image#(authSearch)#::&auth#(/authSearch)#&url=#[link]#&query=#[former]#+inurl:#[link]#" target="_blank" class="meta-link"><span class="glyphicon glyphicon-picture"></span> Pictures</a>#(/showPictures)#
           #(showCache)#::<a href="CacheResource_p.html?url=#[link]#" target="_blank" class="meta-link">Cached</a>#(/showCache)#
           #(showProxy)#::<a href="proxy.html?url=#[link]#" target="_blank" class="meta-link">Proxy</a>#(/showProxy)#
@@ -108,59 +120,35 @@
   #(item)#::
   <tr class="#(col)#TableCellLight::TableCellDark#(/col)#">
   	<td>#[name]#</td>
-  	<td><a href="#[href]#" target="#[target]#" #(noreferrer)#::rel="noreferrer"#(/noreferrer)#>#[hrefshort]#</a>
-  	<td class="text-center">#(embed)#::#(list)#::<ul class="embeddedAudios list-unstyled">#(/list)#
-  		#{audioSources}#
-  			#(list)#::<li>#(/list)#
-  			<audio src="#[href]#"
-  				title="#[title]#"
-				preload="none" controls="controls"
-				onplaying="handleAudioPlaying(event)"
-				onpause="handleAudioPause(event)"
-				onerror="handleAudioLoadError(event)"
-				onended="handleAudioEnded(event)">Not supported
-			</audio>
-			#(list)#::</li>#(/list)#
-		#{/audioSources}#
-		#(list)#::</ul>#(/list)#
-  		#(moreAudios)#::
-  			<ul id="expandableAudios_#[urlhash]#" class="list-unstyled hidden">
-			#{audioSources}#<li>
-  			<audio src="#[href]#"
-  				title="#[title]#"
-  				class="hidden"
-				preload="none" controls="controls"
-				onplaying="handleAudioPlaying(event)"
-				onpause="handleAudioPause(event)"
-				onerror="handleAudioLoadError(event)"
-				onended="handleAudioEnded(event)">Not supported
-			</audio></li>#{/audioSources}#
-			</ul>
-			<ul class="list-unstyled">
-				<li>
-					<span id="hiddenCount_#[urlhash]#">#[hiddenCount]# more...</span>
-  					<button class="expandAudiosBtn btn btn-default btn-xs hidden" type="button"
-  						aria-controls="expandableAudios_#[urlhash]#" aria-expanded="false" 
-  						title="Show #[expandableCount]# more" 
-  						data-title-collapsed="Show #[expandableCount]# more" 
-  						data-title-expanded="Show only the first #[firstLimit]#"
-  						onclick="toggleExpandableAudios(this, 'expandableAudios_#[urlhash]#', 'hiddenCount_#[urlhash]#', 'evenMoreCount_#[urlhash]#')">
-  						<span class="glyphicon"></span>
-  					</button>
-					#(evenMore)#<span id="evenMoreCount_#[urlhash]#" class="hidden">#[count]# more...</span>#(/evenMore)#
-				</li>
-			</ul>
-  		#(/moreAudios)##(/embed)#
-	</td>
-  </tr>#(/item)#
+  	<td><a href="#[link]#" target="_blank">#[link]#</a></td>
+  	<td>#[urlSize]#</td>
+  	<td>
+  	  <a href="yacysearch.html?contentdom=audio&amp;url=#[link]#&amp;verify=false&amp;contentdom=audio" target="_blank"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+      <a href="#[link]#" target="_blank"><span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span></a>
+    </td>
+  </tr>
+  #(/item)#
   ::
-  #(item)#::<tr class="#(col)#TableCellLight::TableCellDark#(/col)#"><td>#[name]#</td><td><a href="#[href]#" target="#[target]#" #(noreferrer)#::rel="noreferrer"#(/noreferrer)#>#[hrefshort]#</a></tr>#(/item)#
+  #(item)#::
+  <tr class="#(col)#TableCellLight::TableCellDark#(/col)#">
+  	<td>#[name]#</td>
+  	<td><a href="#[link]#" target="_blank">#[link]#</a></td>
+  	<td>#[urlSize]#</td>
+  	<td>
+  	  <a href="yacysearch.html?contentdom=video&amp;url=#[link]#&amp;verify=false&amp;contentdom=video" target="_blank"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+      <a href="#[link]#" target="_blank"><span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span></a>
+    </td>
+  </tr>
+  #(/item)#
   ::
-  #(item)#::<tr class="#(col)#TableCellLight::TableCellDark#(/col)#"><td>#[name]#</td><td><a href="#[href]#" target="#[target]#" #(noreferrer)#::rel="noreferrer"#(/noreferrer)#>#[hrefshort]#</a></tr>#(/item)#
+  #(item)#::
+  <tr class="#(col)#TableCellLight::TableCellDark#(/col)#">
+  	<td><a href="#[link]#" target="_blank">#[name]#</a></td>
+  	<td><a href="#[link]#" target="_blank">#[link]#</a></td>
+  	<td>#[urlSize]#</td>
+  	<td>
+  	  <a href="yacysearch.html?contentdom=app&amp;url=#[link]#&amp;verify=false&amp;contentdom=app" target="_blank"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+    </td>
+  </tr>
+  #(/item)#
 #(/content)#
-
-#(statistics)#::
-  <script type="text/javascript">
-	statistics("#[offset]#", "#[itemscount]#", "#[itemsperpage]#", "#[totalcount]#", "#[localIndexCount]#", "#[remoteIndexCount]#", "#[remotePeerCount]#", "#[navurlBase]#", #[localQuery]#, #[feedRunning]#);
-  </script>
-#(/statistics)#
