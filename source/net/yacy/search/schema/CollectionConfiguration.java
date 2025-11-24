@@ -727,9 +727,9 @@ public class CollectionConfiguration extends SchemaConfiguration implements Seri
             final String recipeImage = html.getRecipeImage();
             if (recipeImage != null) this.add(doc, CollectionSchema.recipe_image_s, recipeImage);
             final Double recipeRating = html.getRecipeRating();
-            if (recipeRating != null) this.add(doc, CollectionSchema.recipe_rating_d, recipeRating);
+            if (recipeRating != null) doc.setField(CollectionSchema.recipe_rating_d.getSolrFieldName(), recipeRating.doubleValue());
             final Integer recipeRatingCount = html.getRecipeRatingCount();
-            if (recipeRatingCount != null) this.add(doc, CollectionSchema.recipe_rating_count_i, recipeRatingCount);
+            if (recipeRatingCount != null) this.add(doc, CollectionSchema.recipe_rating_count_i, recipeRatingCount.intValue());
 
             final List<String> articles = html.getArticles();
             this.add(doc, CollectionSchema.articlecount_i, articles.size());
