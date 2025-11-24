@@ -331,6 +331,67 @@ public class yacysearchitem {
                 prop.putHTML("content_showThumbnail_thumbnailUrl", thumbnailUrl);
                 prop.put("content_showThumbnail_urlhash", urlhash);
 
+                // Content type detection for rich results
+                // OpenGraph type (article, video, product, etc.)
+                String ogType = "";
+                final Object ogTypeObj = result.getFieldValue(CollectionSchema.opengraph_type_s.getSolrFieldName());
+                if (ogTypeObj != null && !ogTypeObj.toString().isEmpty()) {
+                    ogType = ogTypeObj.toString().toLowerCase();
+                }
+                prop.putHTML("content_ogType", ogType);
+
+                // Determine content category for styling (video, article, product, event, default)
+                String contentCategory = "default";
+                if (ogType.contains("video") || resultUrlstring.contains("youtube.com") ||
+                    resultUrlstring.contains("vimeo.com") || resultUrlstring.contains("dailymotion.com")) {
+                    contentCategory = "video";
+                } else if (ogType.contains("product") || ogType.contains("shop")) {
+                    contentCategory = "product";
+                } else if (ogType.contains("article") || ogType.contains("blog") || ogType.contains("news")) {
+                    contentCategory = "article";
+                } else if (ogType.contains("music") || ogType.contains("audio")) {
+                    contentCategory = "audio";
+                } else if (ogType.contains("profile") || ogType.contains("person")) {
+                    contentCategory = "profile";
+                }
+
+                // Check for event dates
+                final Collection<Object> startDates = result.getFieldValues(CollectionSchema.startDates_dts.getSolrFieldName());
+                final Collection<Object> endDates = result.getFieldValues(CollectionSchema.endDates_dts.getSolrFieldName());
+                boolean hasEventDates = (startDates != null && !startDates.isEmpty()) || (endDates != null && !endDates.isEmpty());
+                if (hasEventDates) {
+                    contentCategory = "event";
+                    prop.put("content_showEventDates", 1);
+                    if (startDates != null && !startDates.isEmpty()) {
+                        final Object startDate = startDates.iterator().next();
+                        if (startDate instanceof Date) {
+                            prop.put("content_showEventDates_startDate", GenericFormatter.RFC1123_SHORT_FORMATTER.format((Date) startDate));
+                        } else {
+                            prop.put("content_showEventDates_startDate", startDate.toString());
+                        }
+                    } else {
+                        prop.put("content_showEventDates_startDate", "");
+                    }
+                    if (endDates != null && !endDates.isEmpty()) {
+                        final Object endDate = endDates.iterator().next();
+                        if (endDate instanceof Date) {
+                            prop.put("content_showEventDates_endDate", GenericFormatter.RFC1123_SHORT_FORMATTER.format((Date) endDate));
+                        } else {
+                            prop.put("content_showEventDates_endDate", endDate.toString());
+                        }
+                    } else {
+                        prop.put("content_showEventDates_endDate", "");
+                    }
+                } else {
+                    prop.put("content_showEventDates", 0);
+                }
+
+                prop.put("content_contentCategory", contentCategory);
+                prop.put("content_isVideo", contentCategory.equals("video") ? 1 : 0);
+                prop.put("content_isArticle", contentCategory.equals("article") ? 1 : 0);
+                prop.put("content_isProduct", contentCategory.equals("product") ? 1 : 0);
+                prop.put("content_isEvent", contentCategory.equals("event") ? 1 : 0);
+
                 if (showEvent) prop.put("content_showEvent_date", GenericFormatter.RFC1123_SHORT_FORMATTER.format(events[0]));
                 if (showKeywords) { // tokenize keywords
                     final StringTokenizer stoc = new StringTokenizer(result.dc_subject()," ");

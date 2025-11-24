@@ -1,11 +1,25 @@
 #(content)#::
-  <article class="searchresults" data-ranking="#[ranking]#" data-nav-generation="#[nav-generation]#">
+  <article class="searchresults content-#[contentCategory]#" data-ranking="#[ranking]#" data-nav-generation="#[nav-generation]#" data-content-type="#[contentCategory]#">
+    <!-- Content Type Badge -->
+    #(isVideo)#::
+    <div class="content-type-badge video"><span class="glyphicon glyphicon-play-circle"></span> Video</div>
+    #(/isVideo)#
+    #(isEvent)#::
+    <div class="content-type-badge event"><span class="glyphicon glyphicon-calendar"></span> Event</div>
+    #(/isEvent)#
+    #(isProduct)#::
+    <div class="content-type-badge product"><span class="glyphicon glyphicon-shopping-cart"></span> Product</div>
+    #(/isProduct)#
+
     <div class="result-content">
       <!-- Left sidebar: Thumbnail + Key Stats -->
       <div class="result-sidebar">
         #(showThumbnail)#::
         <div class="result-thumbnail">
           <img src="ViewImage.png?maxwidth=140&amp;maxheight=100&amp;isStatic=true&amp;quadratic&amp;url=#[thumbnailUrl]#" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"/>
+          #(isVideo)#::
+          <div class="video-play-overlay"><span class="glyphicon glyphicon-play"></span></div>
+          #(/isVideo)#
         </div>
         #(/showThumbnail)#
         <!-- Key Stats under thumbnail -->
@@ -25,6 +39,12 @@
             <span class="glyphicon glyphicon-link"></span> Cite
           </a>
           #(/showCitation)#
+          #(showEventDates)#::
+          <div class="stat-item event-date" title="Event Date">
+            <span class="glyphicon glyphicon-calendar"></span>
+            <span class="event-date-text">#[startDate]##(endDate)#::&ndash; #[endDate]##(/endDate)#</span>
+          </div>
+          #(/showEventDates)#
         </div>
       </div>
 
