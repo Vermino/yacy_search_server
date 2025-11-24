@@ -515,16 +515,21 @@ body#yacysearch .progress-bar {
 
 .carousel-track-container {
   overflow: hidden;
+  position: relative;
 }
 
 .carousel-track {
-  display: flex;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
   gap: 16px;
   overflow-x: auto;
+  overflow-y: hidden;
   scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding: 4px 0;
+  width: 100%;
 }
 
 .carousel-track::-webkit-scrollbar {
@@ -532,7 +537,10 @@ body#yacysearch .progress-bar {
 }
 
 .carousel-card {
-  flex: 0 0 260px;
+  flex: 0 0 260px !important;
+  min-width: 260px;
+  max-width: 260px;
+  width: 260px;
   background: white;
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -541,6 +549,7 @@ body#yacysearch .progress-bar {
   text-decoration: none;
   color: inherit;
   transition: all 0.3s ease;
+  display: block;
 }
 
 .carousel-card:hover {
