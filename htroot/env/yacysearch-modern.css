@@ -711,8 +711,10 @@ div.searchresults:hover {
 
 /* Result layout with sidebar */
 .result-content {
-  display: flex;
+  display: flex !important;
+  flex-direction: row !important;
   gap: 20px;
+  align-items: flex-start;
 }
 
 /* Left sidebar with thumbnail and stats */
@@ -1654,6 +1656,29 @@ article.searchresults:nth-child(5) { animation-delay: 0.4s; }
   }
 }
 
+/* Very small screens: stack result content vertically */
+@media (max-width: 480px) {
+  .result-content {
+    flex-direction: column !important;
+  }
+
+  .result-sidebar {
+    width: 100%;
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .result-thumbnail {
+    width: 80px;
+    height: 60px;
+  }
+
+  .result-stats {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
 /* ============================================
    Screen Reader & Accessibility
    ============================================ */
@@ -2006,9 +2031,11 @@ body#yacysearch .navbar-right {
 /* ============================================
    Content Area Width Fix
    ============================================ */
-body#yacysearch #results {
+body#yacysearch #results,
+body#yacysearch #resultscontainer {
   flex: 1;
   min-width: 0;
+  width: 100%;
 }
 
 /* Panel styling for sidebar filter panels */
