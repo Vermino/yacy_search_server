@@ -1226,7 +1226,8 @@ public class ContentScraper extends AbstractScraper implements Scraper {
                 addJsonLdType(obj.get("@type"));
             }
 
-            for (final String key : obj.keySet()) {
+            for (final Iterator<String> it = obj.keys(); it.hasNext();) {
+                final String key = it.next();
                 if ("@type".equals(key)) {
                     continue;
                 }
