@@ -431,7 +431,8 @@ public class yacysearchitem {
 
                 // Extract enhanced metadata for recipes
                 if (contentCategory.equals("recipe")) {
-                    final String descriptionLower = result.dc_description().toLowerCase();
+                    final String descriptionText = result.snippet();
+                    final String descriptionLower = descriptionText != null ? descriptionText.toLowerCase() : "";
                     final String combinedText = titleLower + " " + descriptionLower;
 
                     // Extract cooking time (look for patterns like "30 min", "1 hour", "2 hrs")
@@ -497,7 +498,8 @@ public class yacysearchitem {
 
                     // Extract video duration (look for patterns like "5:30", "1:23:45" in title/description)
                     String duration = "";
-                    final String descriptionLower = result.dc_description().toLowerCase();
+                    final String descriptionText = result.snippet();
+                    final String descriptionLower = descriptionText != null ? descriptionText.toLowerCase() : "";
                     final String combinedText = titleLower + " " + descriptionLower;
                     java.util.regex.Pattern durationPattern = java.util.regex.Pattern.compile("(\\d+):(\\d{2})(:(\\d{2}))?");
                     java.util.regex.Matcher durationMatcher = durationPattern.matcher(combinedText);
