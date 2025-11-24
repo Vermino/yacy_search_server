@@ -1223,7 +1223,7 @@ public class ContentScraper extends AbstractScraper implements Scraper {
         if (node instanceof JSONObject) {
             final JSONObject obj = (JSONObject) node;
             if (obj.has("@type")) {
-                addJsonLdType(obj.get("@type"));
+                addJsonLdType(obj.opt("@type"));
             }
 
             for (final Iterator<String> it = obj.keys(); it.hasNext();) {
