@@ -602,6 +602,16 @@ article.searchresults:hover .result-thumbnail img {
   color: white;
 }
 
+.content-type-badge.recipe {
+  background: linear-gradient(135deg, #ea580c, #f97316);
+  color: white;
+}
+
+.content-type-badge.audio {
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: white;
+}
+
 /* Video play overlay on thumbnail */
 .video-play-overlay {
   position: absolute;
@@ -659,6 +669,22 @@ article.searchresults.content-product:hover {
 
 article.searchresults.content-article {
   border-left: 4px solid var(--primary-green);
+}
+
+article.searchresults.content-recipe {
+  border-left: 4px solid #f97316;
+}
+
+article.searchresults.content-recipe:hover {
+  border-color: #ea580c;
+}
+
+article.searchresults.content-audio {
+  border-left: 4px solid #10b981;
+}
+
+article.searchresults.content-audio:hover {
+  border-color: #059669;
 }
 
 /* URL Line with favicon - see consolidated styles below */

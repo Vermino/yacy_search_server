@@ -340,18 +340,53 @@ public class yacysearchitem {
                 }
                 prop.putHTML("content_ogType", ogType);
 
-                // Determine content category for styling (video, article, product, event, default)
+                // Determine content category for styling (video, recipe, article, product, event, default)
                 String contentCategory = "default";
-                if (ogType.contains("video") || resultUrlstring.contains("youtube.com") ||
-                    resultUrlstring.contains("vimeo.com") || resultUrlstring.contains("dailymotion.com")) {
+                final String resultUrlLower = resultUrlstring.toLowerCase();
+                final String titleLower = result.dc_title().toLowerCase();
+
+                // Video detection - check og:type, known video sites, URL patterns
+                if (ogType.contains("video") ||
+                    resultUrlLower.contains("youtube.com") || resultUrlLower.contains("youtu.be") ||
+                    resultUrlLower.contains("vimeo.com") || resultUrlLower.contains("dailymotion.com") ||
+                    resultUrlLower.contains("tiktok.com") || resultUrlLower.contains("twitch.tv") ||
+                    resultUrlLower.contains("rumble.com") || resultUrlLower.contains("bitchute.com") ||
+                    resultUrlLower.contains("/video/") || resultUrlLower.contains("/watch/") ||
+                    resultUrlLower.contains("/videos/") || resultUrlLower.endsWith(".mp4") ||
+                    resultUrlLower.endsWith(".webm") || resultUrlLower.endsWith(".avi")) {
                     contentCategory = "video";
-                } else if (ogType.contains("product") || ogType.contains("shop")) {
+                }
+                // Recipe detection - check URL patterns and title keywords
+                else if (resultUrlLower.contains("/recipe") || resultUrlLower.contains("/recipes/") ||
+                         resultUrlLower.contains("allrecipes.com") || resultUrlLower.contains("foodnetwork.com") ||
+                         resultUrlLower.contains("epicurious.com") || resultUrlLower.contains("tasty.co") ||
+                         resultUrlLower.contains("delish.com") || resultUrlLower.contains("bonappetit.com") ||
+                         resultUrlLower.contains("seriouseats.com") || resultUrlLower.contains("simplyrecipes.com") ||
+                         titleLower.contains("recipe") || titleLower.contains("how to cook") ||
+                         titleLower.contains("how to make")) {
+                    contentCategory = "recipe";
+                }
+                // Product detection
+                else if (ogType.contains("product") || ogType.contains("shop") ||
+                         resultUrlLower.contains("/product/") || resultUrlLower.contains("/shop/") ||
+                         resultUrlLower.contains("/buy/") || resultUrlLower.contains("amazon.com/dp/") ||
+                         resultUrlLower.contains("ebay.com/itm/")) {
                     contentCategory = "product";
-                } else if (ogType.contains("article") || ogType.contains("blog") || ogType.contains("news")) {
+                }
+                // Article/news detection
+                else if (ogType.contains("article") || ogType.contains("blog") || ogType.contains("news") ||
+                         resultUrlLower.contains("/article/") || resultUrlLower.contains("/blog/") ||
+                         resultUrlLower.contains("/news/") || resultUrlLower.contains("/post/")) {
                     contentCategory = "article";
-                } else if (ogType.contains("music") || ogType.contains("audio")) {
+                }
+                // Audio/music detection
+                else if (ogType.contains("music") || ogType.contains("audio") ||
+                         resultUrlLower.contains("spotify.com") || resultUrlLower.contains("soundcloud.com") ||
+                         resultUrlLower.endsWith(".mp3") || resultUrlLower.endsWith(".wav")) {
                     contentCategory = "audio";
-                } else if (ogType.contains("profile") || ogType.contains("person")) {
+                }
+                // Profile detection
+                else if (ogType.contains("profile") || ogType.contains("person")) {
                     contentCategory = "profile";
                 }
 
@@ -388,9 +423,11 @@ public class yacysearchitem {
 
                 prop.put("content_contentCategory", contentCategory);
                 prop.put("content_isVideo", contentCategory.equals("video") ? 1 : 0);
+                prop.put("content_isRecipe", contentCategory.equals("recipe") ? 1 : 0);
                 prop.put("content_isArticle", contentCategory.equals("article") ? 1 : 0);
                 prop.put("content_isProduct", contentCategory.equals("product") ? 1 : 0);
                 prop.put("content_isEvent", contentCategory.equals("event") ? 1 : 0);
+                prop.put("content_isAudio", contentCategory.equals("audio") ? 1 : 0);
 
                 if (showEvent) prop.put("content_showEvent_date", GenericFormatter.RFC1123_SHORT_FORMATTER.format(events[0]));
                 if (showKeywords) { // tokenize keywords
