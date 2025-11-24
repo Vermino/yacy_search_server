@@ -436,13 +436,14 @@ public class ContentScraperTest {
 
 				Assert.assertEquals(expected.size(), scraper.getAnchors().size());
 				Assert.assertTrue(expected.containsAll(scraper.getAnchors()));
-			} finally {
-				scraper.close();
+                        } finally {
+                                scraper.close();
+                        }
                 }
-    }
+        }
 
-    @Test
-    public void testSchemaOrgTypesFromJsonLd() throws Exception {
+        @Test
+        public void testSchemaOrgTypesFromJsonLd() throws Exception {
         final DigestURL docUrl = new DigestURL("http://test.org/jsonld.html");
         final String html = "<html><head><script type=\"application/ld+json\">" +
                 "{\n" +
