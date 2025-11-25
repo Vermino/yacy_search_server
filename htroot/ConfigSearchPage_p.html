@@ -329,50 +329,6 @@ var solr= $.getJSON("solr/collection1/select?q=*:*&start=0&rows=0&wt=json&facet=
                   </div>
                 </fieldset>
 
-                <fieldset>
-                  <legend>Structured snippets &amp; carousel</legend>
-                  <p class="info" style="margin-bottom: 8px;">
-                    Tip: to boost structured results ahead of generic matches, add pre-ranking boosts for schema fields
-                    on the <a href="RankingRWI_p.html" target="_blank" rel="noopener">RankingRWI</a> page (for example
-                    `schema_org_primary_type_s:10` or `schema_org_types_sxt:5`).
-                  </p>
-                  <div class="form-group">
-                    <label>
-                      <input type="checkbox" name="search.result.badge.allowHeuristics" value="true" #(search.result.badge.allowHeuristics)#::checked="checked"#(/search.result.badge.allowHeuristics)# />
-                      Allow heuristic badges when no schema.org type is present
-                    </label>
-                    <p class="info">Disable to show badges only when schema.org markup is detected.</p>
-                  </div>
-                  <div class="form-group">
-                    <label>
-                      <input type="checkbox" name="search.result.carousel.requireThumbnail" value="true" #(search.result.carousel.requireThumbnail)#::checked="checked"#(/search.result.carousel.requireThumbnail)# />
-                      Require a thumbnail before a result can enter the carousel
-                    </label>
-                  </div>
-                  <div class="form-group">
-                    <label>
-                      <input type="checkbox" name="search.result.carousel.requireSchema" value="true" #(search.result.carousel.requireSchema)#::checked="checked"#(/search.result.carousel.requireSchema)# />
-                      Require schema.org metadata for carousel eligibility (type + meta pills)
-                    </label>
-                  </div>
-                  <div class="form-group">
-                    <label>
-                      <input type="checkbox" name="search.result.carousel.allowRelaxedFallback" value="true" #(search.result.carousel.allowRelaxedFallback)#::checked="checked"#(/search.result.carousel.allowRelaxedFallback)# />
-                      Allow relaxed fallback when strict candidates are missing
-                    </label>
-                  </div>
-                  <div class="form-group">
-                    <label>Minimum snippet length for carousel candidates
-                      <input type="number" name="search.result.carousel.minSnippetLength" min="0" value="#[search.result.carousel.minSnippetLength]#" />
-                    </label>
-                    <p class="info">Short snippets can stay badged but will be excluded from the carousel if they fall below this length.</p>
-                  </div>
-                  <div class="form-group">
-                    <label>Minimum number of results to show a carousel
-                      <input type="number" name="search.result.carousel.minResults" min="1" value="#[search.result.carousel.minResults]#" />
-                    </label>
-                  </div>
-                </fieldset>
               </div>
             </td>
           </tr>
