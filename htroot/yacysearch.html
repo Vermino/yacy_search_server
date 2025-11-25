@@ -366,16 +366,55 @@ function initRichResultsCarousel() {
 
   var chosenType = null;
   var results = [];
+  var bestFallback = null;
 
-  typeConfigs.some(function (config) {
+  function filterCandidates(nodes, config, strict) {
+    return nodes.filter(function (node) {
+      var dataset = node.dataset || {};
+      var hasThumb = dataset.hasThumbnail === '1';
+      if (!hasThumb) return false;
+      var hasSchema = dataset.hasSchema === '1';
+      var snippetLength = parseInt(dataset.snippetLength || '0', 10);
+      var hasRecipeMeta = dataset.hasRecipeMeta === '1';
+      var hasVideoMeta = dataset.hasVideoMeta === '1';
+      var hasEventDate = dataset.hasEventDate === '1';
+
+      var snippetThreshold = strict ? 80 : 40;
+
+      switch (config.type) {
+        case 'recipe':
+          return hasThumb && ((strict && hasSchema && hasRecipeMeta) || (!strict && (hasRecipeMeta || hasSchema)));
+        case 'video':
+          return hasThumb && ((strict && hasSchema && hasVideoMeta) || (!strict && (hasVideoMeta || hasSchema)));
+        case 'event':
+          return hasThumb && ((strict && hasSchema && hasEventDate) || (!strict && (hasEventDate || hasSchema)));
+        default:
+          return hasThumb && snippetLength >= snippetThreshold && (hasSchema || !strict);
+      }
+    });
+  }
+
+  typeConfigs.forEach(function (config) {
     var nodes = Array.prototype.slice.call(document.querySelectorAll('article.searchresults.content-' + config.type));
-    if (nodes.length >= 2) {
+    if (!nodes.length) return;
+
+    var strictCandidates = filterCandidates(nodes, config, true);
+    var relaxedCandidates = filterCandidates(nodes, config, false);
+
+    if (!chosenType && strictCandidates.length >= 2) {
       chosenType = config;
-      results = nodes;
-      return true;
+      results = strictCandidates;
+    } else if (!chosenType) {
+      if (!bestFallback || relaxedCandidates.length > bestFallback.results.length) {
+        bestFallback = { config: config, results: relaxedCandidates };
+      }
     }
-    return false;
   });
+
+  if (!chosenType && bestFallback && bestFallback.results.length >= 2) {
+    chosenType = bestFallback.config;
+    results = bestFallback.results;
+  }
 
   if (!chosenType) {
     carousel.classList.add('hidden');

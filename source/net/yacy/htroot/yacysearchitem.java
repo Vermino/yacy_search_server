@@ -328,7 +328,8 @@ public class yacysearchitem {
                         }
                     }
                 }
-                prop.put("content_showThumbnail", showThumbnail && !thumbnailUrl.isEmpty() ? 1 : 0);
+                final boolean hasThumbnailImage = showThumbnail && !thumbnailUrl.isEmpty();
+                prop.put("content_showThumbnail", hasThumbnailImage ? 1 : 0);
                 prop.putHTML("content_showThumbnail_thumbnailUrl", thumbnailUrl);
                 prop.put("content_showThumbnail_urlhash", urlhash);
 
@@ -449,6 +450,7 @@ public class yacysearchitem {
                 if (hasEventDates) {
                     contentCategory = "event";
                     prop.put("content_showEventDates", 1);
+                    prop.put("content_hasEventDate", 1);
                     if (startDates != null && !startDates.isEmpty()) {
                         final Object startDate = startDates.iterator().next();
                         if (startDate instanceof Date) {
@@ -471,9 +473,12 @@ public class yacysearchitem {
                     }
                 } else {
                     prop.put("content_showEventDates", 0);
+                    prop.put("content_hasEventDate", 0);
                 }
 
                 prop.put("content_contentCategory", contentCategory);
+                prop.put("content_hasSchemaContentCategory", hasSchemaContentCategory ? 1 : 0);
+                prop.put("content_hasThumbnailImage", hasThumbnailImage ? 1 : 0);
                 prop.put("content_isVideo", contentCategory.equals("video") ? 1 : 0);
                 prop.put("content_isRecipe", contentCategory.equals("recipe") ? 1 : 0);
                 prop.put("content_isArticle", contentCategory.equals("article") ? 1 : 0);
@@ -721,6 +726,7 @@ public class yacysearchitem {
             prop.put("content_description", desc);
             prop.putXML("content_description-xml", desc);
             prop.putJSON("content_description-json", desc);
+            prop.put("content_snippetLength", desc.length());
             prop.put("content_mimetype", result.mime()); // for atom <link> type attribute
             final HeuristicResult heuristic = theSearch.getHeuristic(result.hash());
             if (heuristic == null) {
