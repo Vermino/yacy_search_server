@@ -975,7 +975,7 @@ public class YaCyDefaultServlet extends HttpServlet  {
                             e.getCause().getMessage());
                     return;
                 }
-                if(e.getCause() instanceof DisallowedMethodException) {
+                if(isDisallowedMethodException(e.getCause())) {
                     /* The request was sent using an disallowed HTTP method */
                     response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, e.getCause().getMessage());
                     return;
@@ -1307,6 +1307,18 @@ public class YaCyDefaultServlet extends HttpServlet  {
         out.write(in, offset, in.length - offset);
         //DO NOT out.close(); because that would interrupt the server stream - it causes that the content is cut off from here on
         buffer.close();
+    }
+
+    private static boolean isDisallowedMethodException(final Throwable cause) {
+        if (cause == null) {
+            return false;
+        }
+        try {
+            final Class<?> exClass = Class.forName("net.yacy.http.servlets.DisallowedMethodException");
+            return exClass.isInstance(cause);
+        } catch (final ClassNotFoundException e) {
+            return false;
+        }
     }
 
     /**
