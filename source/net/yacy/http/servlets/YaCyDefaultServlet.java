@@ -259,6 +259,7 @@ public class YaCyDefaultServlet extends HttpServlet  {
 
             // Look for a class resource
             boolean hasClass = false;
+            boolean isHtmlLike = false;
             if (reqRanges == null && !endsWithSlash) {
                 final int p = pathInContext.lastIndexOf('.');
                 if (p >= 0) {
@@ -273,6 +274,9 @@ public class YaCyDefaultServlet extends HttpServlet  {
                             hasClass = true;
                         }
                     }
+
+                    final String extension = pathInContext.substring(p + 1).toLowerCase();
+                    isHtmlLike = "html".equals(extension) || "htm".equals(extension) || "xml".equals(extension) || "xhtml".equals(extension);
                 }
             }
 
@@ -304,7 +308,7 @@ public class YaCyDefaultServlet extends HttpServlet  {
                     }
                     response.sendRedirect(response.encodeRedirectURL(URIUtil.addPaths(this._servletContext.getContextPath(), pathInContext)));
                 } else {
-                    if (hasClass) { // this is a YaCy servlet, handle the template
+                    if (hasClass || isHtmlLike) { // process YaCy templates for servlets and plain HTML alike
                         this.handleTemplate(pathInfo, request, response);
                     } else {
                         if (included || this.passConditionalHeaders(request, response, resource)) {
