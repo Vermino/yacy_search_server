@@ -259,6 +259,7 @@ public class YaCyDefaultServlet extends HttpServlet  {
 
             // Look for a class resource
             boolean hasClass = false;
+            boolean isHtmlLike = false;
             if (reqRanges == null && !endsWithSlash) {
                 final int p = pathInContext.lastIndexOf('.');
                 if (p >= 0) {
@@ -273,11 +274,25 @@ public class YaCyDefaultServlet extends HttpServlet  {
                             hasClass = true;
                         }
                     }
+
+                    final String extension = pathInContext.substring(p + 1).toLowerCase();
+                    isHtmlLike = "html".equals(extension) || "htm".equals(extension) || "xml".equals(extension) || "xhtml".equals(extension);
                 }
             }
 
             // find resource
             resource = this.getResource(pathInContext);
+
+            // If the extension check above did not classify this as HTML-like,
+            // fall back to the resolved mime type so template processing still
+            // happens for template pages requested without an extension (or
+            // with uncommon extensions).
+            if (!isHtmlLike && resource != null && resource.exists()) {
+                final String mimeGuess = Classification.ext2mime(pathInContext, null);
+                if (mimeGuess != null && mimeGuess.startsWith(MimeTypes.Type.TEXT_HTML.asString())) {
+                    isHtmlLike = true;
+                }
+            }
 
             if (!hasClass && (resource == null || !resource.exists()) && !pathInContext.contains("..")) {
                 // try to get this in the alternative htDocsPath
@@ -304,7 +319,7 @@ public class YaCyDefaultServlet extends HttpServlet  {
                     }
                     response.sendRedirect(response.encodeRedirectURL(URIUtil.addPaths(this._servletContext.getContextPath(), pathInContext)));
                 } else {
-                    if (hasClass) { // this is a YaCy servlet, handle the template
+                    if (hasClass || isHtmlLike) { // process YaCy templates for servlets and plain HTML alike
                         this.handleTemplate(pathInfo, request, response);
                     } else {
                         if (included || this.passConditionalHeaders(request, response, resource)) {
@@ -975,7 +990,7 @@ public class YaCyDefaultServlet extends HttpServlet  {
                             e.getCause().getMessage());
                     return;
                 }
-                if(e.getCause() instanceof DisallowedMethodException) {
+                if(isDisallowedMethodException(e.getCause())) {
                     /* The request was sent using an disallowed HTTP method */
                     response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, e.getCause().getMessage());
                     return;
@@ -1184,6 +1199,55 @@ public class YaCyDefaultServlet extends HttpServlet  {
                     }
                 }
             }
+        } else if (targetLocalizedFile.exists() && targetLocalizedFile.isFile() && targetLocalizedFile.canRead()) {
+            /*
+             * When no dedicated servlet exists we still want to process the template so that SSI includes
+             * (for metas, headers, menus, etc.) are expanded. Serving the raw file would leave tokens
+             * like #%env/templates/header.template%# visible and break styling on admin pages.
+             */
+            final servletProperties templatePatterns = new servletProperties();
+
+            // add the application version, the uptime and the client name to every rewrite table
+            templatePatterns.put(servletProperties.PEER_STAT_VERSION, yacyBuildProperties.getVersion());
+            templatePatterns.put(servletProperties.PEER_STAT_UPTIME, ((System.currentTimeMillis() - sb.startupTime) / 1000) / 60); // uptime in minutes
+            templatePatterns.putHTML(servletProperties.PEER_STAT_CLIENTNAME, sb.peers.mySeed().getName());
+            templatePatterns.putHTML(servletProperties.PEER_STAT_CLIENTID, sb.peers.myID());
+            templatePatterns.put(servletProperties.PEER_STAT_MYTIME, GenericFormatter.SHORT_SECOND_FORMATTER.format());
+            templatePatterns.put(servletProperties.RELATIVE_BASE, YaCyDefaultServlet.getRelativeBase(target));
+            templatePatterns.put(SwitchboardConstants.REFERRER_META_POLICY, sb.getConfig(SwitchboardConstants.REFERRER_META_POLICY, SwitchboardConstants.REFERRER_META_POLICY_DEFAULT));
+
+            final boolean authorized = sb.adminAuthenticated(new RequestHeader(request)) >= 2;
+            templatePatterns.put("authorized", authorized ? 1 : 0);
+            templatePatterns.put("simpleheadernavbar", sb.getConfig("decoration.simpleheadernavbar", "navbar-default"));
+
+            final String mimeType = Classification.ext2mime(targetExt, MimeTypes.Type.TEXT_HTML.asString());
+            InputStream fis;
+            final long fileSize = targetLocalizedFile.length();
+            if (fileSize <= Math.min(4 * 1024 * 1204, MemoryControl.available() / 100)) {
+                fis = new ByteArrayInputStream(FileUtils.read(targetLocalizedFile));
+            } else {
+                fis = new BufferedInputStream(new FileInputStream(targetLocalizedFile));
+            }
+
+            response.setContentType(mimeType);
+            response.setStatus(HttpServletResponse.SC_OK);
+            final ByteArrayOutputStream bas = new ByteArrayOutputStream(4096);
+            try {
+                TemplateEngine.writeTemplate(targetLocalizedFile.getName(), fis, bas, templatePatterns);
+                this.parseSSI(bas.toByteArray(), request, response);
+            } finally {
+                try {
+                    fis.close();
+                } catch (final IOException ignored) {
+                    ConcurrentLog.warn("FILEHANDLER", "YaCyDefaultServlet: could not close target file " + targetLocalizedFile.getName());
+                }
+                try {
+                    bas.close();
+                } catch (final IOException ignored) {
+                    /* Should never happen with a ByteArrayOutputStream */
+                }
+            }
+            return;
         }
     }
 
@@ -1307,6 +1371,18 @@ public class YaCyDefaultServlet extends HttpServlet  {
         out.write(in, offset, in.length - offset);
         //DO NOT out.close(); because that would interrupt the server stream - it causes that the content is cut off from here on
         buffer.close();
+    }
+
+    private static boolean isDisallowedMethodException(final Throwable cause) {
+        if (cause == null) {
+            return false;
+        }
+        try {
+            final Class<?> exClass = Class.forName("net.yacy.http.servlets.DisallowedMethodException");
+            return exClass.isInstance(cause);
+        } catch (final ClassNotFoundException e) {
+            return false;
+        }
     }
 
     /**

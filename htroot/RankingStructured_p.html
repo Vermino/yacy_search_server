@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>YaCy '#[clientname]#': Structured Result Configuration</title>
+    #%env/templates/metas.template%#
+    <script>
+      function handleRangeChange(event) {
+        var rangeElem = event.target || event.srcElement;
+        if (!rangeElem || !rangeElem.id) return;
+        var output = document.getElementById(rangeElem.id + "_value");
+        if (output) {
+          output.textContent = rangeElem.value;
+        }
+      }
+    </script>
+  </head>
+  <body id="RankingStructured_p">
+    #%env/templates/header.template%#
+    #%env/templates/submenuRanking.template%#
+    <h2>Structured Result Configuration</h2>
+    <p>Fine-tune schema-driven badges and carousels without leaving the ranking tools.</p>
+    <form class="dsearch" action="RankingStructured_p.html" method="post" enctype="multipart/form-data">
+      <fieldset>
+        <legend>Badge eligibility</legend>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" name="search.result.badge.allowHeuristics" value="true" #(search.result.badge.allowHeuristics)#::checked="checked"#(/search.result.badge.allowHeuristics)# />
+            Allow heuristic badges when schema.org types are missing
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Carousel strictness</legend>
+        <div class="form-group">
+          <label for="requireSchemaSelect">Schema requirement</label>
+          <select id="requireSchemaSelect" name="search.result.carousel.requireSchema">
+            <option value="true" #(search.result.carousel.requireSchema.true)#::selected="selected"#(/search.result.carousel.requireSchema.true)#>Require schema metadata</option>
+            <option value="false" #(search.result.carousel.requireSchema.false)#::selected="selected"#(/search.result.carousel.requireSchema.false)#>Allow inferred types</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="requireThumbnailSelect">Thumbnail requirement</label>
+          <select id="requireThumbnailSelect" name="search.result.carousel.requireThumbnail">
+            <option value="true" #(search.result.carousel.requireThumbnail.true)#::selected="selected"#(/search.result.carousel.requireThumbnail.true)#>Require schema or OG image</option>
+            <option value="false" #(search.result.carousel.requireThumbnail.false)#::selected="selected"#(/search.result.carousel.requireThumbnail.false)#>Allow text-only cards</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="allowRelaxed">Fallback behavior</label>
+          <select id="allowRelaxed" name="search.result.carousel.allowRelaxedFallback">
+            <option value="false" #(search.result.carousel.allowRelaxedFallback.false)#::selected="selected"#(/search.result.carousel.allowRelaxedFallback.false)#>Strict only (no fallback)</option>
+            <option value="true" #(search.result.carousel.allowRelaxedFallback.true)#::selected="selected"#(/search.result.carousel.allowRelaxedFallback.true)#>Allow relaxed fallback</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Quality thresholds</legend>
+        <div class="form-group">
+          <label id="snippetLengthLabel" for="snippetLength">Minimum snippet length for carousel</label>
+          <div style="display:flex;align-items:center;gap:12px;max-width:520px;">
+            <input id="snippetLength" aria-labelledby="snippetLengthLabel" type="range" min="0" max="240" step="20" value="#[search.result.carousel.minSnippetLength]#" name="search.result.carousel.minSnippetLength" onchange="handleRangeChange(event)" />
+            <output id="snippetLength_value">#[search.result.carousel.minSnippetLength]#</output>
+          </div>
+        </div>
+        <div class="form-group">
+          <label id="minResultsLabel" for="minResults">Minimum cards needed to render a carousel</label>
+          <div style="display:flex;align-items:center;gap:12px;max-width:520px;">
+            <input id="minResults" aria-labelledby="minResultsLabel" type="range" min="1" max="8" step="1" value="#[search.result.carousel.minResults]#" name="search.result.carousel.minResults" onchange="handleRangeChange(event)" />
+            <output id="minResults_value">#[search.result.carousel.minResults]#</output>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <input type="submit" name="EnterRanking" class="btn btn-primary" value="Save structured ranking" />
+      </fieldset>
+    </form>
+
+    #%env/templates/footer.template%#
+  </body>
+</html>

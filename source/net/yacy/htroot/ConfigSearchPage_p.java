@@ -102,6 +102,21 @@ public class ConfigSearchPage_p {
                 sb.setConfig("search.result.show.indexbrowser", post.getBoolean("search.result.show.indexbrowser"));
                 sb.setConfig("search.result.show.snapshots", post.getBoolean("search.result.show.snapshots"));
 
+                sb.setConfig(SwitchboardConstants.SEARCH_RICH_BADGE_ALLOW_HEURISTICS,
+                        post.getBoolean(SwitchboardConstants.SEARCH_RICH_BADGE_ALLOW_HEURISTICS));
+                sb.setConfig(SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_THUMBNAIL,
+                        post.getBoolean(SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_THUMBNAIL));
+                sb.setConfig(SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_SCHEMA,
+                        post.getBoolean(SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_SCHEMA));
+                sb.setConfig(SwitchboardConstants.SEARCH_RICH_CAROUSEL_ALLOW_RELAXED,
+                        post.getBoolean(SwitchboardConstants.SEARCH_RICH_CAROUSEL_ALLOW_RELAXED));
+                final int minSnippetLength = post.getInt(SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_SNIPPET,
+                        SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_SNIPPET_DEFAULT);
+                sb.setConfig(SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_SNIPPET, minSnippetLength);
+                final int minCarouselResults = post.getInt(SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_RESULTS,
+                        SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_RESULTS_DEFAULT);
+                sb.setConfig(SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_RESULTS, minCarouselResults);
+
                 // construct navigation String
                 final Set<String> navConfigs = new HashSet<>();
                 if (post.getBoolean("search.navigation.location")) {
@@ -191,6 +206,18 @@ public class ConfigSearchPage_p {
                 sb.setConfig("search.result.show.proxy", config.getProperty("search.result.show.proxy","false"));
                 sb.setConfig("search.result.show.indexbrowser", config.getProperty("search.result.show.indexbrowser","true"));
                 sb.setConfig("search.result.show.snapshots", config.getProperty("search.result.show.snapshots","true"));
+                sb.setConfig(SwitchboardConstants.SEARCH_RICH_BADGE_ALLOW_HEURISTICS,
+                        Boolean.toString(SwitchboardConstants.SEARCH_RICH_BADGE_ALLOW_HEURISTICS_DEFAULT));
+                sb.setConfig(SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_THUMBNAIL,
+                        Boolean.toString(SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_THUMBNAIL_DEFAULT));
+                sb.setConfig(SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_SCHEMA,
+                        Boolean.toString(SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_SCHEMA_DEFAULT));
+                sb.setConfig(SwitchboardConstants.SEARCH_RICH_CAROUSEL_ALLOW_RELAXED,
+                        Boolean.toString(SwitchboardConstants.SEARCH_RICH_CAROUSEL_ALLOW_RELAXED_DEFAULT));
+                sb.setConfig(SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_SNIPPET,
+                        SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_SNIPPET_DEFAULT);
+                sb.setConfig(SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_RESULTS,
+                        SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_RESULTS_DEFAULT);
 				sb.setConfig(SwitchboardConstants.SEARCH_NAVIGATION_MAXCOUNT,
 						config.getProperty(SwitchboardConstants.SEARCH_NAVIGATION_MAXCOUNT,
 								String.valueOf(QueryParams.FACETS_STANDARD_MAXCOUNT_DEFAULT)));
@@ -256,6 +283,24 @@ public class ConfigSearchPage_p {
         prop.put("search.result.show.indexbrowser", sb.getConfigBool("search.result.show.indexbrowser", false) ? 1 : 0);
         prop.put("search.result.show.snapshots", sb.getConfigBool("search.result.show.snapshots", false) ? 1 : 0);
         prop.put("search.result.show.ranking", sb.getConfigBool(SwitchboardConstants.SEARCH_RESULT_SHOW_RANKING, SwitchboardConstants.SEARCH_RESULT_SHOW_RANKING_DEFAULT) ? 1 : 0);
+        prop.put(SwitchboardConstants.SEARCH_RICH_BADGE_ALLOW_HEURISTICS,
+                sb.getConfigBool(SwitchboardConstants.SEARCH_RICH_BADGE_ALLOW_HEURISTICS,
+                        SwitchboardConstants.SEARCH_RICH_BADGE_ALLOW_HEURISTICS_DEFAULT) ? 1 : 0);
+        prop.put(SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_THUMBNAIL,
+                sb.getConfigBool(SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_THUMBNAIL,
+                        SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_THUMBNAIL_DEFAULT) ? 1 : 0);
+        prop.put(SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_SCHEMA,
+                sb.getConfigBool(SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_SCHEMA,
+                        SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_SCHEMA_DEFAULT) ? 1 : 0);
+        prop.put(SwitchboardConstants.SEARCH_RICH_CAROUSEL_ALLOW_RELAXED,
+                sb.getConfigBool(SwitchboardConstants.SEARCH_RICH_CAROUSEL_ALLOW_RELAXED,
+                        SwitchboardConstants.SEARCH_RICH_CAROUSEL_ALLOW_RELAXED_DEFAULT) ? 1 : 0);
+        prop.put(SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_SNIPPET,
+                sb.getConfigInt(SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_SNIPPET,
+                        SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_SNIPPET_DEFAULT));
+        prop.put(SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_RESULTS,
+                sb.getConfigInt(SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_RESULTS,
+                        SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_RESULTS_DEFAULT));
 
         final Set<String> navConfigs = sb.getConfigSet("search.navigation");
         boolean locationNavEnabled = false;

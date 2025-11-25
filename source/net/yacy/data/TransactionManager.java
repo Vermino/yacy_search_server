@@ -31,7 +31,6 @@ import org.apache.commons.codec.digest.HmacUtils;
 import net.yacy.cora.order.Base64Order;
 import net.yacy.cora.protocol.HeaderFramework;
 import net.yacy.cora.protocol.RequestHeader;
-import net.yacy.http.servlets.DisallowedMethodException;
 import net.yacy.http.servlets.TemplateMissingParameterException;
 import net.yacy.search.Switchboard;
 import net.yacy.search.SwitchboardConstants;
@@ -150,7 +149,7 @@ public class TransactionManager {
      * @param header current request header
      * @param post request parameters
      * @throws IllegalArgumentException when a parameter is null.
-     * @throws DisallowedMethodException when the HTTP method is something else than post
+     * @throws RuntimeException when the HTTP method is something else than post
      * @throws TemplateMissingParameterException when the transaction token is missing
      * @throws BadTransactionException when a condition for valid transaction is not met.
      */
@@ -163,8 +162,9 @@ public class TransactionManager {
         if (post == null) // non-local requests must use POST parameters
             throw new IllegalArgumentException("Missing required post parameters.");
 
-        if (!HeaderFramework.METHOD_POST.equals(header.getMethod())) // non-local users must use POST protocol
-                throw new DisallowedMethodException("HTTP POST method is the only one authorized.");
+        if (!HeaderFramework.METHOD_POST.equals(header.getMethod())) { // non-local users must use POST protocol
+                throw createDisallowedMethodException();
+        }
 
         String userName = getUserName(header);
         if (userName == null)
@@ -181,6 +181,22 @@ public class TransactionManager {
          * using a time constant function */
         if(!MessageDigest.isEqual(token.getBytes(StandardCharsets.UTF_8), transactionToken.getBytes(StandardCharsets.UTF_8))) {
                 throw new BadTransactionException("Invalid transaction token.");
+        }
+    }
+
+    /**
+     * Build a DisallowedMethodException when the class is available without causing a
+     * {@link NoClassDefFoundError} if the servlet classes are not on the current classpath
+     * (for example when only the core classes are packaged). This keeps the transaction
+     * guard working instead of producing a 500 error.
+     */
+    private static RuntimeException createDisallowedMethodException() {
+        try {
+            final Class<?> exClass = Class.forName("net.yacy.http.servlets.DisallowedMethodException");
+            return (RuntimeException) exClass.getConstructor(String.class)
+                    .newInstance("HTTP POST method is the only one authorized.");
+        } catch (final Throwable t) {
+            return new IllegalStateException("HTTP POST method is the only one authorized.");
         }
     }
 

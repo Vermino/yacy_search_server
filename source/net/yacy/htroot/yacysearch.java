@@ -996,6 +996,24 @@ public class yacysearch {
             prop.put("resultTable_embed", (contentdom == ContentDomain.AUDIO && extendedSearchRights));
             prop.put("eventID", theQuery.id(false)); // for bottomline
             prop.put("jsResort_eventID", theQuery.id(false));
+            prop.put(SwitchboardConstants.SEARCH_RICH_BADGE_ALLOW_HEURISTICS,
+                    sb.getConfigBool(SwitchboardConstants.SEARCH_RICH_BADGE_ALLOW_HEURISTICS,
+                            SwitchboardConstants.SEARCH_RICH_BADGE_ALLOW_HEURISTICS_DEFAULT) ? 1 : 0);
+            prop.put(SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_THUMBNAIL,
+                    sb.getConfigBool(SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_THUMBNAIL,
+                            SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_THUMBNAIL_DEFAULT) ? 1 : 0);
+            prop.put(SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_SCHEMA,
+                    sb.getConfigBool(SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_SCHEMA,
+                            SwitchboardConstants.SEARCH_RICH_CAROUSEL_REQUIRE_SCHEMA_DEFAULT) ? 1 : 0);
+            prop.put(SwitchboardConstants.SEARCH_RICH_CAROUSEL_ALLOW_RELAXED,
+                    sb.getConfigBool(SwitchboardConstants.SEARCH_RICH_CAROUSEL_ALLOW_RELAXED,
+                            SwitchboardConstants.SEARCH_RICH_CAROUSEL_ALLOW_RELAXED_DEFAULT) ? 1 : 0);
+            prop.put(SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_SNIPPET,
+                    sb.getConfigInt(SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_SNIPPET,
+                            SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_SNIPPET_DEFAULT));
+            prop.put(SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_RESULTS,
+                    sb.getConfigInt(SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_RESULTS,
+                            SwitchboardConstants.SEARCH_RICH_CAROUSEL_MIN_RESULTS_DEFAULT));
 
             // process result of search
             if ( !filtered.isEmpty() ) {

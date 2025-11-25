@@ -240,7 +240,7 @@ document.getElementById("Enter").innerHTML = "search again";
 	<button id="hideErrorImagesBtn" class="btn btn-default btn-sm hidden" onclick="hideErrThumbnails()" title="Hide links to images that could not be rendered">Hide</button>
 </div>
 
-<!-- Rich Results Carousel for Recipes/Videos -->
+<!-- Rich Results Carousel for structured result types -->
 <div id="richResultsCarousel" class="rich-carousel hidden">
   <div class="carousel-header">
     <h3 class="carousel-title"><span class="glyphicon glyphicon-cutlery"></span> Recipes</h3>
@@ -345,98 +345,185 @@ function latestinfo() {
 }
 window.setTimeout(latestinfo, 500); // we need that to get a correct pagination bar at the end of the page
 
-// Rich Results Carousel functionality
+// Rich Results Carousel functionality (multi-type)
 function initRichResultsCarousel() {
-  var recipeResults = document.querySelectorAll('article.searchresults.content-recipe');
-  var videoResults = document.querySelectorAll('article.searchresults.content-video');
   var carousel = document.getElementById('richResultsCarousel');
   var track = document.getElementById('carouselTrack');
   var title = carousel ? carousel.querySelector('.carousel-title') : null;
 
   if (!carousel || !track) return;
 
-  // Determine which type to show (recipes take priority, then videos)
-  var results = recipeResults.length > 0 ? recipeResults : videoResults;
-  var isRecipe = recipeResults.length > 0;
+  var carouselConfig = {
+    requireThumbnail: #[search.result.carousel.requireThumbnail]# == 1,
+    requireSchema: #[search.result.carousel.requireSchema]# == 1,
+    allowRelaxedFallback: #[search.result.carousel.allowRelaxedFallback]# == 1,
+    minSnippetLength: #[search.result.carousel.minSnippetLength]#,
+    minResults: #[search.result.carousel.minResults]#
+  };
 
-  if (results.length < 2) {
+  var typeConfigs = [
+    { type: 'recipe', icon: 'glyphicon-cutlery', label: 'Recipes', overlay: false, meta: buildRecipeMeta },
+    { type: 'video', icon: 'glyphicon-play-circle', label: 'Videos', overlay: true, meta: buildVideoMeta },
+    { type: 'howto', icon: 'glyphicon-list-alt', label: 'How-Tos', overlay: false, meta: function (r) { return buildGenericMeta(r, 'howto'); } },
+    { type: 'product', icon: 'glyphicon-shopping-cart', label: 'Products', overlay: false, meta: function (r) { return buildGenericMeta(r, 'product'); } },
+    { type: 'software', icon: 'glyphicon-hdd', label: 'Software', overlay: false, meta: function (r) { return buildGenericMeta(r, 'software'); } },
+    { type: 'faq', icon: 'glyphicon-question-sign', label: 'FAQs', overlay: false, meta: function (r) { return buildGenericMeta(r, 'faq'); } },
+    { type: 'qa', icon: 'glyphicon-comment', label: 'Q&A', overlay: false, meta: function (r) { return buildGenericMeta(r, 'qa'); } },
+    { type: 'event', icon: 'glyphicon-calendar', label: 'Events', overlay: false, meta: buildEventMeta }
+  ];
+
+  var chosenType = null;
+  var results = [];
+  var bestFallback = null;
+
+  function filterCandidates(nodes, config, strict) {
+    return nodes.filter(function (node) {
+      var dataset = node.dataset || {};
+      var hasThumb = dataset.hasThumbnail === '1';
+      if (carouselConfig.requireThumbnail && !hasThumb) return false;
+      var hasSchema = dataset.hasSchema === '1';
+      var snippetLength = parseInt(dataset.snippetLength || '0', 10);
+      var hasRecipeMeta = dataset.hasRecipeMeta === '1';
+      var hasVideoMeta = dataset.hasVideoMeta === '1';
+      var hasEventDate = dataset.hasEventDate === '1';
+
+      var snippetThresholdStrict = carouselConfig.minSnippetLength || 80;
+      var snippetThresholdRelaxed = Math.max(0, Math.floor(snippetThresholdStrict / 2));
+      var schemaRequired = carouselConfig.requireSchema && (strict || config.type === 'recipe' || config.type === 'video' || config.type === 'event');
+
+      switch (config.type) {
+        case 'recipe':
+          if (schemaRequired && !hasSchema) return false;
+          if (strict) return hasRecipeMeta;
+          return hasRecipeMeta || (carouselConfig.allowRelaxedFallback && hasSchema);
+        case 'video':
+          if (schemaRequired && !hasSchema) return false;
+          if (strict) return hasVideoMeta;
+          return hasVideoMeta || (carouselConfig.allowRelaxedFallback && hasSchema);
+        case 'event':
+          if (schemaRequired && !hasSchema) return false;
+          if (strict) return hasEventDate;
+          return hasEventDate || (carouselConfig.allowRelaxedFallback && hasSchema);
+        default:
+          var threshold = strict ? snippetThresholdStrict : snippetThresholdRelaxed;
+          if (snippetLength < threshold) return false;
+          if (schemaRequired && !hasSchema) return false;
+          return hasSchema || (!carouselConfig.requireSchema && carouselConfig.allowRelaxedFallback);
+      }
+    });
+  }
+
+  typeConfigs.forEach(function (config) {
+    var nodes = Array.prototype.slice.call(document.querySelectorAll('article.searchresults.content-' + config.type));
+    if (!nodes.length) return;
+
+    var strictCandidates = filterCandidates(nodes, config, true);
+    var relaxedCandidates = carouselConfig.allowRelaxedFallback ? filterCandidates(nodes, config, false) : [];
+
+    if (!chosenType && strictCandidates.length >= carouselConfig.minResults) {
+      chosenType = config;
+      results = strictCandidates;
+    } else if (!chosenType && carouselConfig.allowRelaxedFallback) {
+      if (!bestFallback || relaxedCandidates.length > bestFallback.results.length) {
+        bestFallback = { config: config, results: relaxedCandidates };
+      }
+    }
+  });
+
+  if (!chosenType && bestFallback && bestFallback.results.length >= carouselConfig.minResults) {
+    chosenType = bestFallback.config;
+    results = bestFallback.results;
+  }
+
+  if (!chosenType) {
     carousel.classList.add('hidden');
     return;
   }
 
-  // Update title based on content type
   if (title) {
-    if (isRecipe) {
-      title.innerHTML = '<span class="glyphicon glyphicon-cutlery"></span> Recipes';
-    } else {
-      title.innerHTML = '<span class="glyphicon glyphicon-play-circle"></span> Videos';
-    }
+    title.innerHTML = '<span class="glyphicon ' + chosenType.icon + '"></span> ' + chosenType.label;
+  }
+
+  function cleanText(el) {
+    return el ? el.textContent.replace(/\s+/g, ' ').trim() : '';
+  }
+
+  function buildRecipeMeta(result) {
+    var cookTime = cleanText(result.querySelector('.stat-item.recipe-time'));
+    var difficulty = cleanText(result.querySelector('.stat-item.recipe-difficulty'));
+    var servings = cleanText(result.querySelector('.stat-item.recipe-servings'));
+    var meta = '';
+    if (cookTime) meta += '<span class="card-badge recipe-time"><span class="glyphicon glyphicon-time"></span> ' + cookTime + '</span>';
+    if (difficulty) meta += '<span class="card-badge recipe-difficulty">' + difficulty + '</span>';
+    if (servings) meta += '<span class="card-badge recipe-servings"><span class="glyphicon glyphicon-user"></span> ' + servings + '</span>';
+    return meta;
+  }
+
+  function buildVideoMeta(result) {
+    var platform = cleanText(result.querySelector('.stat-item.video-platform'));
+    var duration = cleanText(result.querySelector('.stat-item.video-duration'));
+    var meta = '';
+    if (platform) meta += '<span class="card-badge video-platform">' + platform + '</span>';
+    if (duration) meta += '<span class="card-badge video-duration"><span class="glyphicon glyphicon-time"></span> ' + duration + '</span>';
+    return meta;
+  }
+
+  function buildEventMeta(result) {
+    var eventDate = cleanText(result.querySelector('.stat-item.event-date .event-date-text'));
+    if (!eventDate) return '';
+    return '<span class="card-badge event-date"><span class="glyphicon glyphicon-calendar"></span> ' + eventDate + '</span>';
+  }
+
+  function buildGenericMeta(result, type) {
+    var meta = '';
+    var readTime = cleanText(result.querySelector('.stat-item.time'));
+    var trust = cleanText(result.querySelector('.stat-item.trust'));
+    if (type === 'howto') meta += '<span class="card-badge howto"><span class="glyphicon glyphicon-list-alt"></span> How-To</span>';
+    if (type === 'product') meta += '<span class="card-badge product"><span class="glyphicon glyphicon-shopping-cart"></span> Product</span>';
+    if (type === 'software') meta += '<span class="card-badge software"><span class="glyphicon glyphicon-hdd"></span> Software</span>';
+    if (type === 'faq') meta += '<span class="card-badge faq"><span class="glyphicon glyphicon-question-sign"></span> FAQ</span>';
+    if (type === 'qa') meta += '<span class="card-badge qa"><span class="glyphicon glyphicon-comment"></span> Q&A</span>';
+    if (readTime) meta += '<span class="card-badge generic-meta"><span class="glyphicon glyphicon-time"></span> ' + readTime + '</span>';
+    if (trust) meta += '<span class="card-badge generic-meta"><span class="glyphicon glyphicon-ok-sign"></span> ' + trust + '</span>';
+    return meta;
   }
 
   // Create carousel cards from search results
   track.innerHTML = '';
-  results.forEach(function(result, index) {
-    if (index >= 8) return; // Max 8 items in carousel
-
+  results.slice(0, 8).forEach(function (result) {
     var thumbnail = result.querySelector('.result-thumbnail img');
     var titleEl = result.querySelector('h4.linktitle a');
     var urlEl = result.querySelector('cite.result-cite a');
-    var readTimeEl = result.querySelector('.stat-item.time');
-    var trustEl = result.querySelector('.stat-item.trust');
-
-    // Recipe-specific metadata
-    var recipeCookTimeEl = result.querySelector('.stat-item.recipe-time');
-    var recipeDifficultyEl = result.querySelector('.stat-item.recipe-difficulty');
-    var recipeServingsEl = result.querySelector('.stat-item.recipe-servings');
-
-    // Video-specific metadata
-    var videoPlatformEl = result.querySelector('.stat-item.video-platform');
-    var videoDurationEl = result.querySelector('.stat-item.video-duration');
+    var snippetEl = result.querySelector('.snippet');
 
     var imgSrc = thumbnail ? thumbnail.src : '';
     var titleText = titleEl ? titleEl.textContent : 'Untitled';
     var link = titleEl ? titleEl.href : '#';
     var domain = urlEl ? new URL(urlEl.href).hostname.replace('www.', '') : '';
-    var readTime = readTimeEl ? readTimeEl.textContent.trim() : '';
+    var snippet = snippetEl ? cleanText(snippetEl) : '';
 
-    // Extract metadata text (remove icon text)
-    var cookTime = recipeCookTimeEl ? recipeCookTimeEl.textContent.trim() : '';
-    var difficulty = recipeDifficultyEl ? recipeDifficultyEl.textContent.trim() : '';
-    var servings = recipeServingsEl ? recipeServingsEl.textContent.trim() : '';
-    var platform = videoPlatformEl ? videoPlatformEl.textContent.trim() : '';
-    var duration = videoDurationEl ? videoDurationEl.textContent.trim() : '';
+    var metaHtml = chosenType.meta ? chosenType.meta(result) : '';
 
     var card = document.createElement('a');
     card.className = 'carousel-card';
     card.href = link;
     card.target = '_blank';
 
-    // Build metadata display based on content type
-    var metaHtml = '';
-    if (isRecipe) {
-      if (cookTime) metaHtml += '<span class="card-badge recipe-time"><span class="glyphicon glyphicon-time"></span> ' + cookTime + '</span>';
-      if (difficulty) metaHtml += '<span class="card-badge recipe-difficulty">' + difficulty + '</span>';
-      if (servings) metaHtml += '<span class="card-badge recipe-servings"><span class="glyphicon glyphicon-user"></span> ' + servings + '</span>';
-    } else {
-      if (platform) metaHtml += '<span class="card-badge video-platform">' + platform + '</span>';
-      if (duration) metaHtml += '<span class="card-badge video-duration"><span class="glyphicon glyphicon-time"></span> ' + duration + '</span>';
-    }
+    var description = snippet ? snippet.substring(0, 120) + (snippet.length > 120 ? '…' : '') : '';
 
     card.innerHTML =
       '<div class="card-image">' +
         (imgSrc ? '<img src="' + imgSrc + '" alt="" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=no-image><span class=glyphicon glyphicon-picture></span></div>\'">' : '<div class="no-image"><span class="glyphicon glyphicon-picture"></span></div>') +
-        (isRecipe ? '' : '<div class="play-overlay"><span class="glyphicon glyphicon-play"></span></div>') +
+        (chosenType.overlay ? '<div class="play-overlay"><span class="glyphicon glyphicon-play"></span></div>' : '') +
       '</div>' +
       '<div class="card-content">' +
         '<div class="card-title">' + titleText + '</div>' +
         '<div class="card-source">' + domain + '</div>' +
+        (description ? '<div class="card-description">' + description + '</div>' : '') +
         (metaHtml ? '<div class="card-meta">' + metaHtml + '</div>' : '') +
       '</div>';
 
     track.appendChild(card);
-
-    // Note: We keep original results visible in the main list
-    // The carousel is a featured view, not a replacement for search results
   });
 
   carousel.classList.remove('hidden');

@@ -35,6 +35,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
@@ -310,16 +311,24 @@ public class yacysearchitem {
                 prop.put("content_showTrustScore", sb.getConfigBool("search.result.show.trustscore", true) ? 1 : 0);
                 prop.put("content_showTrustScore_trustScore", String.format("%.0f", trustScore));
 
-                // Thumbnail URL (OpenGraph image or first image)
+                // Thumbnail URL (schema/recipe image, OpenGraph image, or first image)
                 String thumbnailUrl = "";
                 boolean showThumbnail = sb.getConfigBool("search.result.show.thumbnail", true);
+                final Object schemaImageObj = result.getFieldValue(CollectionSchema.schema_org_image_s.getSolrFieldName());
+                final String schemaImage = schemaImageObj != null ? schemaImageObj.toString() : "";
+                final Object recipeImageObj = result.getFieldValue(CollectionSchema.recipe_image_s.getSolrFieldName());
+                final String recipeImage = recipeImageObj != null ? recipeImageObj.toString() : "";
                 if (showThumbnail) {
-                    // Try OpenGraph image first
                     final Object ogImage = result.getFieldValue(CollectionSchema.opengraph_image_s.getSolrFieldName());
-                    if (ogImage != null && !ogImage.toString().isEmpty()) {
+                    // Prefer structured images over generic fallbacks
+                    if (!recipeImage.isEmpty()) {
+                        thumbnailUrl = recipeImage;
+                    } else if (!schemaImage.isEmpty()) {
+                        thumbnailUrl = schemaImage;
+                    } else if (ogImage != null && !ogImage.toString().isEmpty()) {
                         thumbnailUrl = ogImage.toString();
                     } else if (result.limage() > 0) {
-                        // Fall back to first image
+                        // Fall back to first image discovered on page
                         try {
                             thumbnailUrl = result.imageURL();
                         } catch (final UnsupportedOperationException e) {
@@ -327,7 +336,8 @@ public class yacysearchitem {
                         }
                     }
                 }
-                prop.put("content_showThumbnail", showThumbnail && !thumbnailUrl.isEmpty() ? 1 : 0);
+                final boolean hasThumbnailImage = showThumbnail && !thumbnailUrl.isEmpty();
+                prop.put("content_showThumbnail", hasThumbnailImage ? 1 : 0);
                 prop.putHTML("content_showThumbnail_thumbnailUrl", thumbnailUrl);
                 prop.put("content_showThumbnail_urlhash", urlhash);
 
@@ -340,13 +350,59 @@ public class yacysearchitem {
                 }
                 prop.putHTML("content_ogType", ogType);
 
+                String schemaPrimaryType = null;
+                final Object schemaPrimaryObj = result.getFieldValue(CollectionSchema.schema_org_primary_type_s.getSolrFieldName());
+                if (schemaPrimaryObj != null) {
+                    schemaPrimaryType = schemaPrimaryObj.toString();
+                }
+                final boolean allowHeuristicBadges = sb.getConfigBool(
+                        SwitchboardConstants.SEARCH_RICH_BADGE_ALLOW_HEURISTICS,
+                        SwitchboardConstants.SEARCH_RICH_BADGE_ALLOW_HEURISTICS_DEFAULT);
+                final Set<String> schemaTypes = new HashSet<>();
+                final Collection<Object> schemaTypeValues = result.getFieldValues(CollectionSchema.schema_org_types_sxt.getSolrFieldName());
+                if (schemaTypeValues != null) {
+                    for (final Object type : schemaTypeValues) {
+                        if (type != null) schemaTypes.add(type.toString());
+                    }
+                }
+                if (schemaPrimaryType == null && !schemaTypes.isEmpty()) {
+                    schemaPrimaryType = schemaTypes.iterator().next();
+                }
+
                 // Determine content category for styling (video, recipe, article, product, event, default)
                 String contentCategory = "default";
                 final String resultUrlLower = resultUrlstring.toLowerCase();
                 final String titleLower = result.dc_title().toLowerCase();
 
+                if (schemaPrimaryType != null) {
+                    final String schemaTypeLower = schemaPrimaryType.toLowerCase();
+                    if (schemaTypeLower.contains("recipe")) {
+                        contentCategory = "recipe";
+                    } else if (schemaTypeLower.contains("howto")) {
+                        contentCategory = "howto";
+                    } else if (schemaTypeLower.contains("faqpage")) {
+                        contentCategory = "faq";
+                    } else if (schemaTypeLower.contains("qapage") || schemaTypeLower.contains("discussionforumposting")) {
+                        contentCategory = "qa";
+                    } else if (schemaTypeLower.contains("product")) {
+                        contentCategory = "product";
+                    } else if (schemaTypeLower.contains("softwareapplication")) {
+                        contentCategory = "software";
+                    } else if (schemaTypeLower.contains("videoobject")) {
+                        contentCategory = "video";
+                    } else if (schemaTypeLower.contains("article") || schemaTypeLower.contains("blogposting") || schemaTypeLower.contains("newsarticle")) {
+                        contentCategory = "article";
+                    } else if (schemaTypeLower.contains("event")) {
+                        contentCategory = "event";
+                    } else if (schemaTypeLower.contains("organization") || schemaTypeLower.contains("localbusiness")) {
+                        contentCategory = "organization";
+                    }
+                }
+
+                final boolean hasSchemaContentCategory = !"default".equals(contentCategory);
+
                 // Video detection - check og:type, known video sites, URL patterns
-                if (ogType.contains("video") ||
+                if (contentCategory.equals("video") || ogType.contains("video") ||
                     resultUrlLower.contains("youtube.com") || resultUrlLower.contains("youtu.be") ||
                     resultUrlLower.contains("vimeo.com") || resultUrlLower.contains("dailymotion.com") ||
                     resultUrlLower.contains("tiktok.com") || resultUrlLower.contains("twitch.tv") ||
@@ -356,38 +412,46 @@ public class yacysearchitem {
                     resultUrlLower.endsWith(".webm") || resultUrlLower.endsWith(".avi")) {
                     contentCategory = "video";
                 }
-                // Recipe detection - check URL patterns and title keywords
-                else if (resultUrlLower.contains("/recipe") || resultUrlLower.contains("/recipes/") ||
-                         resultUrlLower.contains("allrecipes.com") || resultUrlLower.contains("foodnetwork.com") ||
-                         resultUrlLower.contains("epicurious.com") || resultUrlLower.contains("tasty.co") ||
-                         resultUrlLower.contains("delish.com") || resultUrlLower.contains("bonappetit.com") ||
-                         resultUrlLower.contains("seriouseats.com") || resultUrlLower.contains("simplyrecipes.com") ||
-                         titleLower.contains("recipe") || titleLower.contains("how to cook") ||
-                         titleLower.contains("how to make")) {
-                    contentCategory = "recipe";
-                }
-                // Product detection
-                else if (ogType.contains("product") || ogType.contains("shop") ||
-                         resultUrlLower.contains("/product/") || resultUrlLower.contains("/shop/") ||
-                         resultUrlLower.contains("/buy/") || resultUrlLower.contains("amazon.com/dp/") ||
-                         resultUrlLower.contains("ebay.com/itm/")) {
-                    contentCategory = "product";
-                }
-                // Article/news detection
-                else if (ogType.contains("article") || ogType.contains("blog") || ogType.contains("news") ||
-                         resultUrlLower.contains("/article/") || resultUrlLower.contains("/blog/") ||
-                         resultUrlLower.contains("/news/") || resultUrlLower.contains("/post/")) {
-                    contentCategory = "article";
-                }
-                // Audio/music detection
-                else if (ogType.contains("music") || ogType.contains("audio") ||
-                         resultUrlLower.contains("spotify.com") || resultUrlLower.contains("soundcloud.com") ||
-                         resultUrlLower.endsWith(".mp3") || resultUrlLower.endsWith(".wav")) {
-                    contentCategory = "audio";
-                }
-                // Profile detection
-                else if (ogType.contains("profile") || ogType.contains("person")) {
-                    contentCategory = "profile";
+                // Heuristic fallback classification (only when schema didn't provide a category)
+                else if (!hasSchemaContentCategory && allowHeuristicBadges) {
+                    // How-to detection first to avoid misclassifying "how to" guides as recipes
+                    if (titleLower.startsWith("how to ") || titleLower.contains(" how to ") ||
+                        titleLower.contains("how-to") || resultUrlLower.contains("/how-to") ||
+                        resultUrlLower.contains("/howto")) {
+                        contentCategory = "howto";
+                    }
+                    // Recipe detection - tighten heuristics to recipe-focused domains/keywords
+                    else if (resultUrlLower.contains("/recipe") || resultUrlLower.contains("/recipes/") ||
+                        resultUrlLower.contains("allrecipes.com") || resultUrlLower.contains("foodnetwork.com") ||
+                        resultUrlLower.contains("epicurious.com") || resultUrlLower.contains("tasty.co") ||
+                        resultUrlLower.contains("delish.com") || resultUrlLower.contains("bonappetit.com") ||
+                        resultUrlLower.contains("seriouseats.com") || resultUrlLower.contains("simplyrecipes.com") ||
+                        titleLower.contains("recipe")) {
+                        contentCategory = "recipe";
+                    }
+                    // Product detection
+                    else if (ogType.contains("product") || ogType.contains("shop") ||
+                            resultUrlLower.contains("/product/") || resultUrlLower.contains("/shop/") ||
+                            resultUrlLower.contains("/buy/") || resultUrlLower.contains("amazon.com/dp/") ||
+                            resultUrlLower.contains("ebay.com/itm/")) {
+                        contentCategory = "product";
+                    }
+                    // Article/news detection
+                    else if (ogType.contains("article") || ogType.contains("blog") || ogType.contains("news") ||
+                            resultUrlLower.contains("/article/") || resultUrlLower.contains("/blog/") ||
+                            resultUrlLower.contains("/news/") || resultUrlLower.contains("/post/")) {
+                        contentCategory = "article";
+                    }
+                    // Audio/music detection
+                    else if (ogType.contains("music") || ogType.contains("audio") ||
+                            resultUrlLower.contains("spotify.com") || resultUrlLower.contains("soundcloud.com") ||
+                            resultUrlLower.endsWith(".mp3") || resultUrlLower.endsWith(".wav")) {
+                        contentCategory = "audio";
+                    }
+                    // Profile detection
+                    else if (ogType.contains("profile") || ogType.contains("person")) {
+                        contentCategory = "profile";
+                    }
                 }
 
                 // Check for event dates
@@ -397,6 +461,7 @@ public class yacysearchitem {
                 if (hasEventDates) {
                     contentCategory = "event";
                     prop.put("content_showEventDates", 1);
+                    prop.put("content_hasEventDate", 1);
                     if (startDates != null && !startDates.isEmpty()) {
                         final Object startDate = startDates.iterator().next();
                         if (startDate instanceof Date) {
@@ -419,13 +484,21 @@ public class yacysearchitem {
                     }
                 } else {
                     prop.put("content_showEventDates", 0);
+                    prop.put("content_hasEventDate", 0);
                 }
 
                 prop.put("content_contentCategory", contentCategory);
+                prop.put("content_hasSchemaContentCategory", hasSchemaContentCategory ? 1 : 0);
+                prop.put("content_hasThumbnailImage", hasThumbnailImage ? 1 : 0);
                 prop.put("content_isVideo", contentCategory.equals("video") ? 1 : 0);
                 prop.put("content_isRecipe", contentCategory.equals("recipe") ? 1 : 0);
                 prop.put("content_isArticle", contentCategory.equals("article") ? 1 : 0);
+                prop.put("content_isHowTo", contentCategory.equals("howto") ? 1 : 0);
+                prop.put("content_isFaq", contentCategory.equals("faq") ? 1 : 0);
+                prop.put("content_isQa", contentCategory.equals("qa") ? 1 : 0);
                 prop.put("content_isProduct", contentCategory.equals("product") ? 1 : 0);
+                prop.put("content_isSoftware", contentCategory.equals("software") ? 1 : 0);
+                prop.put("content_isOrganization", contentCategory.equals("organization") ? 1 : 0);
                 prop.put("content_isEvent", contentCategory.equals("event") ? 1 : 0);
                 prop.put("content_isAudio", contentCategory.equals("audio") ? 1 : 0);
 
@@ -664,6 +737,7 @@ public class yacysearchitem {
             prop.put("content_description", desc);
             prop.putXML("content_description-xml", desc);
             prop.putJSON("content_description-json", desc);
+            prop.put("content_snippetLength", desc.length());
             prop.put("content_mimetype", result.mime()); // for atom <link> type attribute
             final HeuristicResult heuristic = theSearch.getHeuristic(result.hash());
             if (heuristic == null) {

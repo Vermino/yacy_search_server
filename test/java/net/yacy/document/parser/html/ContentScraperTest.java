@@ -436,15 +436,47 @@ public class ContentScraperTest {
 
 				Assert.assertEquals(expected.size(), scraper.getAnchors().size());
 				Assert.assertTrue(expected.containsAll(scraper.getAnchors()));
-			} finally {
-				scraper.close();
-			}
-		}
+                        } finally {
+                                scraper.close();
+                        }
+                }
+        }
+
+        @Test
+        public void testSchemaOrgTypesFromJsonLd() throws Exception {
+        final DigestURL docUrl = new DigestURL("http://test.org/jsonld.html");
+        final String html = "<html><head><script type=\"application/ld+json\">" +
+                "{\n" +
+                "  \"@context\": \"https://schema.org\",\n" +
+                "  \"@graph\": [\n" +
+                "    {\"@type\": \"https://schema.org/Recipe\", \"name\": \"Test Recipe\"},\n" +
+                "    {\"@type\": [\"HowTo\", \"Thing\"], \"name\": \"Nested HowTo\"}\n" +
+                "  ]\n" +
+                "}" +
+                "</script></head><body></body></html>";
+
+        final ContentScraper scraper = new ContentScraper(docUrl, 10, new HashSet<String>(), TagValency.EVAL, new VocabularyScraper(), 0);
+        try (Writer writer = new TransformerWriter(null, null, scraper, false)) {
+            FileUtils.copy(new StringReader(html), writer);
+        }
+
+        try {
+            final Set<String> schemaTypes = scraper.getSchemaOrgTypes();
+            Assert.assertTrue(schemaTypes.contains("Recipe"));
+            Assert.assertTrue(schemaTypes.contains("HowTo"));
+            Assert.assertTrue(schemaTypes.contains("Thing"));
+            Assert.assertEquals("Recipe", scraper.getSchemaOrgPrimaryType());
+
+            final Set<DigestURL> linkedTypes = scraper.getLinkedDataTypes();
+            Assert.assertTrue(linkedTypes.contains(new DigestURL("https://schema.org/Recipe")));
+        } finally {
+            scraper.close();
+        }
     }
-    
+
     /**
      * Test microdata itemtype attribute parsing
-     * @throws IOException 
+     * @throws IOException
      */
     @Test
     public void testParseMicroDataItemType() throws IOException {

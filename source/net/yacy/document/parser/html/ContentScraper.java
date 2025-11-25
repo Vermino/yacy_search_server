@@ -49,6 +49,11 @@ import java.util.regex.Pattern;
 
 import javax.swing.event.EventListenerList;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 import net.yacy.cora.date.ISO8601Formatter;
 import net.yacy.cora.document.id.AnchorURL;
 import net.yacy.cora.document.id.DigestURL;
@@ -223,6 +228,16 @@ public class ContentScraper extends AbstractScraper implements Scraper {
      */
     private final SizeLimitedSet<DigestURL> linkedDataTypes;
 
+    /**
+     * Normalized schema.org type names extracted from linked data annotations
+     */
+    private final Set<String> schemaOrgTypes;
+
+    /**
+     * Primary schema.org type selected using a simple priority list
+     */
+    private String schemaOrgPrimaryType;
+
     private final SizeLimitedMap<String, String> metas;
     private final SizeLimitedMap<String, DigestURL> hreflang, navigation;
     private final LinkedHashSet<String> titles;
@@ -231,6 +246,7 @@ public class ContentScraper extends AbstractScraper implements Scraper {
     // schema.org/Recipe structured data
     private String recipeName, recipeCookTime, recipePrepTime, recipeTotalTime;
     private String recipeYield, recipeCategory, recipeCuisine, recipeAuthor, recipeImage;
+    private String schemaMainImage;
     private Double recipeRating;
     private Integer recipeRatingCount;
     //private String headline;
@@ -312,6 +328,8 @@ public class ContentScraper extends AbstractScraper implements Scraper {
         this.frames = new SizeLimitedSet<>(maxLinks);
         this.iframes = new SizeLimitedSet<>(maxLinks);
         this.linkedDataTypes = new SizeLimitedSet<>(maxLinks);
+        this.schemaOrgTypes = new HashSet<>();
+        this.schemaOrgPrimaryType = null;
         this.metas = new SizeLimitedMap<>(maxLinks);
         this.hreflang = new SizeLimitedMap<>(maxLinks);
         this.navigation = new SizeLimitedMap<>(maxLinks);
@@ -332,6 +350,7 @@ public class ContentScraper extends AbstractScraper implements Scraper {
         this.recipeImage = null;
         this.recipeRating = null;
         this.recipeRatingCount = null;
+        this.schemaMainImage = null;
         this.headlines = (List<String>[]) Array.newInstance(ArrayList.class, 6);
         for (int i = 0; i < this.headlines.length; i++) this.headlines[i] = new ArrayList<>();
         this.bold = new ClusteredScoreMap<>(false);
@@ -665,6 +684,80 @@ public class ContentScraper extends AbstractScraper implements Scraper {
         return types;
     }
 
+    private void registerSchemaTypes(final Set<DigestURL> itemTypes) {
+        for (final DigestURL itemType : itemTypes) {
+            registerSchemaTypeName(itemType == null ? null : itemType.toNormalform(false));
+        }
+    }
+
+    private static String extractSchemaTypeName(final DigestURL typeUrl) {
+        if (typeUrl == null) {
+            return null;
+        }
+
+        String path = typeUrl.getPath();
+        if (path == null || path.isEmpty()) {
+            path = typeUrl.getFile();
+        }
+        if (path == null) {
+            return null;
+        }
+
+        final int slash = path.lastIndexOf('/') + 1;
+        String typeName = slash > 0 && slash < path.length() ? path.substring(slash) : path;
+        final int hash = typeName.lastIndexOf('#');
+        if (hash >= 0 && hash + 1 < typeName.length()) {
+            typeName = typeName.substring(hash + 1);
+        }
+
+        return typeName.isEmpty() ? null : typeName;
+    }
+
+    private void registerSchemaTypeName(final String rawType) {
+        if (rawType == null) {
+            return;
+        }
+
+        String typeName = rawType.trim();
+        if (typeName.isEmpty()) {
+            return;
+        }
+
+        try {
+            final DigestURL typeUrl = new DigestURL(typeName);
+            this.linkedDataTypes.add(typeUrl);
+            final String extracted = extractSchemaTypeName(typeUrl);
+            if (extracted != null) {
+                typeName = extracted;
+            }
+        } catch (final MalformedURLException ignored) {
+            /* Not an absolute URL, keep the raw type name */
+        }
+
+        if (this.schemaOrgTypes.add(typeName)) {
+            updatePrimarySchemaType();
+        }
+    }
+
+    private void updatePrimarySchemaType() {
+        final String[] priority = new String[]{
+            "Recipe", "HowTo", "FAQPage", "QAPage", "DiscussionForumPosting",
+            "Product", "SoftwareApplication", "VideoObject", "Article", "BlogPosting",
+            "NewsArticle", "Event", "Organization", "LocalBusiness"
+        };
+
+        for (final String candidate : priority) {
+            for (final String type : this.schemaOrgTypes) {
+                if (candidate.equalsIgnoreCase(type)) {
+                    this.schemaOrgPrimaryType = candidate;
+                    return;
+                }
+            }
+        }
+
+        this.schemaOrgPrimaryType = this.schemaOrgTypes.stream().findFirst().orElse(null);
+    }
+
     private void checkOpts(final Tag tag) {
         // vocabulary classes
         final String classprop = tag.opts.getProperty("class", EMPTY_STRING);
@@ -726,8 +819,9 @@ public class ContentScraper extends AbstractScraper implements Scraper {
                     case "author": // Recipe author (could be in <meta itemprop="author" content="...">)
                         if (this.recipeAuthor == null) this.recipeAuthor = propval;
                         break;
-                    case "image": // Recipe image URL
+                    case "image": // Schema/Recipe image URL
                         if (this.recipeImage == null) this.recipeImage = propval;
+                        if (this.schemaMainImage == null) this.schemaMainImage = propval;
                         break;
                     case "ratingValue": // Rating value (e.g., "4.5")
                         try {
@@ -1066,6 +1160,10 @@ public class ContentScraper extends AbstractScraper implements Scraper {
             h = cleanLine(CharacterCoding.html2unicode(stripAllTags(tag.content.getChars())));
             if (h.length() > 0) this.dd.add(h);
         } else if (tag.tagType == TagType.script) {
+            final String scriptType = tag.opts.getProperty("type", EMPTY_STRING);
+            if ("application/ld+json".equalsIgnoreCase(scriptType)) {
+                parseJsonLdTypes(new String(tag.content.getChars()));
+            }
             final String src = tag.opts.getProperty("src", EMPTY_STRING);
             if (src.length() > 0) {
                 final AnchorURL absoluteSrc = this.absolutePath(src);
@@ -1105,7 +1203,103 @@ public class ContentScraper extends AbstractScraper implements Scraper {
              * HTML microdata can be annotated on any kind of tag, so we don't restrict this
              * scraping to the limited sets in linkTags0 and linkTags1
              */
-            this.linkedDataTypes.addAll(this.parseMicrodataItemType(tag.opts));
+            final Set<DigestURL> itemTypes = this.parseMicrodataItemType(tag.opts);
+            this.registerSchemaTypes(itemTypes);
+        }
+    }
+
+    private void parseJsonLdTypes(final String jsonText) {
+        final String trimmed = jsonText == null ? null : jsonText.trim();
+        if (trimmed == null || trimmed.isEmpty()) {
+            return;
+        }
+
+        try {
+            final Object parsed = new JSONTokener(trimmed).nextValue();
+            extractJsonLdTypes(parsed);
+        } catch (final JSONException e) {
+            ConcurrentLog.warn("CONTENTSCRAPER", "Failed to parse JSON-LD: " + e.getMessage());
+        }
+    }
+
+    private void extractJsonLdTypes(final Object node) {
+        if (node instanceof JSONObject) {
+            final JSONObject obj = (JSONObject) node;
+            if (obj.has("@type")) {
+                addJsonLdType(obj.opt("@type"));
+            }
+
+            if (obj.has("image")) {
+                captureJsonLdImage(obj.opt("image"));
+            }
+
+            for (final Iterator<String> it = obj.keys(); it.hasNext();) {
+                final String key = it.next();
+                if ("@type".equals(key)) {
+                    continue;
+                }
+                final Object value = obj.opt(key);
+                if (value instanceof JSONObject || value instanceof JSONArray) {
+                    extractJsonLdTypes(value);
+                }
+            }
+        } else if (node instanceof JSONArray) {
+            final JSONArray array = (JSONArray) node;
+            for (int i = 0; i < array.length(); i++) {
+                final Object value = array.opt(i);
+                if (value instanceof JSONObject || value instanceof JSONArray) {
+                    extractJsonLdTypes(value);
+                }
+            }
+        }
+    }
+
+    private void captureJsonLdImage(final Object value) {
+        if (this.schemaMainImage != null || value == null) {
+            return;
+        }
+
+        if (value instanceof JSONArray) {
+            final JSONArray array = (JSONArray) value;
+            for (int i = 0; i < array.length() && this.schemaMainImage == null; i++) {
+                captureJsonLdImage(array.opt(i));
+            }
+        } else if (value instanceof JSONObject) {
+            final JSONObject imgObj = (JSONObject) value;
+            if (imgObj.has("url")) {
+                captureJsonLdImage(imgObj.opt("url"));
+            } else if (imgObj.has("contentUrl")) {
+                captureJsonLdImage(imgObj.opt("contentUrl"));
+            } else if (imgObj.has("@id")) {
+                captureJsonLdImage(imgObj.opt("@id"));
+            }
+        } else if (value instanceof String) {
+            final String candidate = ((String) value).trim();
+            if (!candidate.isEmpty()) {
+                this.schemaMainImage = candidate;
+                if (this.recipeImage == null && "Recipe".equalsIgnoreCase(this.schemaOrgPrimaryType)) {
+                    this.recipeImage = candidate;
+                }
+            }
+        }
+    }
+
+    private void addJsonLdType(final Object typeValue) {
+        if (typeValue instanceof JSONArray) {
+            final JSONArray types = (JSONArray) typeValue;
+            for (int i = 0; i < types.length(); i++) {
+                addJsonLdType(types.opt(i));
+            }
+        } else if (typeValue instanceof String) {
+            registerSchemaTypeName((String) typeValue);
+        } else if (typeValue instanceof JSONObject) {
+            final JSONObject typeObj = (JSONObject) typeValue;
+            if (typeObj.has("@id")) {
+                final Object idValue = typeObj.opt("@id");
+                if (idValue instanceof String) {
+                    registerSchemaTypeName((String) idValue);
+                }
+            }
         }
     }
 
@@ -1267,12 +1461,24 @@ public class ContentScraper extends AbstractScraper implements Scraper {
         return this.recipeImage;
     }
 
+    public String getSchemaMainImage() {
+        return this.schemaMainImage;
+    }
+
     public Double getRecipeRating() {
         return this.recipeRating;
     }
 
     public Integer getRecipeRatingCount() {
         return this.recipeRatingCount;
+    }
+
+    public Set<String> getSchemaOrgTypes() {
+        return new HashSet<>(this.schemaOrgTypes);
+    }
+
+    public String getSchemaOrgPrimaryType() {
+        return this.schemaOrgPrimaryType;
     }
 
     public DigestURL[] getFlash() {
@@ -1644,6 +1850,8 @@ public class ContentScraper extends AbstractScraper implements Scraper {
         this.frames.clear();
         this.iframes.clear();
         this.linkedDataTypes.clear();
+        this.schemaOrgTypes.clear();
+        this.schemaOrgPrimaryType = null;
         this.embeds.clear();
         this.images.clear();
         this.icons.clear();
@@ -1654,6 +1862,18 @@ public class ContentScraper extends AbstractScraper implements Scraper {
         this.articles.clear();
         this.startDates.clear();
         this.endDates.clear();
+        this.recipeName = null;
+        this.recipeCookTime = null;
+        this.recipePrepTime = null;
+        this.recipeTotalTime = null;
+        this.recipeYield = null;
+        this.recipeCategory = null;
+        this.recipeCuisine = null;
+        this.recipeAuthor = null;
+        this.recipeImage = null;
+        this.recipeRating = null;
+        this.recipeRatingCount = null;
+        this.schemaMainImage = null;
         this.headlines = null;
         this.bold.clear();
         this.italic.clear();
