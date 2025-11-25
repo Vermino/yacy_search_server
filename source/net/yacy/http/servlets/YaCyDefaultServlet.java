@@ -1184,6 +1184,55 @@ public class YaCyDefaultServlet extends HttpServlet  {
                     }
                 }
             }
+        } else if (targetLocalizedFile.exists() && targetLocalizedFile.isFile() && targetLocalizedFile.canRead()) {
+            /*
+             * When no dedicated servlet exists we still want to process the template so that SSI includes
+             * (for metas, headers, menus, etc.) are expanded. Serving the raw file would leave tokens
+             * like #%env/templates/header.template%# visible and break styling on admin pages.
+             */
+            final servletProperties templatePatterns = new servletProperties();
+
+            // add the application version, the uptime and the client name to every rewrite table
+            templatePatterns.put(servletProperties.PEER_STAT_VERSION, yacyBuildProperties.getVersion());
+            templatePatterns.put(servletProperties.PEER_STAT_UPTIME, ((System.currentTimeMillis() - sb.startupTime) / 1000) / 60); // uptime in minutes
+            templatePatterns.putHTML(servletProperties.PEER_STAT_CLIENTNAME, sb.peers.mySeed().getName());
+            templatePatterns.putHTML(servletProperties.PEER_STAT_CLIENTID, sb.peers.myID());
+            templatePatterns.put(servletProperties.PEER_STAT_MYTIME, GenericFormatter.SHORT_SECOND_FORMATTER.format());
+            templatePatterns.put(servletProperties.RELATIVE_BASE, YaCyDefaultServlet.getRelativeBase(target));
+            templatePatterns.put(SwitchboardConstants.REFERRER_META_POLICY, sb.getConfig(SwitchboardConstants.REFERRER_META_POLICY, SwitchboardConstants.REFERRER_META_POLICY_DEFAULT));
+
+            final boolean authorized = sb.adminAuthenticated(new RequestHeader(request)) >= 2;
+            templatePatterns.put("authorized", authorized ? 1 : 0);
+            templatePatterns.put("simpleheadernavbar", sb.getConfig("decoration.simpleheadernavbar", "navbar-default"));
+
+            final String mimeType = Classification.ext2mime(targetExt, MimeTypes.Type.TEXT_HTML.asString());
+            InputStream fis;
+            final long fileSize = targetLocalizedFile.length();
+            if (fileSize <= Math.min(4 * 1024 * 1204, MemoryControl.available() / 100)) {
+                fis = new ByteArrayInputStream(FileUtils.read(targetLocalizedFile));
+            } else {
+                fis = new BufferedInputStream(new FileInputStream(targetLocalizedFile));
+            }
+
+            response.setContentType(mimeType);
+            response.setStatus(HttpServletResponse.SC_OK);
+            final ByteArrayOutputStream bas = new ByteArrayOutputStream(4096);
+            try {
+                TemplateEngine.writeTemplate(targetLocalizedFile.getName(), fis, bas, templatePatterns);
+                this.parseSSI(bas.toByteArray(), request, response);
+            } finally {
+                try {
+                    fis.close();
+                } catch (final IOException ignored) {
+                    ConcurrentLog.warn("FILEHANDLER", "YaCyDefaultServlet: could not close target file " + targetLocalizedFile.getName());
+                }
+                try {
+                    bas.close();
+                } catch (final IOException ignored) {
+                    /* Should never happen with a ByteArrayOutputStream */
+                }
+            }
+            return;
         }
     }
 
