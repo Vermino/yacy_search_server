@@ -283,6 +283,17 @@ public class YaCyDefaultServlet extends HttpServlet  {
             // find resource
             resource = this.getResource(pathInContext);
 
+            // If the extension check above did not classify this as HTML-like,
+            // fall back to the resolved mime type so template processing still
+            // happens for template pages requested without an extension (or
+            // with uncommon extensions).
+            if (!isHtmlLike && resource != null && resource.exists()) {
+                final String mimeGuess = Classification.ext2mime(pathInContext, null);
+                if (mimeGuess != null && mimeGuess.startsWith(MimeTypes.Type.TEXT_HTML.asString())) {
+                    isHtmlLike = true;
+                }
+            }
+
             if (!hasClass && (resource == null || !resource.exists()) && !pathInContext.contains("..")) {
                 // try to get this in the alternative htDocsPath
             	if (resource != null) resource.close();
