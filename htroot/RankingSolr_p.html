@@ -9,6 +9,7 @@
     #%env/templates/submenuRanking.template%#
     <h2>Solr Ranking Configuration</h2>
     <p>These are ranking attributes for Solr. This ranking applies for internal and remote (P2P or shard) Solr access.</p>
+    <p>If you want to pre-rank structured results (recipes, how-tos, FAQ, products, events, etc.), add boosts for schema fields such as <code>schema_org_primary_type_s</code>, <code>schema_org_types_sxt</code>, or <code>schema_org_image_s</code> once those fields are present in your index (recrawl may be required).</p>
 
     <form action="RankingSolr_p.html" method="get" enctype="multipart/form-data" accept-charset="UTF-8">
     Select a profile:
