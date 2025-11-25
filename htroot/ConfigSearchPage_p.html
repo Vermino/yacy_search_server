@@ -331,6 +331,11 @@ var solr= $.getJSON("solr/collection1/select?q=*:*&start=0&rows=0&wt=json&facet=
 
                 <fieldset>
                   <legend>Structured snippets &amp; carousel</legend>
+                  <p class="info" style="margin-bottom: 8px;">
+                    Tip: to boost structured results ahead of generic matches, add pre-ranking boosts for schema fields
+                    on the <a href="RankingRWI_p.html" target="_blank" rel="noopener">RankingRWI</a> page (for example
+                    `schema_org_primary_type_s:10` or `schema_org_types_sxt:5`).
+                  </p>
                   <div class="form-group">
                     <label>
                       <input type="checkbox" name="search.result.badge.allowHeuristics" value="true" #(search.result.badge.allowHeuristics)#::checked="checked"#(/search.result.badge.allowHeuristics)# />
