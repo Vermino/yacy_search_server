@@ -724,7 +724,10 @@ public class CollectionConfiguration extends SchemaConfiguration implements Seri
             if (recipeCuisine != null) this.add(doc, CollectionSchema.recipe_cuisine_s, recipeCuisine);
             final String recipeAuthor = html.getRecipeAuthor();
             if (recipeAuthor != null) this.add(doc, CollectionSchema.recipe_author_s, recipeAuthor);
-            final String recipeImage = html.getRecipeImage();
+            String recipeImage = html.getRecipeImage();
+            if (recipeImage == null) {
+                recipeImage = html.getSchemaMainImage();
+            }
             if (recipeImage != null) this.add(doc, CollectionSchema.recipe_image_s, recipeImage);
             final Double recipeRating = html.getRecipeRating();
             if (recipeRating != null) doc.setField(CollectionSchema.recipe_rating_d.getSolrFieldName(), recipeRating.doubleValue());
@@ -735,6 +738,8 @@ public class CollectionConfiguration extends SchemaConfiguration implements Seri
             if (!schemaOrgTypes.isEmpty()) this.add(doc, CollectionSchema.schema_org_types_sxt, schemaOrgTypes.toArray(new String[schemaOrgTypes.size()]));
             final String primarySchemaType = html.getSchemaOrgPrimaryType();
             if (primarySchemaType != null) this.add(doc, CollectionSchema.schema_org_primary_type_s, primarySchemaType);
+            final String schemaMainImage = html.getSchemaMainImage();
+            if (schemaMainImage != null) this.add(doc, CollectionSchema.schema_org_image_s, schemaMainImage);
 
             final List<String> articles = html.getArticles();
             this.add(doc, CollectionSchema.articlecount_i, articles.size());

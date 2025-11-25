@@ -228,6 +228,7 @@ public enum CollectionSchema implements SchemaDeclaration {
     opengraph_type_s(SolrType.text_general, true, true, false, false, false, "Open Graph Metadata from og:type metadata field, see http://ogp.me/ns#"),
     opengraph_url_s(SolrType.text_general, true, true, false, false, false, "Open Graph Metadata from og:url metadata field, see http://ogp.me/ns#"),
     opengraph_image_s(SolrType.text_general, true, true, false, false, false, "Open Graph Metadata from og:image metadata field, see http://ogp.me/ns#"),
+    schema_org_image_s(SolrType.string, true, true, false, false, false, "primary image captured from schema.org markup"),
 
     // schema.org/Recipe structured data
     recipe_name_t(SolrType.text_general, true, true, false, false, true, "Recipe name from schema.org/Recipe or itemprop=name"),

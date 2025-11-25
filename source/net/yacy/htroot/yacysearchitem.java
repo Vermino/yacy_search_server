@@ -311,16 +311,24 @@ public class yacysearchitem {
                 prop.put("content_showTrustScore", sb.getConfigBool("search.result.show.trustscore", true) ? 1 : 0);
                 prop.put("content_showTrustScore_trustScore", String.format("%.0f", trustScore));
 
-                // Thumbnail URL (OpenGraph image or first image)
+                // Thumbnail URL (schema/recipe image, OpenGraph image, or first image)
                 String thumbnailUrl = "";
                 boolean showThumbnail = sb.getConfigBool("search.result.show.thumbnail", true);
+                final Object schemaImageObj = result.getFieldValue(CollectionSchema.schema_org_image_s.getSolrFieldName());
+                final String schemaImage = schemaImageObj != null ? schemaImageObj.toString() : "";
+                final Object recipeImageObj = result.getFieldValue(CollectionSchema.recipe_image_s.getSolrFieldName());
+                final String recipeImage = recipeImageObj != null ? recipeImageObj.toString() : "";
                 if (showThumbnail) {
-                    // Try OpenGraph image first
                     final Object ogImage = result.getFieldValue(CollectionSchema.opengraph_image_s.getSolrFieldName());
-                    if (ogImage != null && !ogImage.toString().isEmpty()) {
+                    // Prefer structured images over generic fallbacks
+                    if (!recipeImage.isEmpty()) {
+                        thumbnailUrl = recipeImage;
+                    } else if (!schemaImage.isEmpty()) {
+                        thumbnailUrl = schemaImage;
+                    } else if (ogImage != null && !ogImage.toString().isEmpty()) {
                         thumbnailUrl = ogImage.toString();
                     } else if (result.limage() > 0) {
-                        // Fall back to first image
+                        // Fall back to first image discovered on page
                         try {
                             thumbnailUrl = result.imageURL();
                         } catch (final UnsupportedOperationException e) {

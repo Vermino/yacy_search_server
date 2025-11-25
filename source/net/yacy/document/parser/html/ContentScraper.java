@@ -246,6 +246,7 @@ public class ContentScraper extends AbstractScraper implements Scraper {
     // schema.org/Recipe structured data
     private String recipeName, recipeCookTime, recipePrepTime, recipeTotalTime;
     private String recipeYield, recipeCategory, recipeCuisine, recipeAuthor, recipeImage;
+    private String schemaMainImage;
     private Double recipeRating;
     private Integer recipeRatingCount;
     //private String headline;
@@ -349,6 +350,7 @@ public class ContentScraper extends AbstractScraper implements Scraper {
         this.recipeImage = null;
         this.recipeRating = null;
         this.recipeRatingCount = null;
+        this.schemaMainImage = null;
         this.headlines = (List<String>[]) Array.newInstance(ArrayList.class, 6);
         for (int i = 0; i < this.headlines.length; i++) this.headlines[i] = new ArrayList<>();
         this.bold = new ClusteredScoreMap<>(false);
@@ -817,8 +819,9 @@ public class ContentScraper extends AbstractScraper implements Scraper {
                     case "author": // Recipe author (could be in <meta itemprop="author" content="...">)
                         if (this.recipeAuthor == null) this.recipeAuthor = propval;
                         break;
-                    case "image": // Recipe image URL
+                    case "image": // Schema/Recipe image URL
                         if (this.recipeImage == null) this.recipeImage = propval;
+                        if (this.schemaMainImage == null) this.schemaMainImage = propval;
                         break;
                     case "ratingValue": // Rating value (e.g., "4.5")
                         try {
@@ -1226,6 +1229,10 @@ public class ContentScraper extends AbstractScraper implements Scraper {
                 addJsonLdType(obj.opt("@type"));
             }
 
+            if (obj.has("image")) {
+                captureJsonLdImage(obj.opt("image"));
+            }
+
             for (final Iterator<String> it = obj.keys(); it.hasNext();) {
                 final String key = it.next();
                 if ("@type".equals(key)) {
@@ -1242,6 +1249,36 @@ public class ContentScraper extends AbstractScraper implements Scraper {
                 final Object value = array.opt(i);
                 if (value instanceof JSONObject || value instanceof JSONArray) {
                     extractJsonLdTypes(value);
+                }
+            }
+        }
+    }
+
+    private void captureJsonLdImage(final Object value) {
+        if (this.schemaMainImage != null || value == null) {
+            return;
+        }
+
+        if (value instanceof JSONArray) {
+            final JSONArray array = (JSONArray) value;
+            for (int i = 0; i < array.length() && this.schemaMainImage == null; i++) {
+                captureJsonLdImage(array.opt(i));
+            }
+        } else if (value instanceof JSONObject) {
+            final JSONObject imgObj = (JSONObject) value;
+            if (imgObj.has("url")) {
+                captureJsonLdImage(imgObj.opt("url"));
+            } else if (imgObj.has("contentUrl")) {
+                captureJsonLdImage(imgObj.opt("contentUrl"));
+            } else if (imgObj.has("@id")) {
+                captureJsonLdImage(imgObj.opt("@id"));
+            }
+        } else if (value instanceof String) {
+            final String candidate = ((String) value).trim();
+            if (!candidate.isEmpty()) {
+                this.schemaMainImage = candidate;
+                if (this.recipeImage == null && "Recipe".equalsIgnoreCase(this.schemaOrgPrimaryType)) {
+                    this.recipeImage = candidate;
                 }
             }
         }
@@ -1422,6 +1459,10 @@ public class ContentScraper extends AbstractScraper implements Scraper {
 
     public String getRecipeImage() {
         return this.recipeImage;
+    }
+
+    public String getSchemaMainImage() {
+        return this.schemaMainImage;
     }
 
     public Double getRecipeRating() {
@@ -1821,6 +1862,18 @@ public class ContentScraper extends AbstractScraper implements Scraper {
         this.articles.clear();
         this.startDates.clear();
         this.endDates.clear();
+        this.recipeName = null;
+        this.recipeCookTime = null;
+        this.recipePrepTime = null;
+        this.recipeTotalTime = null;
+        this.recipeYield = null;
+        this.recipeCategory = null;
+        this.recipeCuisine = null;
+        this.recipeAuthor = null;
+        this.recipeImage = null;
+        this.recipeRating = null;
+        this.recipeRatingCount = null;
+        this.schemaMainImage = null;
         this.headlines = null;
         this.bold.clear();
         this.italic.clear();

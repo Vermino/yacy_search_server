@@ -42,6 +42,11 @@
     The attributes are first normalized over all search results and then the normalized attribute is multiplied with the ranking coefficient computed from this list.
     The ranking coefficient grows exponentially with the ranking levels given in the following table. If you increase a single value by one, then the strength of the parameter doubles.
     </p>
+    <p class="info">
+      Looking for structured-result boosts (recipes, how-tos, FAQ, events, products)?
+      Use <a href="RankingSolr_p.html">Solr Ranking</a> to weight schema.org fields or adjust the
+      structured carousel/badge heuristics in <a href="ConfigSearchPage_p.html">Search Page</a>.
+    </p>
     <form class="dsearch" action="RankingRWI_p.html" method="post" enctype="multipart/form-data">
       <fieldset>
         <legend>Pre-Ranking</legend>
