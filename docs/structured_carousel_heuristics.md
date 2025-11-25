@@ -2,6 +2,11 @@
 
 This document describes how result badges differ from carousel eligibility and what backend signals we should expand to improve precision across schema.org types.
 
+**Admin shortcuts:** The new controls on `ConfigSearchPage_p` let you test stricter or more permissive rules without redeploying:
+- Require thumbnails and schema metadata before a card can be considered for a carousel.
+- Adjust the minimum snippet length and minimum candidate count used to render a carousel strip.
+- Toggle whether a relaxed fallback is allowed when strict candidates are missing.
+
 ## Badge vs. carousel
 - **Badges**: continue to light up when a result is classified into a content category (schema primary type or fallback heuristics). Badges are intentionally permissive so users can spot context quickly.
 - **Carousel entries**: require richer signals to avoid duplicating the same set of results. Cards are chosen only when they have a thumbnail and type-specific completeness (recipe meta, video meta, event date, etc.). If no results satisfy the strict checks, the carousel relaxes to the best available candidates but still demands a thumbnail and some metadata.

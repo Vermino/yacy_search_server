@@ -672,6 +672,25 @@ public final class SwitchboardConstants {
     /** Default setting value controlling whether the ranking score value should be displayed for each search result in the HTML results page */
     public static final boolean SEARCH_RESULT_SHOW_RANKING_DEFAULT = false;
 
+    /** Structured snippet and carousel tuning */
+    public static final String SEARCH_RICH_BADGE_ALLOW_HEURISTICS = "search.result.badge.allowHeuristics";
+    public static final boolean SEARCH_RICH_BADGE_ALLOW_HEURISTICS_DEFAULT = true;
+
+    public static final String SEARCH_RICH_CAROUSEL_REQUIRE_THUMBNAIL = "search.result.carousel.requireThumbnail";
+    public static final boolean SEARCH_RICH_CAROUSEL_REQUIRE_THUMBNAIL_DEFAULT = true;
+
+    public static final String SEARCH_RICH_CAROUSEL_REQUIRE_SCHEMA = "search.result.carousel.requireSchema";
+    public static final boolean SEARCH_RICH_CAROUSEL_REQUIRE_SCHEMA_DEFAULT = true;
+
+    public static final String SEARCH_RICH_CAROUSEL_ALLOW_RELAXED = "search.result.carousel.allowRelaxedFallback";
+    public static final boolean SEARCH_RICH_CAROUSEL_ALLOW_RELAXED_DEFAULT = true;
+
+    public static final String SEARCH_RICH_CAROUSEL_MIN_SNIPPET = "search.result.carousel.minSnippetLength";
+    public static final int SEARCH_RICH_CAROUSEL_MIN_SNIPPET_DEFAULT = 80;
+
+    public static final String SEARCH_RICH_CAROUSEL_MIN_RESULTS = "search.result.carousel.minResults";
+    public static final int SEARCH_RICH_CAROUSEL_MIN_RESULTS_DEFAULT = 2;
+
     /** Key of the setting controlling whether a tags/keywords list should be displayed for each search result in the HTML results page */
     public static final String SEARCH_RESULT_SHOW_KEYWORDS = "search.result.show.keywords";
 

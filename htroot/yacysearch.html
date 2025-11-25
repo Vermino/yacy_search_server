@@ -353,6 +353,14 @@ function initRichResultsCarousel() {
 
   if (!carousel || !track) return;
 
+  var carouselConfig = {
+    requireThumbnail: #[search.result.carousel.requireThumbnail]# == 1,
+    requireSchema: #[search.result.carousel.requireSchema]# == 1,
+    allowRelaxedFallback: #[search.result.carousel.allowRelaxedFallback]# == 1,
+    minSnippetLength: #[search.result.carousel.minSnippetLength]#,
+    minResults: #[search.result.carousel.minResults]#
+  };
+
   var typeConfigs = [
     { type: 'recipe', icon: 'glyphicon-cutlery', label: 'Recipes', overlay: false, meta: buildRecipeMeta },
     { type: 'video', icon: 'glyphicon-play-circle', label: 'Videos', overlay: true, meta: buildVideoMeta },
@@ -372,24 +380,35 @@ function initRichResultsCarousel() {
     return nodes.filter(function (node) {
       var dataset = node.dataset || {};
       var hasThumb = dataset.hasThumbnail === '1';
-      if (!hasThumb) return false;
+      if (carouselConfig.requireThumbnail && !hasThumb) return false;
       var hasSchema = dataset.hasSchema === '1';
       var snippetLength = parseInt(dataset.snippetLength || '0', 10);
       var hasRecipeMeta = dataset.hasRecipeMeta === '1';
       var hasVideoMeta = dataset.hasVideoMeta === '1';
       var hasEventDate = dataset.hasEventDate === '1';
 
-      var snippetThreshold = strict ? 80 : 40;
+      var snippetThresholdStrict = carouselConfig.minSnippetLength || 80;
+      var snippetThresholdRelaxed = Math.max(0, Math.floor(snippetThresholdStrict / 2));
+      var schemaRequired = carouselConfig.requireSchema && (strict || config.type === 'recipe' || config.type === 'video' || config.type === 'event');
 
       switch (config.type) {
         case 'recipe':
-          return hasThumb && ((strict && hasSchema && hasRecipeMeta) || (!strict && (hasRecipeMeta || hasSchema)));
+          if (schemaRequired && !hasSchema) return false;
+          if (strict) return hasRecipeMeta;
+          return hasRecipeMeta || (carouselConfig.allowRelaxedFallback && hasSchema);
         case 'video':
-          return hasThumb && ((strict && hasSchema && hasVideoMeta) || (!strict && (hasVideoMeta || hasSchema)));
+          if (schemaRequired && !hasSchema) return false;
+          if (strict) return hasVideoMeta;
+          return hasVideoMeta || (carouselConfig.allowRelaxedFallback && hasSchema);
         case 'event':
-          return hasThumb && ((strict && hasSchema && hasEventDate) || (!strict && (hasEventDate || hasSchema)));
+          if (schemaRequired && !hasSchema) return false;
+          if (strict) return hasEventDate;
+          return hasEventDate || (carouselConfig.allowRelaxedFallback && hasSchema);
         default:
-          return hasThumb && snippetLength >= snippetThreshold && (hasSchema || !strict);
+          var threshold = strict ? snippetThresholdStrict : snippetThresholdRelaxed;
+          if (snippetLength < threshold) return false;
+          if (schemaRequired && !hasSchema) return false;
+          return hasSchema || (!carouselConfig.requireSchema && carouselConfig.allowRelaxedFallback);
       }
     });
   }
@@ -399,19 +418,19 @@ function initRichResultsCarousel() {
     if (!nodes.length) return;
 
     var strictCandidates = filterCandidates(nodes, config, true);
-    var relaxedCandidates = filterCandidates(nodes, config, false);
+    var relaxedCandidates = carouselConfig.allowRelaxedFallback ? filterCandidates(nodes, config, false) : [];
 
-    if (!chosenType && strictCandidates.length >= 2) {
+    if (!chosenType && strictCandidates.length >= carouselConfig.minResults) {
       chosenType = config;
       results = strictCandidates;
-    } else if (!chosenType) {
+    } else if (!chosenType && carouselConfig.allowRelaxedFallback) {
       if (!bestFallback || relaxedCandidates.length > bestFallback.results.length) {
         bestFallback = { config: config, results: relaxedCandidates };
       }
     }
   });
 
-  if (!chosenType && bestFallback && bestFallback.results.length >= 2) {
+  if (!chosenType && bestFallback && bestFallback.results.length >= carouselConfig.minResults) {
     chosenType = bestFallback.config;
     results = bestFallback.results;
   }

@@ -2,6 +2,11 @@
 
 This quick guide explains where to tighten or relax structured-snippet eligibility in YaCy’s modern search UI.
 
+**UI controls:** Administrators can now tune these switches without touching code on `ConfigSearchPage_p`:
+- Allow or disable heuristic badges when no schema.org type is present (`search.result.badge.allowHeuristics`).
+- Require thumbnails and/or schema metadata before a result can enter the carousel (`search.result.carousel.requireThumbnail`, `search.result.carousel.requireSchema`).
+- Toggle relaxed fallback, snippet-length threshold, and the minimum number of cards needed to render a carousel (`search.result.carousel.allowRelaxedFallback`, `search.result.carousel.minSnippetLength`, `search.result.carousel.minResults`).
+
 ## Badges (result-level labels)
 Badges render whenever a result is classified into a `contentCategory`. To change what counts as a recipe/video/how-to/etc.:
 

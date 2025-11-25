@@ -347,6 +347,9 @@ public class yacysearchitem {
                 if (schemaPrimaryObj != null) {
                     schemaPrimaryType = schemaPrimaryObj.toString();
                 }
+                final boolean allowHeuristicBadges = sb.getConfigBool(
+                        SwitchboardConstants.SEARCH_RICH_BADGE_ALLOW_HEURISTICS,
+                        SwitchboardConstants.SEARCH_RICH_BADGE_ALLOW_HEURISTICS_DEFAULT);
                 final Set<String> schemaTypes = new HashSet<>();
                 final Collection<Object> schemaTypeValues = result.getFieldValues(CollectionSchema.schema_org_types_sxt.getSolrFieldName());
                 if (schemaTypeValues != null) {
@@ -402,7 +405,7 @@ public class yacysearchitem {
                     contentCategory = "video";
                 }
                 // Heuristic fallback classification (only when schema didn't provide a category)
-                else if (!hasSchemaContentCategory) {
+                else if (!hasSchemaContentCategory && allowHeuristicBadges) {
                     // How-to detection first to avoid misclassifying "how to" guides as recipes
                     if (titleLower.startsWith("how to ") || titleLower.contains(" how to ") ||
                         titleLower.contains("how-to") || resultUrlLower.contains("/how-to") ||
